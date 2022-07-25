@@ -27,12 +27,12 @@ export const runDbMigrations = async (connectionName = "default") => {
   await conn.runMigrations();
 };
 
-export const encryptPassword = async (password) => {
-  return await bcrypt.hash(password, 10);
+export const hash = async (value) => {
+  return await bcrypt.hash(value, 10);
 };
 
-export const comparePasswords = async (userPassword, currentPassword) => {
-  return await bcrypt.compare(currentPassword, userPassword);
+export const compare = async (newValue, hashedValue) => {
+  return await bcrypt.compare(hashedValue, newValue);
 };
 
 export const getAge = async (birthDate: Date) => {

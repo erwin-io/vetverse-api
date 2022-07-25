@@ -3938,7 +3938,7 @@
     "ecdsa-sig-formatter" "1.0.11"
     "safe-buffer" "^5.0.1"
 
-"jws@^3.2.2":
+"jws@^3.2.2", "jws@3.x.x":
   "integrity" "sha512-YHlZCB6lMTllWDtSPHz/ZXTsi8S00usEV6v1tjq8tOUZzw7DpSDWVXjXDre6ed1w/pd495ODpHZYSdkRTsa0HA=="
   "resolved" "https://registry.npmjs.org/jws/-/jws-3.2.2.tgz"
   "version" "3.2.2"
@@ -3952,14 +3952,6 @@
   "version" "4.0.0"
   dependencies:
     "jwa" "^2.0.0"
-    "safe-buffer" "^5.0.1"
-
-"jws@3.x.x":
-  "integrity" "sha512-YHlZCB6lMTllWDtSPHz/ZXTsi8S00usEV6v1tjq8tOUZzw7DpSDWVXjXDre6ed1w/pd495ODpHZYSdkRTsa0HA=="
-  "resolved" "https://registry.npmjs.org/jws/-/jws-3.2.2.tgz"
-  "version" "3.2.2"
-  dependencies:
-    "jwa" "^1.4.1"
     "safe-buffer" "^5.0.1"
 
 "keytar@^7.3.0":

@@ -1,8 +1,9 @@
+import { Users } from "./../../shared/entities/Users";
 import {
   CreateClientUserDto,
   CreateStaffUserDto,
 } from "./../users/dto/user.create.dto";
-import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
+import { Injectable, HttpException, HttpStatus, UnauthorizedException } from "@nestjs/common";
 import { CreateUserDto } from "../users/dto/user.create.dto";
 import { RegistrationStatus } from "./interfaces/regisration-status.interface";
 import { UsersService } from "../users/users.service";
@@ -11,6 +12,10 @@ import { LoginUserDto } from "../users/dto/user-login.dto";
 import { UserDto, UsernameDto } from "../users/dto/user.dto";
 import { JwtPayload } from "./interfaces/payload.interface";
 import { JwtService } from "@nestjs/jwt";
+import { TokenPayload } from "./interfaces/tokenPayload.interface";
+import * as fs from "fs";
+import * as path from "path";
+import { compare, hash } from "src/common/utils/utils";
 
 @Injectable()
 export class AuthService {
@@ -27,35 +32,88 @@ export class AuthService {
     return await this.usersService.createStaffUser(userDto);
   }
 
-  async login(loginUserDto: LoginUserDto) {
+  async login({ username, password }: LoginUserDto) {
     // find user in db
-    const user = await this.usersService.findByLogin(loginUserDto);
+    const user: Users = await this.usersService.findByLogin(username, password);
 
     // generate and sign token
-    const token = this._createToken(user);
+    const { userId } = user;
+    const accessToken: string = await this.getAccessToken(userId);
+    const refreshToken: string = await this.getRefreshToken(userId);
+
+    await this.updateRefreshTokenInUser(refreshToken, userId)
+
 
     return {
-      username: user.username,
-      ...token,
+      userId,
+      accessToken,
+      refreshToken,
     };
   }
 
-  async validateUser(payload: JwtPayload) {
-    const user = await this.usersService.findByPayload(payload);
-    if (!user) {
-      throw new HttpException("Invalid token", HttpStatus.UNAUTHORIZED);
-    }
-    return user;
+  async logOut(userId: string) {
+    await this.updateRefreshTokenInUser(null, userId);
   }
 
-  private _createToken({ username }: UsernameDto): any {
+  private getAccessToken(userId: string): any {
+    const secret = fs.readFileSync(
+      path.join(__dirname, "../../../private.key")
+    );
     const expiresIn = "1h";
 
-    const user: JwtPayload = { username };
-    const accessToken = this.jwtService.sign(user);
+    const user: JwtPayload = { userId };
+    const accessToken = this.jwtService.sign(user, {
+      secret: secret,
+      expiresIn: expiresIn,
+    });
+    return accessToken;
+  }
+
+  async getRefreshToken(userId: string) {
+    const secret = fs.readFileSync(
+      path.join(__dirname, "../../../refreshtoken.private.key")
+    );
+    const expiresIn = "1800s";
+
+    const user: JwtPayload = { userId };
+    const accessToken = this.jwtService.sign(user, {
+      secret: secret,
+      expiresIn: expiresIn,
+    });
+    return accessToken;
+  }
+
+  async updateRefreshTokenInUser(refreshToken, userId) {
+    if (refreshToken) {
+      refreshToken = await hash(refreshToken);
+    }
+
+    await this.usersService.setCurrentRefreshToken(refreshToken, userId);
+  }
+
+  async getNewAccessAndRefreshToken(userId: string) {
+    const refreshToken = await this.getRefreshToken(userId);
+    await this.updateRefreshTokenInUser(refreshToken, userId);
+
     return {
-      expiresIn,
-      accessToken,
+      accessToken: await this.getAccessToken(userId),
+      refreshToken: refreshToken,
     };
+  }
+
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: string) {
+    const result = await this.usersService.getRefreshTokenUserById(userId);
+
+    const isRefreshTokenMatching = await compare(
+      result.refresh_token,
+      refreshToken,
+    );
+
+    if (isRefreshTokenMatching) {
+      await this.updateRefreshTokenInUser(null, userId);
+      return result;
+    } else {
+      throw new UnauthorizedException();
+    }
   }
 }

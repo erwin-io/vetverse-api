@@ -24,6 +24,9 @@ export class Users {
   @Column("nvarchar", { name: "Password", length: 250 })
   password: string;
 
+  @Column("nvarchar", { name: "currentHashedRefreshToken", nullable: true })
+  currentHashedRefreshToken: string | null;
+
   @OneToMany(() => Clients, (clients) => clients.user)
   clients: Clients[];
 
