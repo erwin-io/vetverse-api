@@ -1,10 +1,10 @@
 <p align="center">
-  vetverse-api
+  <h1>vetverse-api</h1>
 </p>
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+[Nest](https://github.com/nestjs/nest) framework TypeScript api repository for vetverse application.
 
 ## Installation
 
