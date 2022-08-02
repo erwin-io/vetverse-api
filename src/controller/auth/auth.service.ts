@@ -16,6 +16,7 @@ import { TokenPayload } from "./interfaces/tokenPayload.interface";
 import * as fs from "fs";
 import * as path from "path";
 import { compare, hash } from "src/common/utils/utils";
+import { Staff } from "src/shared/entities/Staff";
 
 @Injectable()
 export class AuthService {
@@ -38,14 +39,39 @@ export class AuthService {
 
     // generate and sign token
     const { userId } = user;
+    const getInfo: any = await this.usersService.findById(userId);
     const accessToken: string = await this.getAccessToken(userId);
     const refreshToken: string = await this.getRefreshToken(userId);
 
     await this.updateRefreshTokenInUser(refreshToken, userId)
-
-
+    const userType = getInfo.user.userType;
+    const fullName = getInfo.firtstName + ' ' + (getInfo.MiddleName !== undefined ? getInfo.MiddleName + ' ' +  getInfo.lastName: getInfo.lastName);
+    const
+    {
+      firtstName,
+      middleName,
+      lastName,
+      email,
+      mobileNumber,
+      address,
+      birthDate,
+      age,
+      gender
+    } = getInfo;
     return {
       userId,
+      username,
+      userType,
+      fullName,
+      firtstName,
+      middleName,
+      lastName,
+      email,
+      mobileNumber,
+      address,
+      birthDate,
+      age,
+      gender,
       accessToken,
       refreshToken,
     };

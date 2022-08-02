@@ -6,7 +6,6 @@ import { AuthService } from "./auth.service";
 import { Strategy } from "passport-local";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "src/shared/entities/Users";
-import { Repository } from "typeorm";
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -17,7 +16,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(username: string, password: string) {
     // class is constructed but this method is never called
     const login = { username, password };
-    const user: UserDto = await this.authService.login({ username, password });
+    const user: any = await this.authService.login({ username, password });
 
     if (!user) {
       throw new UnauthorizedException();
