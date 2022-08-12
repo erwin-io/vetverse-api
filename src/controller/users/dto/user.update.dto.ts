@@ -1,6 +1,7 @@
-import { IsNotEmpty, IsEmail, IsDate } from "class-validator";
+import { IsNotEmpty, IsEmail, IsDate, IsBoolean } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
-import { Type } from "class-transformer";
+import { Transform, Type } from "class-transformer";
+import { ToBoolean } from "src/common/helper/env.helper";
 
 export class UserDto {
   @ApiProperty()
@@ -14,10 +15,21 @@ export class UsernameDto extends UserDto {
   username: string;
 }
 
-export class StaffUserDto extends UserDto {
+export class ToggleEnableDto extends UserDto {
+  @ApiProperty({ required: false, default: true })
+  @IsBoolean()
+  @Transform(
+    (value: any) =>
+      value === "true" || value === true || value === 1 || value === "1"
+  )
+  @ToBoolean()
+  enable = true;
+}
+
+export class UpdateStaffUserDto extends UserDto {
   @ApiProperty()
   @IsNotEmpty()
-  firtstName: string;
+  firstName: string;
 
   @ApiProperty()
   middleName: string;
@@ -42,12 +54,16 @@ export class StaffUserDto extends UserDto {
   @ApiProperty()
   @IsNotEmpty()
   genderId: string;
-}
 
-export class ClientUserDto extends UserDto {
   @ApiProperty()
   @IsNotEmpty()
-  firtstName: string;
+  roleIds: string;
+}
+
+export class UpdateClientUserDto extends UserDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  firstName: string;
 
   @ApiProperty()
   middleName: string;

@@ -1,4 +1,4 @@
-import { UsersService } from './../users/users.service';
+import { UsersService } from "./../users/users.service";
 import { Module } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LocalStrategy } from "./local.strategy";
@@ -11,18 +11,16 @@ import * as fs from "fs";
 import * as path from "path";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Users } from "src/shared/entities/Users";
+import { Roles } from "src/shared/entities/Roles";
+import { RolesModule } from "../roles/roles.module";
 
 @Module({
   imports: [
     UsersModule,
+    RolesModule,
     PassportModule.register({}),
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Users])
-    // PassportModule,
-    // JwtModule.register({
-    //   secret: fs.readFileSync(path.join(__dirname, "../../../private.key")),
-    //   signOptions: { expiresIn: "2h" },
-    // }),
+    TypeOrmModule.forFeature([Users, Roles]),
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],

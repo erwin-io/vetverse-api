@@ -5,20 +5,20 @@ import {
   Post,
   Body,
   Put,
-  Delete,
-  UsePipes,
   UseGuards,
-  Req,
   Query,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 // import { AuthGuard } from '@nestjs/passport';
-import { ClientUserDto, StaffUserDto, UserDto } from "./dto/user.dto";
+import {
+  ToggleEnableDto,
+  UpdateClientUserDto,
+  UpdateStaffUserDto,
+} from "./dto/user.update.dto";
 import { CustomResponse } from "./../../common/helper/customresponse.helpers";
-import { CreateStaffUserDto, CreateUserDto } from "./dto/user.create.dto";
-import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { CreateStaffUserDto } from "./dto/user.create.dto";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/jwt.auth.guard";
-import { SelectQuery } from "typeorm/query-builder/SelectQuery";
 
 @ApiTags("users")
 @Controller("users")
@@ -28,14 +28,16 @@ export class UsersController {
 
   @Get()
   @ApiQuery({
-    name: "usertypeId",
+    name: "userTypeId",
     description: "Gets the User type id",
+    required: true,
+    type: String,
   })
   @UseGuards(JwtAuthGuard)
-  async findAll(@Query("usertypeId") usertypeId?) {
+  async findAll(@Query("userTypeId") userTypeId?) {
     const res: CustomResponse = {};
     try {
-      res.data = await this.userService.findAll(usertypeId);
+      res.data = await this.userService.findAll(userTypeId);
       res.success = true;
       return res;
     } catch (e) {
@@ -77,7 +79,7 @@ export class UsersController {
 
   @Put("/client")
   @UseGuards(JwtAuthGuard)
-  async updateClientUser(@Body() clientUserDto: ClientUserDto) {
+  async updateClientUser(@Body() clientUserDto: UpdateClientUserDto) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
@@ -93,11 +95,30 @@ export class UsersController {
 
   @Put("/staff")
   @UseGuards(JwtAuthGuard)
-  async updateStaffUser(@Body() staffUserDto: StaffUserDto) {
+  async updateStaffUser(@Body() staffUserDto: UpdateStaffUserDto) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
       res.data = await this.userService.updateStaffUser(staffUserDto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Put("/toggleEnable")
+  @UseGuards(JwtAuthGuard)
+  async toggleEnable(@Body() toggleEnableDto: ToggleEnableDto) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.userService.toggleEnable(
+        toggleEnableDto.enable,
+        Number(toggleEnableDto.userId)
+      );
       res.success = true;
       return res;
     } catch (e) {

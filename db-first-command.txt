@@ -1,0 +1,1 @@
+npx typeorm-model-generator -h localhost -d vetversedb -u sa -x admin123 -e mssql -o src/shared

@@ -1,10 +1,15 @@
-import { UserDto } from "./../users/dto/user.dto";
-import {
-  CreateClientUserDto,
-  CreateStaffUserDto,
-} from "./../users/dto/user.create.dto";
+import { UserDto } from "../users/dto/user.update.dto";
+import { ClientUserDto, StaffUserDto } from "./../users/dto/user.create.dto";
 import { LocalAuthGuard } from "./local.auth.guard";
-import { Controller, Body, Post, Get, Req, UseGuards } from "@nestjs/common";
+import {
+  Controller,
+  Body,
+  Post,
+  Get,
+  Req,
+  UseGuards,
+  Param,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LoginUserDto } from "../users/dto/user-login.dto";
 import { JwtPayload } from "./interfaces/payload.interface";
@@ -20,7 +25,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post("register/client")
-  public async registerClient(@Body() createUserDto: CreateClientUserDto) {
+  public async registerClient(@Body() createUserDto: ClientUserDto) {
     const res: CustomResponse = {};
     try {
       res.data = await this.authService.registerClient(createUserDto);
@@ -34,7 +39,7 @@ export class AuthController {
   }
 
   @Post("register/staff")
-  public async registerStaff(@Body() createUserDto: CreateStaffUserDto) {
+  public async registerStaff(@Body() createUserDto: StaffUserDto) {
     const res: CustomResponse = {};
     try {
       res.data = await this.authService.registerStaff(createUserDto);
@@ -61,6 +66,21 @@ export class AuthController {
       return res;
     }
   }
+  
+  @Get("/findByUsername/:username")
+  async findByUsername(@Param("username") username: string) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.authService.findByUserName(username);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -83,13 +103,12 @@ export class AuthController {
   public async testAuth(@Req() req: any): Promise<JwtPayload> {
     return req.user;
   }
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+
   @Post("/refresh-token")
-  async refreshToken(@GetUser() data: UserDto, @Body() token: RefreshTokenDto) {
+  async refreshToken(@Body() token: RefreshTokenDto) {
     const result = await this.authService.getUserIfRefreshTokenMatches(
       token.refresh_token,
-      data.userId,
+      token.userId,
     );
     if (result) {
       return this.authService.getNewAccessAndRefreshToken(result.userId);

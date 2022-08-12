@@ -1,4 +1,3 @@
-import { UserDto } from './../users/dto/user.dto';
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { PassportStrategy } from "@nestjs/passport";
 import { Injectable, UnauthorizedException } from "@nestjs/common";

@@ -7,6 +7,9 @@ import { Users } from "./../entities/Users";
 import { Injectable, Inject } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmOptionsFactory, TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { Roles } from "../entities/Roles";
+import { PetType } from "../entities/PetType";
+import { PetCategory } from "../entities/PetCategory";
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -21,7 +24,17 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       database: this.config.get<string>("DATABASE_NAME"),
       username: this.config.get<string>("DATABASE_USER"),
       password: this.config.get<string>("DATABASE_PASSWORD"),
-      entities: [Users, Clients, Staff, Gender, UserType, EntityStatus],
+      entities: [
+        Users,
+        Roles,
+        Clients,
+        Staff,
+        PetType,
+        PetCategory,
+        Gender,
+        UserType,
+        EntityStatus,
+      ],
       synchronize: false, // never use TRUE in production!
       options: { encrypt: false },
     };

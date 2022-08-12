@@ -6,8 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Gender } from "./Gender";
 import { Users } from "./Users";
+import { Gender } from "./Gender";
 
 @Index("PK_Clients", ["clientId"], { unique: true })
 @Entity("Clients", { schema: "dbo" })
@@ -15,8 +15,8 @@ export class Clients {
   @PrimaryGeneratedColumn({ type: "bigint", name: "ClientId" })
   clientId: string;
 
-  @Column("nvarchar", { name: "FirtstName", length: 250 })
-  firtstName: string;
+  @Column("nvarchar", { name: "FirstName", length: 250 })
+  firstName: string;
 
   @Column("nvarchar", { name: "MiddleName", nullable: true, length: 250 })
   middleName: string | null;
@@ -39,11 +39,11 @@ export class Clients {
   @Column("bigint", { name: "Age" })
   age: string;
 
-  @ManyToOne(() => Gender, (gender) => gender.clients)
-  @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
-  gender: Gender;
-
   @ManyToOne(() => Users, (users) => users.clients)
   @JoinColumn([{ name: "UserId", referencedColumnName: "userId" }])
   user: Users;
+
+  @ManyToOne(() => Gender, (gender) => gender.clients)
+  @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
+  gender: Gender;
 }

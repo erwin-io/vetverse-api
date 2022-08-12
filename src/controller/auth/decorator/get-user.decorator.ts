@@ -1,4 +1,4 @@
-import { UserDto } from "./../../users/dto/user.dto";
+import { UserDto } from "../../users/dto/user.update.dto";
 import { createParamDecorator, ExecutionContext } from "@nestjs/common";
 
 export const GetUser = createParamDecorator(

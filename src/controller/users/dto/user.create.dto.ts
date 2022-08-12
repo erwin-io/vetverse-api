@@ -12,10 +12,10 @@ export class CreateUserDto {
   password: string;
 }
 
-export class CreateStaffUserDto extends CreateUserDto {
+export class StaffUserDto extends CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
-  firtstName: string;
+  firstName: string;
 
   @ApiProperty()
   middleName: string;
@@ -42,10 +42,16 @@ export class CreateStaffUserDto extends CreateUserDto {
   genderId: string;
 }
 
-export class CreateClientUserDto extends CreateUserDto {
+export class CreateStaffUserDto extends StaffUserDto {
   @ApiProperty()
   @IsNotEmpty()
-  firtstName: string;
+  roleIds: string;
+}
+
+export class ClientUserDto extends CreateUserDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  firstName: string;
 
   @ApiProperty()
   middleName: string;

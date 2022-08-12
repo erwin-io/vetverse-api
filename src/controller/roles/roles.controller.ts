@@ -1,0 +1,101 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
+import { ApiTags, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+import { CustomResponse } from "src/common/helper/customresponse.helpers";
+import { JwtAuthGuard } from "../auth/jwt.auth.guard";
+import { RoleDto } from "./dto/role.dtos";
+import { CreateRoleDto } from "./dto/roles.create.dto";
+import { RolesService } from "./roles.service";
+
+@ApiTags("roles")
+@Controller("roles")
+@ApiBearerAuth()
+export class RolesController {
+  constructor(private readonly rolesService: RolesService) {}
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async findAll() {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.rolesService.findAll();
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Get(":roleId")
+  @UseGuards(JwtAuthGuard)
+  async findOne(@Param("roleId") roleId: string) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.rolesService.findById(roleId);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Post("")
+  @UseGuards(JwtAuthGuard)
+  async add(@Body() createRoleDto: CreateRoleDto) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.rolesService.add(createRoleDto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Put("")
+  @UseGuards(JwtAuthGuard)
+  async updateClientUser(@Body() roleDto: RoleDto) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.rolesService.update(roleDto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Delete(":roleId")
+  @UseGuards(JwtAuthGuard)
+  async delete(@Param("roleId") roleId: string) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.rolesService.delete(roleId);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+}

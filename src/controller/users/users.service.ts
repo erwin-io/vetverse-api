@@ -1,9 +1,17 @@
 import { Clients } from "../../shared/entities/Clients";
-import { ClientUserDto, StaffUserDto, UserDto } from "./dto/user.dto";
+import {
+  UpdateClientUserDto,
+  UpdateStaffUserDto,
+  UserDto,
+} from "./dto/user.update.dto";
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, Repository } from "typeorm";
-import { CreateClientUserDto, CreateStaffUserDto } from "./dto/user.create.dto";
+import {
+  ClientUserDto,
+  CreateStaffUserDto,
+  StaffUserDto,
+} from "./dto/user.create.dto";
 import { compare, hash, getAge } from "../../common/utils/utils";
 import { Users } from "src/shared/entities/Users";
 import { Gender } from "src/shared/entities/Gender";
@@ -25,7 +33,13 @@ export class UsersService {
         .innerJoinAndSelect("s.user", "u")
         .innerJoinAndSelect("u.userType", "ut");
       const result = await query.getMany();
-      result.map((e: Staff) => {
+      result.map((e: any) => {
+        e.fullName =
+          e.firstName +
+          " " +
+          (e.MiddleName !== undefined
+            ? e.MiddleName + " " + e.lastName
+            : e.lastName);
         e.user = this._sanitizeUser(e.user);
         return e;
       });
@@ -37,8 +51,13 @@ export class UsersService {
         .innerJoinAndSelect("c.user", "u")
         .innerJoinAndSelect("u.userType", "ut");
       const result = await query.getMany();
-
-      result.map((e: Clients) => {
+      result.map((e: any) => {
+        e.fullName =
+          e.firstName +
+          " " +
+          (e.MiddleName !== undefined
+            ? e.MiddleName + " " + e.lastName
+            : e.lastName);
         e.user = this._sanitizeUser(e.user);
         return e;
       });
@@ -66,21 +85,33 @@ export class UsersService {
         : true;
     const userTypeId = user.userType.userTypeId;
     if (Number(userTypeId) === 1) {
-      const result = await entityManager.findOne(Staff, {
+      const result: any = await entityManager.findOne(Staff, {
         where: {
           user: options,
         },
         relations: ["user", "gender"],
       });
+      result.fullName =
+        result.firstName +
+        " " +
+        (result.MiddleName !== undefined
+          ? result.MiddleName + " " + result.lastName
+          : result.lastName);
       result.user = sanitizeUser ? this._sanitizeUser(user) : result.user;
       return result;
     } else {
-      const result = await entityManager.findOne(Clients, {
+      const result: any = await entityManager.findOne(Clients, {
         where: {
           user: options,
         },
         relations: ["user", "gender"],
       });
+      result.fullName =
+        result.firstName +
+        " " +
+        (result.MiddleName !== undefined
+          ? result.MiddleName + " " + result.lastName
+          : result.lastName);
       result.user = sanitizeUser ? this._sanitizeUser(user) : result.user;
       return result;
     }
@@ -94,6 +125,16 @@ export class UsersService {
     return result;
   }
 
+  async findByUsername(username) {
+    const result = await this.findOne(
+      { username },
+      false,
+      this.userRepo.manager
+    );
+    if (result === (null || undefined)) return null;
+    return this._sanitizeUser(result.user);
+  }
+
   async findByLogin(username, password) {
     const result = await this.findOne(
       { username },
@@ -103,6 +144,9 @@ export class UsersService {
     if (!result) {
       throw new HttpException("Username not found", HttpStatus.NOT_FOUND);
     }
+    if (!result.user.enable) {
+      throw new HttpException("Yout account has been disabled", HttpStatus.OK);
+    }
     const areEqual = await compare(result.user.password, password);
     if (!areEqual) {
       throw new HttpException("Invalid credentials", HttpStatus.NOT_ACCEPTABLE);
@@ -110,7 +154,7 @@ export class UsersService {
     return this._sanitizeUser(result.user);
   }
 
-  async createClientUser(userDto: CreateClientUserDto) {
+  async registerClientUser(userDto: ClientUserDto) {
     const { username } = userDto;
     return await this.userRepo.manager.transaction(async (entityManager) => {
       const userInDb = await this.findOne({ username }, false, entityManager);
@@ -127,7 +171,7 @@ export class UsersService {
       user = await entityManager.save(Users, user);
       let client = new Clients();
       client.user = user;
-      client.firtstName = userDto.firtstName;
+      client.firstName = userDto.firstName;
       client.middleName = userDto.middleName;
       client.lastName = userDto.lastName;
       client.email = userDto.email;
@@ -143,7 +187,7 @@ export class UsersService {
     });
   }
 
-  async createStaffUser(userDto: CreateStaffUserDto) {
+  async registerStaffUser(userDto: StaffUserDto) {
     const { username } = userDto;
 
     return await this.userRepo.manager.transaction(async (entityManager) => {
@@ -161,7 +205,7 @@ export class UsersService {
       user = await entityManager.save(Users, user);
       let staff = new Staff();
       staff.user = user;
-      staff.firtstName = userDto.firtstName;
+      staff.firstName = userDto.firstName;
       staff.middleName = userDto.middleName;
       staff.lastName = userDto.lastName;
       staff.email = userDto.email;
@@ -175,7 +219,40 @@ export class UsersService {
     });
   }
 
-  async updateClientUser(userDto: ClientUserDto) {
+  async createStaffUser(userDto: CreateStaffUserDto) {
+    const { username } = userDto;
+
+    return await this.userRepo.manager.transaction(async (entityManager) => {
+      const userInDb = await this.findOne({ username }, false, entityManager);
+      if (userInDb) {
+        throw new HttpException("Username already exist", HttpStatus.CONFLICT);
+      }
+      let user = new Users();
+      user.username = userDto.username;
+      user.password = await hash(userDto.password);
+      user.userType = new UserType();
+      user.userType.userTypeId = "1";
+      user.roleIds = userDto.roleIds;
+      user.entityStatus = new EntityStatus();
+      user.entityStatus.entityStatusId = "1";
+      user = await entityManager.save(Users, user);
+      let staff = new Staff();
+      staff.user = user;
+      staff.firstName = userDto.firstName;
+      staff.middleName = userDto.middleName;
+      staff.lastName = userDto.lastName;
+      staff.email = userDto.email;
+      staff.mobileNumber = userDto.mobileNumber;
+      staff.address = userDto.address;
+      staff.gender = new Gender();
+      staff.gender.genderId = userDto.genderId;
+      staff = await entityManager.save(Staff, staff);
+      staff.user = await this._sanitizeUser(user);
+      return staff;
+    });
+  }
+
+  async updateClientUser(userDto: UpdateClientUserDto) {
     const userId = userDto.userId;
 
     return await this.userRepo.manager.transaction(async (entityManager) => {
@@ -190,7 +267,7 @@ export class UsersService {
       if (!client) {
         throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
       }
-      client.firtstName = userDto.firtstName;
+      client.firstName = userDto.firstName;
       client.middleName = userDto.middleName;
       client.lastName = userDto.lastName;
       client.email = userDto.email;
@@ -208,7 +285,7 @@ export class UsersService {
     });
   }
 
-  async updateStaffUser(userDto: StaffUserDto) {
+  async updateStaffUser(userDto: UpdateStaffUserDto) {
     const userId = userDto.userId;
 
     return await this.userRepo.manager.transaction(async (entityManager) => {
@@ -224,7 +301,15 @@ export class UsersService {
       if (!staff) {
         throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
       }
-      staff.firtstName = userDto.firtstName;
+      let user = staff.user;
+      user.roleIds = userDto.roleIds;
+      const roles =
+        userDto.roleIds !== undefined || userDto.roleIds !== null
+          ? userDto.roleIds.split(",")
+          : [];
+      user.isAdminApproved = roles.length > 0;
+      user = await entityManager.save(Users, user);
+      staff.firstName = userDto.firstName;
       staff.middleName = userDto.middleName;
       staff.lastName = userDto.lastName;
       staff.email = userDto.email;
@@ -258,6 +343,14 @@ export class UsersService {
     await this.userRepo.update(userId, {
       currentHashedRefreshToken,
     });
+  }
+
+  async toggleEnable(enable: boolean, userId: number) {
+    await this.userRepo.update(userId, {
+      enable,
+    });
+    
+    return await this.findOne({ userId }, true, this.userRepo.manager);
   }
 
   private _sanitizeUser(user: Users) {

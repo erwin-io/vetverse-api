@@ -15,8 +15,8 @@ export class Staff {
   @PrimaryGeneratedColumn({ type: "bigint", name: "Staffid" })
   staffid: string;
 
-  @Column("nvarchar", { name: "FirtstName", length: 250 })
-  firtstName: string;
+  @Column("nvarchar", { name: "FirstName", length: 250 })
+  firstName: string;
 
   @Column("nvarchar", { name: "MiddleName", nullable: true, length: 250 })
   middleName: string | null;

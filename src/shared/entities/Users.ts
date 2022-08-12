@@ -27,6 +27,15 @@ export class Users {
   @Column("nvarchar", { name: "currentHashedRefreshToken", nullable: true })
   currentHashedRefreshToken: string | null;
 
+  @Column("bit", { name: "IsAdminApproved", default: () => "(0)" })
+  isAdminApproved: boolean;
+
+  @Column("text", { name: "RoleIds", nullable: true })
+  roleIds: string | null;
+
+  @Column("bit", { name: "Enable", default: () => "(1)" })
+  enable: boolean;
+
   @OneToMany(() => Clients, (clients) => clients.user)
   clients: Clients[];
 

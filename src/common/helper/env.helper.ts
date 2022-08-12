@@ -1,3 +1,4 @@
+import { Transform } from "class-transformer";
 import { existsSync } from "fs";
 import { resolve } from "path";
 
@@ -12,4 +13,8 @@ export function getEnvPath(dest: string): string {
   }
 
   return filePath;
+}
+
+export function ToBoolean(): (target: any, key: string) => void {
+  return Transform((value: any) => value.obj[value.key]);
 }
