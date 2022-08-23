@@ -12,12 +12,19 @@ import {
   CreateStaffUserDto,
   StaffUserDto,
 } from "./dto/user.create.dto";
-import { compare, hash, getAge } from "../../common/utils/utils";
-import { Users } from "src/shared/entities/Users";
-import { Gender } from "src/shared/entities/Gender";
-import { Staff } from "src/shared/entities/Staff";
-import { UserType } from "src/shared/entities/UserType";
-import { EntityStatus } from "src/shared/entities/EntityStatus";
+import {
+  compare,
+  hash,
+  getAge,
+  APP_ROLE_GUEST,
+  isStaffRegistrationApproved,
+} from "../../common/utils/utils";
+import { Users } from "../../shared/entities/Users";
+import { Gender } from "../../shared/entities/Gender";
+import { Staff } from "../../shared/entities/Staff";
+import { UserType } from "../../shared/entities/UserType";
+import { EntityStatus } from "../../shared/entities/EntityStatus";
+import { Roles } from "../../shared/entities/Roles";
 
 @Injectable()
 export class UsersService {
@@ -31,6 +38,7 @@ export class UsersService {
         .createQueryBuilder("Staff", "s")
         .innerJoinAndSelect("s.gender", "g")
         .innerJoinAndSelect("s.user", "u")
+        .innerJoinAndSelect("u.role", "r")
         .innerJoinAndSelect("u.userType", "ut");
       const result = await query.getMany();
       result.map((e: any) => {
@@ -49,6 +57,7 @@ export class UsersService {
         .createQueryBuilder("Clients", "c")
         .innerJoinAndSelect("c.gender", "g")
         .innerJoinAndSelect("c.user", "u")
+        .innerJoinAndSelect("u.role", "r")
         .innerJoinAndSelect("u.userType", "ut");
       const result = await query.getMany();
       result.map((e: any) => {
@@ -72,7 +81,7 @@ export class UsersService {
   ) {
     const user: any = await entityManager.findOne(Users, {
       where: options,
-      relations: ["userType"],
+      relations: ["userType", "role"],
     });
     if (!user) {
       return;
@@ -98,6 +107,8 @@ export class UsersService {
           ? result.MiddleName + " " + result.lastName
           : result.lastName);
       result.user = sanitizeUser ? this._sanitizeUser(user) : result.user;
+      if (result.user.role.roleId === APP_ROLE_GUEST.toString())
+        result.user.role.roleId = null;
       return result;
     } else {
       const result: any = await entityManager.findOne(Clients, {
@@ -113,6 +124,8 @@ export class UsersService {
           ? result.MiddleName + " " + result.lastName
           : result.lastName);
       result.user = sanitizeUser ? this._sanitizeUser(user) : result.user;
+      if (result.user.role.roleId === APP_ROLE_GUEST.toString())
+        result.user.role.roleId = null;
       return result;
     }
   }
@@ -166,6 +179,8 @@ export class UsersService {
       user.password = await hash(userDto.password);
       user.userType = new UserType();
       user.userType.userTypeId = "2";
+      user.role = new Roles();
+      user.role.roleId = APP_ROLE_GUEST.toString();
       user.entityStatus = new EntityStatus();
       user.entityStatus.entityStatusId = "1";
       user = await entityManager.save(Users, user);
@@ -201,6 +216,8 @@ export class UsersService {
       user.userType = new UserType();
       user.userType.userTypeId = "1";
       user.entityStatus = new EntityStatus();
+      user.role = new Roles();
+      user.role.roleId = APP_ROLE_GUEST.toString();
       user.entityStatus.entityStatusId = "1";
       user = await entityManager.save(Users, user);
       let staff = new Staff();
@@ -232,8 +249,9 @@ export class UsersService {
       user.password = await hash(userDto.password);
       user.userType = new UserType();
       user.userType.userTypeId = "1";
-      user.roleIds = userDto.roleIds;
       user.entityStatus = new EntityStatus();
+      user.role = new Roles();
+      user.role.roleId = APP_ROLE_GUEST.toString();
       user.entityStatus.entityStatusId = "1";
       user = await entityManager.save(Users, user);
       let staff = new Staff();
@@ -302,12 +320,10 @@ export class UsersService {
         throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
       }
       let user = staff.user;
-      user.roleIds = userDto.roleIds;
-      const roles =
-        userDto.roleIds !== undefined || userDto.roleIds !== null
-          ? userDto.roleIds.split(",")
-          : [];
-      user.isAdminApproved = roles.length > 0;
+      user.role.roleId = userDto.roleId;
+      user.isAdminApproved = isStaffRegistrationApproved(
+        Number(userDto.roleId)
+      );
       user = await entityManager.save(Users, user);
       staff.firstName = userDto.firstName;
       staff.middleName = userDto.middleName;
@@ -349,7 +365,7 @@ export class UsersService {
     await this.userRepo.update(userId, {
       enable,
     });
-    
+
     return await this.findOne({ userId }, true, this.userRepo.manager);
   }
 

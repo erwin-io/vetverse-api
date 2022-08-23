@@ -45,7 +45,7 @@ export class StaffUserDto extends CreateUserDto {
 export class CreateStaffUserDto extends StaffUserDto {
   @ApiProperty()
   @IsNotEmpty()
-  roleIds: string;
+  roleId: string;
 }
 
 export class ClientUserDto extends CreateUserDto {

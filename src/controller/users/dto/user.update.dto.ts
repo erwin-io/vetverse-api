@@ -57,7 +57,7 @@ export class UpdateStaffUserDto extends UserDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  roleIds: string;
+  roleId: string;
 }
 
 export class UpdateClientUserDto extends UserDto {

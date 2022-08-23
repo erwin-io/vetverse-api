@@ -10,6 +10,7 @@ import {
 import { Clients } from "./Clients";
 import { Staff } from "./Staff";
 import { UserType } from "./UserType";
+import { Roles } from "./Roles";
 import { EntityStatus } from "./EntityStatus";
 
 @Index("PK_Users", ["userId"], { unique: true })
@@ -30,9 +31,6 @@ export class Users {
   @Column("bit", { name: "IsAdminApproved", default: () => "(0)" })
   isAdminApproved: boolean;
 
-  @Column("text", { name: "RoleIds", nullable: true })
-  roleIds: string | null;
-
   @Column("bit", { name: "Enable", default: () => "(1)" })
   enable: boolean;
 
@@ -45,6 +43,10 @@ export class Users {
   @ManyToOne(() => UserType, (userType) => userType.users)
   @JoinColumn([{ name: "UserTypeId", referencedColumnName: "userTypeId" }])
   userType: UserType;
+
+  @ManyToOne(() => Roles, (roles) => roles.users)
+  @JoinColumn([{ name: "RoleId", referencedColumnName: "roleId" }])
+  role: Roles;
 
   @ManyToOne(() => EntityStatus, (entityStatus) => entityStatus.users)
   @JoinColumn([

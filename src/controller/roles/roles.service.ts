@@ -1,9 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In } from "typeorm";
+import { APP_ROLE_GUEST } from "src/common/utils/utils";
+import { In, Not } from "typeorm";
 import { Repository } from "typeorm";
 import { Roles } from "../../shared/entities/Roles";
-import { RoleDto } from "./dto/role.dtos";
+import { RoleAccessDto } from "./dto/role.access.dtos";
 import { CreateRoleDto } from "./dto/roles.create.dto";
 
 @Injectable()
@@ -13,8 +14,8 @@ export class RolesService {
   ) {}
   async findAll() {
     try {
-      return await this.roleRsepo.findBy({
-        entityStatusId: "1",
+      return await this.roleRsepo.find({
+        where: { roleId: Not(APP_ROLE_GUEST.toString()) },
       });
     } catch (e) {
       throw e;
@@ -23,12 +24,8 @@ export class RolesService {
 
   async findOne(options?: any) {
     try {
-      // const role = await this.roleRsepo
-      //   .createQueryBuilder("Roles")
-      //   .where(options)
-      //   .andWhere("Roles.EntityStatusId = 1)")
-      //   .getOne();
       const role = await this.roleRsepo.findOneBy(options);
+      if (role.roleId === APP_ROLE_GUEST.toString()) return null;
       return role;
     } catch (e) {
       console.log(e);
@@ -38,7 +35,7 @@ export class RolesService {
 
   async findById(roleId: string) {
     try {
-      const role = await this.findOne({ roleId: roleId, entityStatusId: "1" });
+      const role = await this.findOne({ roleId });
       if (!role) {
         throw new HttpException("Role not found", HttpStatus.NOT_FOUND);
       }
@@ -52,7 +49,6 @@ export class RolesService {
     try {
       const roles = this.roleRsepo.findBy({
         roleId: In(roleId),
-        entityStatusId: "1",
       });
       return roles;
     } catch (e) {
@@ -60,40 +56,14 @@ export class RolesService {
     }
   }
 
-  async add(createRoleDto: CreateRoleDto) {
-    try {
-      const role = new Roles();
-      role.name = createRoleDto.name;
-      role.access = createRoleDto.access;
-      return await this.roleRsepo.save(role);
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  async update(roleDto: RoleDto) {
+  async update(roleDto: RoleAccessDto) {
     try {
       const { roleId } = roleDto;
-      const role = await this.findOne({ roleId: roleId, entityStatusId: "1" });
+      const role = await this.findOne({ roleId });
       if (!role) {
         throw new HttpException("Role not found", HttpStatus.NOT_FOUND);
       }
-      role.name = roleDto.name;
       role.access = roleDto.access;
-      return await this.roleRsepo.save(role);
-    } catch (e) {
-      throw e;
-    }
-  }
-
-  async delete(roleId: string) {
-    try {
-      const role = await this.findOne({ roleId: roleId, entityStatusId: "1" });
-      if (!role) {
-        throw new HttpException("Role not found", HttpStatus.NOT_FOUND);
-      }
-      role.name = `deleted_${roleId}_${new Date()}`;
-      role.entityStatusId = "2";
       return await this.roleRsepo.save(role);
     } catch (e) {
       throw e;

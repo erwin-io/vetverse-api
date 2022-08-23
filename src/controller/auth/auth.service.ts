@@ -35,15 +35,9 @@ export class AuthService {
     const getInfo: any = await this.usersService.findById(userId);
     const accessToken: string = await this.getAccessToken(userId);
     const refreshToken: string = await this.getRefreshToken(userId);
+    const role = await this.rolesService.findById(getInfo.user.role.roleId);
 
-    const roleIds =
-      !user.roleIds || user.roleIds === "" ? [] : user.roleIds.split(",");
-    const roles = await this.rolesService.findByGroupId(roleIds);
-    let access = [];
-    roles.forEach((r) => {
-      const roleAccess = r.access.split(",");
-      access = access.concat(roleAccess);
-    });
+
     await this.updateRefreshTokenInUser(refreshToken, userId);
     const userType = getInfo.user.userType;
     const {
@@ -72,7 +66,7 @@ export class AuthService {
       birthDate,
       age,
       gender,
-      access,
+      role,
       accessToken,
       refreshToken,
     };

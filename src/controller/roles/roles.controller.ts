@@ -12,7 +12,7 @@ import {
 import { ApiTags, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 import { CustomResponse } from "src/common/helper/customresponse.helpers";
 import { JwtAuthGuard } from "../auth/jwt.auth.guard";
-import { RoleDto } from "./dto/role.dtos";
+import { RoleAccessDto } from "./dto/role.access.dtos";
 import { CreateRoleDto } from "./dto/roles.create.dto";
 import { RolesService } from "./roles.service";
 
@@ -52,44 +52,13 @@ export class RolesController {
     }
   }
 
-  @Post("")
-  @UseGuards(JwtAuthGuard)
-  async add(@Body() createRoleDto: CreateRoleDto) {
-    const res: CustomResponse = {};
-    try {
-      res.data = await this.rolesService.add(createRoleDto);
-      res.success = true;
-      return res;
-    } catch (e) {
-      res.success = false;
-      res.message = e.message !== undefined ? e.message : e;
-      return res;
-    }
-  }
-
   @Put("")
   @UseGuards(JwtAuthGuard)
-  async updateClientUser(@Body() roleDto: RoleDto) {
+  async updateClientUser(@Body() roleDto: RoleAccessDto) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
       res.data = await this.rolesService.update(roleDto);
-      res.success = true;
-      return res;
-    } catch (e) {
-      res.success = false;
-      res.message = e.message !== undefined ? e.message : e;
-      return res;
-    }
-  }
-
-  @Delete(":roleId")
-  @UseGuards(JwtAuthGuard)
-  async delete(@Param("roleId") roleId: string) {
-    const res: CustomResponse = {};
-    try {
-      const res: CustomResponse = {};
-      res.data = await this.rolesService.delete(roleId);
       res.success = true;
       return res;
     } catch (e) {

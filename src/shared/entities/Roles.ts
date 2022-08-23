@@ -1,10 +1,11 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, OneToMany } from "typeorm";
+import { Users } from "./Users";
 
 @Index("PK_Role", ["roleId"], { unique: true })
 @Index("U_Roles", ["name"], { unique: true })
 @Entity("Roles", { schema: "dbo" })
 export class Roles {
-  @PrimaryGeneratedColumn({ type: "bigint", name: "RoleId" })
+  @Column("bigint", { primary: true, name: "RoleId" })
   roleId: string;
 
   @Column("nvarchar", { name: "Name", unique: true, length: 100 })
@@ -13,6 +14,6 @@ export class Roles {
   @Column("text", { name: "Access", nullable: true })
   access: string | null;
 
-  @Column("bigint", { name: "EntityStatusId", default: () => "(1)" })
-  entityStatusId: string;
+  @OneToMany(() => Users, (users) => users.role)
+  users: Users[];
 }
