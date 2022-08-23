@@ -7,7 +7,7 @@ import { JwtPayload } from "./interfaces/payload.interface";
 import { JwtService } from "@nestjs/jwt";
 import * as fs from "fs";
 import * as path from "path";
-import { compare, hash } from "src/common/utils/utils";
+import { APP_ROLE_GUEST, compare, hash } from "src/common/utils/utils";
 import { RolesService } from "../roles/roles.service";
 
 @Injectable()
@@ -35,8 +35,11 @@ export class AuthService {
     const getInfo: any = await this.usersService.findById(userId);
     const accessToken: string = await this.getAccessToken(userId);
     const refreshToken: string = await this.getRefreshToken(userId);
-    const role = await this.rolesService.findById(getInfo.user.role.roleId);
-
+    getInfo.user.role.roleId =
+      getInfo.user.role.roleId === null ||
+      getInfo.user.role.roleId === undefined
+        ? APP_ROLE_GUEST.toString()
+        : getInfo.user.role.roleId;
 
     await this.updateRefreshTokenInUser(refreshToken, userId);
     const userType = getInfo.user.userType;
@@ -66,7 +69,7 @@ export class AuthService {
       birthDate,
       age,
       gender,
-      role,
+      role: getInfo.user.role,
       accessToken,
       refreshToken,
     };

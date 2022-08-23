@@ -106,6 +106,7 @@ export class UsersService {
         (result.MiddleName !== undefined
           ? result.MiddleName + " " + result.lastName
           : result.lastName);
+      result.user.role = user.role;
       result.user = sanitizeUser ? this._sanitizeUser(user) : result.user;
       if (result.user.role.roleId === APP_ROLE_GUEST.toString())
         result.user.role.roleId = null;
@@ -123,6 +124,7 @@ export class UsersService {
         (result.MiddleName !== undefined
           ? result.MiddleName + " " + result.lastName
           : result.lastName);
+      result.user.role = user.role;
       result.user = sanitizeUser ? this._sanitizeUser(user) : result.user;
       if (result.user.role.roleId === APP_ROLE_GUEST.toString())
         result.user.role.roleId = null;
