@@ -1,6 +1,9 @@
-import { UserDto } from "../users/dto/user.update.dto";
-import { ClientUserDto, StaffUserDto } from "./../users/dto/user.create.dto";
-import { LocalAuthGuard } from "./local.auth.guard";
+import { UserDto } from "../../core/dto/users/user.update.dto";
+import {
+  ClientUserDto,
+  StaffUserDto,
+} from "../../core/dto/users/user.create.dto";
+import { LocalAuthGuard } from "../../core/auth/local.auth.guard";
 import {
   Controller,
   Body,
@@ -10,14 +13,14 @@ import {
   UseGuards,
   Param,
 } from "@nestjs/common";
-import { AuthService } from "./auth.service";
-import { LoginUserDto } from "../users/dto/user-login.dto";
-import { JwtPayload } from "./interfaces/payload.interface";
+import { AuthService } from "../../services/auth.service";
+import { LoginUserDto } from "../../core/dto/users/user-login.dto";
+import { JwtPayload } from "../../core/interfaces/payload.interface";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { CustomResponse } from "./../../common/helper/customresponse.helpers";
-import { JwtAuthGuard } from "./jwt.auth.guard";
-import { GetUser } from "./decorator/get-user.decorator";
-import { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { CustomResponse } from "../../common/helper/customresponse.helpers";
+import { JwtAuthGuard } from "../../core/auth/jwt.auth.guard";
+import { GetUser } from "../../common/decorator/get-user.decorator";
+import { RefreshTokenDto } from "../../core/dto/auth/refresh-token.dto";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -66,7 +69,7 @@ export class AuthController {
       return res;
     }
   }
-  
+
   @Get("/findByUsername/:username")
   async findByUsername(@Param("username") username: string) {
     const res: CustomResponse = {};
@@ -80,7 +83,6 @@ export class AuthController {
       return res;
     }
   }
-
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -108,7 +110,7 @@ export class AuthController {
   async refreshToken(@Body() token: RefreshTokenDto) {
     const result = await this.authService.getUserIfRefreshTokenMatches(
       token.refresh_token,
-      token.userId,
+      token.userId
     );
     if (result) {
       return this.authService.getNewAccessAndRefreshToken(result.userId);

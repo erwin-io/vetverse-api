@@ -1,5 +1,6 @@
 import { Column, Entity, Index, OneToMany } from "typeorm";
 import { Clients } from "./Clients";
+import { Pet } from "./Pet";
 import { Staff } from "./Staff";
 
 @Index("PK_Gender", ["genderId"], { unique: true })
@@ -13,6 +14,9 @@ export class Gender {
 
   @OneToMany(() => Clients, (clients) => clients.gender)
   clients: Clients[];
+
+  @OneToMany(() => Pet, (pet) => pet.gender)
+  pets: Pet[];
 
   @OneToMany(() => Staff, (staff) => staff.gender)
   staff: Staff[];

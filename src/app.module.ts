@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { UsersModule } from "./controller/users/users.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
@@ -8,7 +7,12 @@ import { getEnvPath } from "./common/helper/env.helper";
 import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from "./controller/auth/auth.module";
 import { RolesModule } from "./controller/roles/roles.module";
-
+import { ServiceTypeModule } from "./controller/service-type/service-type.module";
+import { AppointmentModule } from "./controller/appointment/appointment.module";
+import { PetModule } from "./controller/pet/pet.module";
+import { PetTypeModule } from "./controller/pet-type/pet-type.module";
+import { PetCategoryModule } from "./controller/pet-category/pet-category.module";
+import { PaymentsModule } from "./controller/payments/payments.module";
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
@@ -17,6 +21,12 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     AuthModule,
     UsersModule,
     RolesModule,
+    ServiceTypeModule,
+    AppointmentModule,
+    PaymentsModule,
+    PetModule,
+    PetTypeModule,
+    PetCategoryModule,
   ],
   providers: [AppService],
   controllers: [],

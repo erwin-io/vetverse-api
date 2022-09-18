@@ -4,10 +4,13 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { ClientAppointment } from "./ClientAppointment";
 import { Users } from "./Users";
 import { Gender } from "./Gender";
+import { Pet } from "./Pet";
 
 @Index("PK_Clients", ["clientId"], { unique: true })
 @Entity("Clients", { schema: "dbo" })
@@ -39,6 +42,12 @@ export class Clients {
   @Column("bigint", { name: "Age" })
   age: string;
 
+  @OneToMany(
+    () => ClientAppointment,
+    (clientAppointment) => clientAppointment.client
+  )
+  clientAppointments: ClientAppointment[];
+
   @ManyToOne(() => Users, (users) => users.clients)
   @JoinColumn([{ name: "UserId", referencedColumnName: "userId" }])
   user: Users;
@@ -46,4 +55,7 @@ export class Clients {
   @ManyToOne(() => Gender, (gender) => gender.clients)
   @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
   gender: Gender;
+
+  @OneToMany(() => Pet, (pet) => pet.client)
+  pets: Pet[];
 }

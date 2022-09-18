@@ -1,14 +1,11 @@
-import { UsersService } from "./../users/users.service";
 import { Module } from "@nestjs/common";
-import { AuthService } from "./auth.service";
-import { LocalStrategy } from "./local.strategy";
-import { JwtStrategy } from "./jwt.strategy";
+import { AuthService } from "../../services/auth.service";
+import { LocalStrategy } from "../../core/auth/local.strategy";
+import { JwtStrategy } from "../../core/auth/jwt.strategy";
 import { UsersModule } from "../users/users.module";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
 import { AuthController } from "./auth.controller";
-import * as fs from "fs";
-import * as path from "path";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Users } from "src/shared/entities/Users";
 import { Roles } from "src/shared/entities/Roles";

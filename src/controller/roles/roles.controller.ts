@@ -9,12 +9,11 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiTags, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
-import { CustomResponse } from "src/common/helper/customresponse.helpers";
-import { JwtAuthGuard } from "../auth/jwt.auth.guard";
-import { RoleAccessDto } from "./dto/role.access.dtos";
-import { CreateRoleDto } from "./dto/roles.create.dto";
-import { RolesService } from "./roles.service";
+import { ApiTags, ApiBearerAuth } from "@nestjs/swagger";
+import { CustomResponse } from "../../common/helper/customresponse.helpers";
+import { JwtAuthGuard } from "../../core/auth/jwt.auth.guard";
+import { RoleAccessDto } from "../../core/dto/roles/role.access.dtos";
+import { RolesService } from "../../services/roles.service";
 
 @ApiTags("roles")
 @Controller("roles")
@@ -54,7 +53,7 @@ export class RolesController {
 
   @Put("")
   @UseGuards(JwtAuthGuard)
-  async updateClientUser(@Body() roleDto: RoleAccessDto) {
+  async update(@Body() roleDto: RoleAccessDto) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};

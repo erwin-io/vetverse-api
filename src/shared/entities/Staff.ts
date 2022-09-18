@@ -4,10 +4,12 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Gender } from "./Gender";
+import { Appointment } from "./Appointment";
 import { Users } from "./Users";
+import { Gender } from "./Gender";
 
 @Index("PK_Staff", ["staffid"], { unique: true })
 @Entity("Staff", { schema: "dbo" })
@@ -33,11 +35,14 @@ export class Staff {
   @Column("nvarchar", { name: "Address" })
   address: string;
 
-  @ManyToOne(() => Gender, (gender) => gender.staff)
-  @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
-  gender: Gender;
+  @OneToMany(() => Appointment, (appointment) => appointment.staff)
+  appointments: Appointment[];
 
   @ManyToOne(() => Users, (users) => users.staff)
   @JoinColumn([{ name: "UserId", referencedColumnName: "userId" }])
   user: Users;
+
+  @ManyToOne(() => Gender, (gender) => gender.staff)
+  @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
+  gender: Gender;
 }

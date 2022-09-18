@@ -44,6 +44,16 @@
     "ora" "5.4.1"
     "rxjs" "6.6.7"
 
+"@automapper/core@^8.7.6", "@automapper/core@8.7.6":
+  "integrity" "sha512-btaewJ27PWjiulZmVFFwtSlHUyHp8Qifhy/3fI3RIEKmgjkiC/VqIwvjKjesdwsSI5S3zEJMlRQGMYi3L+igcg=="
+  "resolved" "https://registry.npmjs.org/@automapper/core/-/core-8.7.6.tgz"
+  "version" "8.7.6"
+
+"@automapper/nestjs@^8.7.6":
+  "integrity" "sha512-MqcETATU49L0kh1stj21H4l/wOuAam0CRbVB2unzwd2Br/ILS9SgpFJRMJID/pYzrGDs5SMm05QdvFcmRWOExw=="
+  "resolved" "https://registry.npmjs.org/@automapper/nestjs/-/nestjs-8.7.6.tgz"
+  "version" "8.7.6"
+
 "@azure/abort-controller@^1.0.0":
   "integrity" "sha512-TrRLIoSQVzfAJX9H1JeFjzAoDGcoK1IYX1UImfceTZpsyYfWr09Ss1aHW1y5TrrR3iq6RZLBwJ3E24uwPhwahw=="
   "resolved" "https://registry.npmjs.org/@azure/abort-controller/-/abort-controller-1.1.0.tgz"
@@ -908,7 +918,7 @@
     "lodash" "4.17.21"
     "uuid" "8.3.2"
 
-"@nestjs/core@^8.0.0 || ^9.0.0", "@nestjs/core@^9.0.0":
+"@nestjs/core@^7.0.0 || ^8.0.0  || ^9.0.0", "@nestjs/core@^8.0.0 || ^9.0.0", "@nestjs/core@^9.0.0":
   "integrity" "sha512-41BBJlsquasVrGeRWNYb74Fwsc+oB5EmKC/hioQJAhGqIw5Kr5AcdEoEFaMKFzNLAPbU6c/nVW8T8CrvtQbQww=="
   "resolved" "https://registry.npmjs.org/@nestjs/core/-/core-9.0.5.tgz"
   "version" "9.0.5"
@@ -4218,6 +4228,11 @@
   "integrity" "sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw=="
   "resolved" "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
   "version" "1.0.4"
+
+"moment@^2.29.4":
+  "integrity" "sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w=="
+  "resolved" "https://registry.npmjs.org/moment/-/moment-2.29.4.tgz"
+  "version" "2.29.4"
 
 "ms@^2.1.1", "ms@2.1.2":
   "integrity" "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w=="

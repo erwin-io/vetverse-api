@@ -8,17 +8,19 @@ import {
   UseGuards,
   Query,
 } from "@nestjs/common";
-import { UsersService } from "./users.service";
-// import { AuthGuard } from '@nestjs/passport';
+import { UsersService } from "../../services/users.service";
 import {
   ToggleEnableDto,
   UpdateClientUserDto,
   UpdateStaffUserDto,
-} from "./dto/user.update.dto";
+} from "../../core/dto/users/user.update.dto";
 import { CustomResponse } from "./../../common/helper/customresponse.helpers";
-import { CreateStaffUserDto } from "./dto/user.create.dto";
+import {
+  CreateClientUserDto,
+  CreateStaffUserDto,
+} from "../../core/dto/users/user.create.dto";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../auth/jwt.auth.guard";
+import { JwtAuthGuard } from "../../core/auth/jwt.auth.guard";
 
 @ApiTags("users")
 @Controller("users")
@@ -47,6 +49,98 @@ export class UsersController {
     }
   }
 
+  @Get("getStaffByAdvanceSearch")
+  @ApiQuery({ name: "isAdvance", required: false })
+  @ApiQuery({ name: "keyword", required: false })
+  @ApiQuery({ name: "userId", required: false })
+  @ApiQuery({ name: "username", required: false })
+  @ApiQuery({ name: "roles", required: false })
+  @ApiQuery({ name: "email", required: false })
+  @ApiQuery({ name: "mobileNumber", required: false })
+  @ApiQuery({ name: "name", required: false })
+  @UseGuards(JwtAuthGuard)
+  async getStaffByAdvanceSearch(
+    @Query("isAdvance") isAdvance: boolean,
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("keyword") keyword: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("userId") userId: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("username") username: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("roles") roles: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("email") email: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("mobileNumber") mobileNumber: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("name") name: string = ""
+  ) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.userService.findStaffUserByFilter(
+        isAdvance,
+        keyword,
+        userId,
+        username,
+        roles.trim() === "" ? [] : roles.split(","),
+        email,
+        mobileNumber,
+        name
+      );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Get("getClientByAdvanceSearch")
+  @ApiQuery({ name: "isAdvance", required: false })
+  @ApiQuery({ name: "keyword", required: false })
+  @ApiQuery({ name: "userId", required: false })
+  @ApiQuery({ name: "username", required: false })
+  @ApiQuery({ name: "email", required: false })
+  @ApiQuery({ name: "mobileNumber", required: false })
+  @ApiQuery({ name: "name", required: false })
+  @UseGuards(JwtAuthGuard)
+  async getClientByAdvanceSearch(
+    @Query("isAdvance") isAdvance: boolean,
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("keyword") keyword: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("userId") userId: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("username") username: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("email") email: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("mobileNumber") mobileNumber: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("name") name: string = ""
+  ) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.userService.findClientUserByFilter(
+        isAdvance,
+        keyword,
+        userId,
+        username,
+        email,
+        mobileNumber,
+        name
+      );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
   @Get(":id")
   @UseGuards(JwtAuthGuard)
   async findOne(@Param("id") userId: string) {
@@ -62,9 +156,24 @@ export class UsersController {
     }
   }
 
+  @Post("/client")
+  @UseGuards(JwtAuthGuard)
+  async createClient(@Body() createClientUserDto: CreateClientUserDto) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.userService.createClientUser(createClientUserDto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
   @Post("/staff")
   @UseGuards(JwtAuthGuard)
-  async create(@Body() createStaffUserDto: CreateStaffUserDto) {
+  async createStaff(@Body() createStaffUserDto: CreateStaffUserDto) {
     const res: CustomResponse = {};
     try {
       res.data = await this.userService.createStaffUser(createStaffUserDto);

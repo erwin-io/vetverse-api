@@ -10,6 +10,16 @@ import { TypeOrmOptionsFactory, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { Roles } from "../entities/Roles";
 import { PetType } from "../entities/PetType";
 import { PetCategory } from "../entities/PetCategory";
+import { ServiceType } from "../entities/ServiceType";
+import { Appointment } from "../entities/Appointment";
+import { AppointmentStatus } from "../entities/AppointmentStatus";
+import { ClientAppointment } from "../entities/ClientAppointment";
+import { Payment } from "../entities/Payment";
+import { PaymentType } from "../entities/PaymentType";
+import { ConsultaionType } from "../entities/ConsultaionType";
+import { Diagnosis } from "../entities/Diagnosis";
+import { Pet } from "../entities/Pet";
+import { PetAppointment } from "../entities/PetAppointment";
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -29,11 +39,21 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         Roles,
         Clients,
         Staff,
+        Pet,
         PetType,
         PetCategory,
         Gender,
         UserType,
         EntityStatus,
+        ServiceType,
+        Appointment,
+        ConsultaionType,
+        Diagnosis,
+        AppointmentStatus,
+        ClientAppointment,
+        PetAppointment,
+        Payment,
+        PaymentType,
       ],
       synchronize: false, // never use TRUE in production!
       options: { encrypt: false },

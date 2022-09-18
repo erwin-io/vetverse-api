@@ -1,12 +1,7 @@
 import { getConnectionOptions, getConnection } from "typeorm";
 import * as bcrypt from "bcrypt";
-import { Logger } from "@nestjs/common";
+import { RoleEnum } from "../enums/role.enum copy";
 
-export const APP_ROLE_ADMIN = 1;
-export const APP_ROLE_MANAGER = 2;
-export const APP_ROLE_VET = 3;
-export const APP_ROLE_FRONTDESK = 4;
-export const APP_ROLE_GUEST = 5;
 
 export const toPromise = <T>(data: T): Promise<T> => {
   return new Promise<T>((resolve) => {
@@ -47,9 +42,14 @@ export const getAge = async (birthDate: Date) => {
 };
 
 export const isStaffRegistrationApproved = (roleId: number): boolean => {
-  if (roleId === APP_ROLE_ADMIN) return true;
-  else if (roleId === APP_ROLE_MANAGER) return true;
-  else if (roleId === APP_ROLE_VET) return true;
-  else if (roleId === APP_ROLE_FRONTDESK) return true;
+  if (roleId === RoleEnum.ADMIN) return true;
+  else if (roleId === RoleEnum.MANAGER) return true;
+  else if (roleId === RoleEnum.VET) return true;
+  else if (roleId === RoleEnum.FRONTDESK) return true;
   else return false;
+};
+
+export const addHours = (numOfHours, date: Date) => {
+  date.setTime(date.getTime() + numOfHours * 60 * 60 * 1000);
+  return date;
 };

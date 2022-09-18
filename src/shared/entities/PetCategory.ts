@@ -3,27 +3,30 @@ import {
   Entity,
   Index,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Pet } from "./Pet";
 import { PetType } from "./PetType";
 
 @Index("PK_PetCategory", ["petCategoryId"], { unique: true })
+@Index("U_PetCategory", ["name"], { unique: true })
 @Entity("PetCategory", { schema: "dbo" })
 export class PetCategory {
   @PrimaryGeneratedColumn({ type: "bigint", name: "PetCategoryId" })
   petCategoryId: string;
 
-  @Column("bigint", { name: "PetTypeId" })
-  petTypeId: string;
-
-  @Column("nvarchar", { name: "Name", length: 100 })
+  @Column("nvarchar", { name: "Name", unique: true, length: 100 })
   name: string;
 
   @Column("bigint", { name: "EntityStatusId", default: () => "(1)" })
   entityStatusId: string;
 
-  @OneToOne(() => PetType, (petType) => petType.petCategory)
-  @JoinColumn([{ name: "PetCategoryId", referencedColumnName: "petTypeId" }])
-  petCategory: PetType;
+  @OneToMany(() => Pet, (pet) => pet.petCategory)
+  pets: Pet[];
+
+  @ManyToOne(() => PetType, (petType) => petType.petCategories)
+  @JoinColumn([{ name: "PetTypeId", referencedColumnName: "petTypeId" }])
+  petType: PetType;
 }
