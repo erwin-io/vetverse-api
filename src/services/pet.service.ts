@@ -35,6 +35,26 @@ export class PetService {
     }
   }
 
+  async findByClientId(clientId: string) {
+    try {
+      const query = <Pet[]>await this.petRepo.manager
+        .createQueryBuilder("Pet", "p")
+        .leftJoinAndSelect("p.petCategory", "pc")
+        .leftJoinAndSelect("pc.petType", "pt")
+        .leftJoinAndSelect("p.gender", "pg")
+        .where({
+          entityStatusId: "1",
+          client: { clientId },
+        })
+        .getMany();
+      return query.map((p: Pet) => {
+        return new PetViewModel(p);
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
+
   async findOne(options?: any) {
     try {
       const result: any = await this.petRepo.manager

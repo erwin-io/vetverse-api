@@ -36,6 +36,21 @@ export class PetController {
     }
   }
 
+  @Get("findByClientId/:clientId")
+  // @UseGuards(JwtAuthGuard)
+  async findByClientId(@Param("clientId") clientId: string) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.petService.findByClientId(clientId);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
   @Get(":petId")
   @UseGuards(JwtAuthGuard)
   async findOne(@Param("petId") petId: string) {

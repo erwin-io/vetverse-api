@@ -224,7 +224,7 @@ export class UsersService {
         where: {
           user: options,
         },
-        relations: ["user", "gender"],
+        relations: ["user", "gender", "pets"],
       });
       result.fullName =
         result.firstName +
@@ -361,8 +361,9 @@ export class UsersService {
       user.userType.userTypeId = UserTypeEnum.CLIENT.toString();
       user.entityStatus = new EntityStatus();
       user.role = new Roles();
-      user.role.roleId = UserTypeEnum.CLIENT.toString();
+      user.role.roleId = RoleEnum.GUEST.toString();
       user.entityStatus.entityStatusId = "1";
+      user.isAdminApproved = true;
       user = await entityManager.save(Users, user);
       let client = new Clients();
       client.user = user;
@@ -416,6 +417,7 @@ export class UsersService {
       user.role = new Roles();
       user.role.roleId = userDto.roleId;
       user.entityStatus.entityStatusId = "1";
+      user.isAdminApproved = true;
       user = await entityManager.save(Users, user);
       let staff = new Staff();
       staff.user = user;
