@@ -22,7 +22,7 @@ export class PetController {
   constructor(private readonly petService: PetService) {}
 
   @Get()
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async findAll() {
     const res: CustomResponse = {};
     try {
@@ -37,7 +37,7 @@ export class PetController {
   }
 
   @Get("findByClientId/:clientId")
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async findByClientId(@Param("clientId") clientId: string) {
     const res: CustomResponse = {};
     try {
