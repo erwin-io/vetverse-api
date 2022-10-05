@@ -277,6 +277,25 @@ export class UsersService {
     return this._sanitizeUser(result.user);
   }
 
+  async findByLoginCLient(username, password) {
+    const result = await this.findOne(
+      { username, userType: { userTypeId: 2 } },
+      false,
+      this.userRepo.manager
+    );
+    if (!result) {
+      throw new HttpException("Username not found", HttpStatus.NOT_FOUND);
+    }
+    if (!result.user.enable) {
+      throw new HttpException("Yout account has been disabled", HttpStatus.OK);
+    }
+    const areEqual = await compare(result.user.password, password);
+    if (!areEqual) {
+      throw new HttpException("Invalid credentials", HttpStatus.NOT_ACCEPTABLE);
+    }
+    return this._sanitizeUser(result.user);
+  }
+
   async registerClientUser(userDto: ClientUserDto) {
     const { username } = userDto;
     return await this.userRepo.manager.transaction(async (entityManager) => {

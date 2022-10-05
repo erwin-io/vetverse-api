@@ -7,7 +7,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
     super();
   }
-  async validate(username: string, password: string) {
+  async validate(username, password) {
     // class is constructed but this method is never called
     const user: any = await this.authService.login({ username, password });
     if (!user) {

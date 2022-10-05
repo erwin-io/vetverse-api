@@ -13,6 +13,7 @@ import { PetModule } from "./controller/pet/pet.module";
 import { PetTypeModule } from "./controller/pet-type/pet-type.module";
 import { PetCategoryModule } from "./controller/pet-category/pet-category.module";
 import { PaymentsModule } from "./controller/payments/payments.module";
+import { FileModule } from "./controller/file/file.module";
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
@@ -27,6 +28,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     PetModule,
     PetTypeModule,
     PetCategoryModule,
+    FileModule,
   ],
   providers: [AppService],
   controllers: [],

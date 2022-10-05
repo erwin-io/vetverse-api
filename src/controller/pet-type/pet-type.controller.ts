@@ -8,7 +8,7 @@ import {
   Put,
   UseGuards,
 } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { CustomResponse } from "src/common/helper/customresponse.helpers";
 import { JwtAuthGuard } from "src/core/auth/jwt.auth.guard";
 import { CreatePetTypeDto } from "src/core/dto/pet-type/pet-type.create.dto";
@@ -17,6 +17,7 @@ import { PetTypeService } from "src/services/pet-type.service";
 
 @ApiTags("pet-type")
 @Controller("pet-type")
+@ApiBearerAuth()
 export class PetTypeController {
   constructor(private readonly petTypeService: PetTypeService) {}
 

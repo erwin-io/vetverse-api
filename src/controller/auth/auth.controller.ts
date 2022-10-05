@@ -56,11 +56,26 @@ export class AuthController {
   }
 
   @UseGuards(LocalAuthGuard)
-  @Post("login")
-  public async login(@Body() loginUserDto: LoginUserDto) {
+  @Post("login/staff")
+  public async loginStaff(@Body() loginUserDto: LoginUserDto) {
     const res: CustomResponse = {};
     try {
       res.data = await this.authService.login(loginUserDto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post("login/client")
+  public async loginClient(@Body() loginUserDto: LoginUserDto) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.authService.loginClient(loginUserDto);
       res.success = true;
       return res;
     } catch (e) {

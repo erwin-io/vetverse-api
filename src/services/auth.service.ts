@@ -79,6 +79,64 @@ export class AuthService {
     };
   }
 
+  async loginClient({ username, password }: any) {
+    // find user in db
+    const user: Users = await this.usersService.findByLoginCLient(
+      username,
+      password
+    );
+
+    // generate and sign token
+    const { userId } = user;
+    const getInfo: any = await this.usersService.findById(userId);
+    const accessToken: string = await this.getAccessToken(userId);
+    const refreshToken: string = await this.getRefreshToken(userId);
+    getInfo.user.role.roleId =
+      getInfo.user.role.roleId === null ||
+      getInfo.user.role.roleId === undefined
+        ? RoleEnum.GUEST.toString()
+        : getInfo.user.role.roleId;
+    await this.updateRefreshTokenInUser(refreshToken, userId);
+    const userType = getInfo.user.userType;
+    const userTypeIdentityId =
+      userType.userTypeId === UserTypeEnum.CLIENT
+        ? getInfo.clientid
+        : getInfo.staffid;
+    const {
+      clientId,
+      firstName,
+      middleName,
+      lastName,
+      email,
+      mobileNumber,
+      address,
+      birthDate,
+      age,
+      gender,
+      fullName,
+    } = getInfo;
+    return {
+      clientId,
+      userId,
+      username,
+      userType,
+      fullName,
+      firstName,
+      middleName,
+      lastName,
+      email,
+      mobileNumber,
+      address,
+      birthDate,
+      age,
+      gender,
+      role: getInfo.user.role,
+      accessToken,
+      refreshToken,
+      userTypeIdentityId
+    };
+  }
+
   async logOut(userId: string) {
     await this.updateRefreshTokenInUser(null, userId);
   }
