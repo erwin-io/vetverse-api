@@ -75,7 +75,7 @@ export class AuthService {
       role: getInfo.user.role,
       accessToken,
       refreshToken,
-      userTypeIdentityId
+      userTypeIdentityId,
     };
   }
 
@@ -133,7 +133,7 @@ export class AuthService {
       role: getInfo.user.role,
       accessToken,
       refreshToken,
-      userTypeIdentityId
+      userTypeIdentityId,
     };
   }
 
