@@ -170,6 +170,45 @@ export class AppointmentService {
     }
   }
 
+  async getClientAppointmentsByStatus(clientId: string, status: string[]) {
+    try {
+      const params: any = {
+        clientId,
+        status:
+          status.length === 0
+            ? ["Pending", "Approved", "Completed", "Cancelled"]
+            : status,
+      };
+
+      let query = this.appointmentRepo.manager
+        .createQueryBuilder("Appointment", "a")
+        //staff
+        .leftJoinAndSelect("a.staff", "s")
+        //service
+        .leftJoinAndSelect("a.serviceType", "st")
+        //consultation
+        .leftJoinAndSelect("a.consultaionType", "ct")
+        //status
+        .leftJoinAndSelect("a.appointmentStatus", "as")
+        //payments
+        .leftJoinAndSelect("a.payments", "ap")
+        //mapping client
+        .leftJoinAndSelect("a.clientAppointment", "ca")
+        .leftJoinAndSelect("ca.client", "cl")
+        .where("cl.clientId = :clientId")
+        .andWhere("as.name IN(:...status)");
+      query = query.setParameters(params);
+
+      return <AppointmentViewModel[]>(await query.getMany()).map(
+        (a: Appointment) => {
+          return new AppointmentViewModel(a);
+        }
+      );
+    } catch (e) {
+      throw e;
+    }
+  }
+
   async findOne(options?: any) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -230,6 +269,12 @@ export class AppointmentService {
           const service = await entityManager.findOne(ServiceType, {
             where: { serviceTypeId: dto.serviceTypeId },
           });
+          if (!service) {
+            throw new HttpException(
+              "Service not found!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
           newAppointment.comments = dto.comments;
           newAppointment.timeStart = moment(new Date(appointmentDate)).format(
             "h:mm:ss a"
@@ -289,6 +334,12 @@ export class AppointmentService {
           const service = await entityManager.findOne(ServiceType, {
             where: { serviceTypeId: dto.serviceTypeId },
           });
+          if (!service) {
+            throw new HttpException(
+              "Service not found!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
           newAppointment.timeStart = moment(new Date(appointmentDate)).format(
             "h:mm:ss a"
           );
@@ -358,6 +409,12 @@ export class AppointmentService {
           const service = await entityManager.findOne(ServiceType, {
             where: { serviceTypeId: dto.serviceTypeId },
           });
+          if (!service) {
+            throw new HttpException(
+              "Service not found!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
           newAppointment.timeStart = moment(new Date(appointmentDate)).format(
             "h:mm:ss a"
           );
@@ -425,6 +482,13 @@ export class AppointmentService {
           const service = await entityManager.findOne(ServiceType, {
             where: { serviceTypeId: dto.serviceTypeId },
           });
+
+          if (!service) {
+            throw new HttpException(
+              "Service not found!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
           newAppointment.comments = dto.comments;
           newAppointment.timeStart = moment(new Date(appointmentDate)).format(
             "h:mm:ss a"

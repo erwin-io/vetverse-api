@@ -43,6 +43,32 @@ export class AppointmentController {
     }
   }
 
+  @Get("getClientAppointmentsByStatus")
+  @ApiQuery({ name: "clientId", required: false })
+  @ApiQuery({ name: "appointmentStatus", required: false })
+  @UseGuards(JwtAuthGuard)
+  async getClientAppointmentsByStatus(
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("clientId") clientId: string = "",
+    // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+    @Query("appointmentStatus")
+    appointmentStatus: string = ""
+  ) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.appointmentService.getClientAppointmentsByStatus(
+        clientId,
+        appointmentStatus.trim() === "" ? [] : appointmentStatus.split(",")
+      );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
   @Get("getByAdvanceSearch")
   @ApiQuery({ name: "isAdvance", required: false })
   @ApiQuery({ name: "keyword", required: false })
