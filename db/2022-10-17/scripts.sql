@@ -1,93 +1,6 @@
-USE [master]
-GO
-/****** Object:  Database [vetversedb]    Script Date: 17/10/2022 12:49:06 am ******/
-CREATE DATABASE [vetversedb]
- CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'vetversedb', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL13.SQLEXPRESS\MSSQL\DATA\vetversedb.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
- LOG ON 
-( NAME = N'vetversedb_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL13.SQLEXPRESS\MSSQL\DATA\vetversedb_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
-GO
-ALTER DATABASE [vetversedb] SET COMPATIBILITY_LEVEL = 130
-GO
-IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
-begin
-EXEC [vetversedb].[dbo].[sp_fulltext_database] @action = 'enable'
-end
-GO
-ALTER DATABASE [vetversedb] SET ANSI_NULL_DEFAULT OFF 
-GO
-ALTER DATABASE [vetversedb] SET ANSI_NULLS OFF 
-GO
-ALTER DATABASE [vetversedb] SET ANSI_PADDING OFF 
-GO
-ALTER DATABASE [vetversedb] SET ANSI_WARNINGS OFF 
-GO
-ALTER DATABASE [vetversedb] SET ARITHABORT OFF 
-GO
-ALTER DATABASE [vetversedb] SET AUTO_CLOSE OFF 
-GO
-ALTER DATABASE [vetversedb] SET AUTO_SHRINK OFF 
-GO
-ALTER DATABASE [vetversedb] SET AUTO_UPDATE_STATISTICS ON 
-GO
-ALTER DATABASE [vetversedb] SET CURSOR_CLOSE_ON_COMMIT OFF 
-GO
-ALTER DATABASE [vetversedb] SET CURSOR_DEFAULT  GLOBAL 
-GO
-ALTER DATABASE [vetversedb] SET CONCAT_NULL_YIELDS_NULL OFF 
-GO
-ALTER DATABASE [vetversedb] SET NUMERIC_ROUNDABORT OFF 
-GO
-ALTER DATABASE [vetversedb] SET QUOTED_IDENTIFIER OFF 
-GO
-ALTER DATABASE [vetversedb] SET RECURSIVE_TRIGGERS OFF 
-GO
-ALTER DATABASE [vetversedb] SET  DISABLE_BROKER 
-GO
-ALTER DATABASE [vetversedb] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
-GO
-ALTER DATABASE [vetversedb] SET DATE_CORRELATION_OPTIMIZATION OFF 
-GO
-ALTER DATABASE [vetversedb] SET TRUSTWORTHY OFF 
-GO
-ALTER DATABASE [vetversedb] SET ALLOW_SNAPSHOT_ISOLATION OFF 
-GO
-ALTER DATABASE [vetversedb] SET PARAMETERIZATION SIMPLE 
-GO
-ALTER DATABASE [vetversedb] SET READ_COMMITTED_SNAPSHOT OFF 
-GO
-ALTER DATABASE [vetversedb] SET HONOR_BROKER_PRIORITY OFF 
-GO
-ALTER DATABASE [vetversedb] SET RECOVERY SIMPLE 
-GO
-ALTER DATABASE [vetversedb] SET  MULTI_USER 
-GO
-ALTER DATABASE [vetversedb] SET PAGE_VERIFY CHECKSUM  
-GO
-ALTER DATABASE [vetversedb] SET DB_CHAINING OFF 
-GO
-ALTER DATABASE [vetversedb] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
-GO
-ALTER DATABASE [vetversedb] SET TARGET_RECOVERY_TIME = 60 SECONDS 
-GO
-ALTER DATABASE [vetversedb] SET DELAYED_DURABILITY = DISABLED 
-GO
-ALTER DATABASE [vetversedb] SET QUERY_STORE = OFF
-GO
 USE [vetversedb]
 GO
-ALTER DATABASE SCOPED CONFIGURATION SET LEGACY_CARDINALITY_ESTIMATION = OFF;
-GO
-ALTER DATABASE SCOPED CONFIGURATION SET MAXDOP = 0;
-GO
-ALTER DATABASE SCOPED CONFIGURATION SET PARAMETER_SNIFFING = ON;
-GO
-ALTER DATABASE SCOPED CONFIGURATION SET QUERY_OPTIMIZER_HOTFIXES = OFF;
-GO
-USE [vetversedb]
-GO
-/****** Object:  Table [dbo].[Appointment]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[Appointment]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -111,7 +24,7 @@ CREATE TABLE [dbo].[Appointment](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[AppointmentStatus]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[AppointmentStatus]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -125,7 +38,7 @@ CREATE TABLE [dbo].[AppointmentStatus](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ClientAppointment]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[ClientAppointment]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -139,7 +52,7 @@ CREATE TABLE [dbo].[ClientAppointment](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Clients]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[Clients]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -162,7 +75,7 @@ CREATE TABLE [dbo].[Clients](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ConsultaionType]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[ConsultaionType]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -176,7 +89,7 @@ CREATE TABLE [dbo].[ConsultaionType](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Diagnosis]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[Diagnosis]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -194,7 +107,7 @@ CREATE TABLE [dbo].[Diagnosis](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[EntityStatus]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[EntityStatus]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -208,7 +121,7 @@ CREATE TABLE [dbo].[EntityStatus](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Gender]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[Gender]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -222,7 +135,7 @@ CREATE TABLE [dbo].[Gender](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[migrations]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[migrations]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -237,7 +150,7 @@ CREATE TABLE [dbo].[migrations](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Payment]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[Payment]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -254,7 +167,7 @@ CREATE TABLE [dbo].[Payment](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PaymentType]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[PaymentType]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -268,7 +181,7 @@ CREATE TABLE [dbo].[PaymentType](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Pet]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[Pet]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -288,7 +201,7 @@ CREATE TABLE [dbo].[Pet](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PetAppointment]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[PetAppointment]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -302,7 +215,7 @@ CREATE TABLE [dbo].[PetAppointment](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PetCategory]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[PetCategory]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -318,7 +231,7 @@ CREATE TABLE [dbo].[PetCategory](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PetType]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[PetType]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -333,7 +246,7 @@ CREATE TABLE [dbo].[PetType](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Roles]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[Roles]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -348,7 +261,7 @@ CREATE TABLE [dbo].[Roles](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ServiceType]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[ServiceType]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -367,7 +280,7 @@ CREATE TABLE [dbo].[ServiceType](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Staff]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[Staff]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -388,7 +301,7 @@ CREATE TABLE [dbo].[Staff](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Users]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[Users]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -409,7 +322,7 @@ CREATE TABLE [dbo].[Users](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserType]    Script Date: 17/10/2022 12:49:06 am ******/
+/****** Object:  Table [dbo].[UserType]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -531,15 +444,9 @@ INSERT [dbo].[UserType] ([UserTypeId], [Name]) VALUES (1, N'Staff')
 GO
 INSERT [dbo].[UserType] ([UserTypeId], [Name]) VALUES (2, N'Client')
 GO
-/****** Object:  Index [IX_ClientAppointment]    Script Date: 17/10/2022 12:49:07 am ******/
-CREATE UNIQUE NONCLUSTERED INDEX [IX_ClientAppointment] ON [dbo].[ClientAppointment]
-(
-	[AppointmentId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [U_PaymentType]    Script Date: 17/10/2022 12:49:07 am ******/
+/****** Object:  Index [U_PaymentType]    Script Date: 17/10/2022 1:09:08 am ******/
 ALTER TABLE [dbo].[PaymentType] ADD  CONSTRAINT [U_PaymentType] UNIQUE NONCLUSTERED 
 (
 	[Name] ASC
@@ -547,7 +454,7 @@ ALTER TABLE [dbo].[PaymentType] ADD  CONSTRAINT [U_PaymentType] UNIQUE NONCLUSTE
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [U_PetCategory]    Script Date: 17/10/2022 12:49:07 am ******/
+/****** Object:  Index [U_PetCategory]    Script Date: 17/10/2022 1:09:08 am ******/
 ALTER TABLE [dbo].[PetCategory] ADD  CONSTRAINT [U_PetCategory] UNIQUE NONCLUSTERED 
 (
 	[Name] ASC
@@ -555,7 +462,7 @@ ALTER TABLE [dbo].[PetCategory] ADD  CONSTRAINT [U_PetCategory] UNIQUE NONCLUSTE
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [U_PetType]    Script Date: 17/10/2022 12:49:07 am ******/
+/****** Object:  Index [U_PetType]    Script Date: 17/10/2022 1:09:08 am ******/
 ALTER TABLE [dbo].[PetType] ADD  CONSTRAINT [U_PetType] UNIQUE NONCLUSTERED 
 (
 	[Name] ASC
@@ -563,7 +470,7 @@ ALTER TABLE [dbo].[PetType] ADD  CONSTRAINT [U_PetType] UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [U_Roles]    Script Date: 17/10/2022 12:49:07 am ******/
+/****** Object:  Index [U_Roles]    Script Date: 17/10/2022 1:09:08 am ******/
 ALTER TABLE [dbo].[Roles] ADD  CONSTRAINT [U_Roles] UNIQUE NONCLUSTERED 
 (
 	[Name] ASC
@@ -571,7 +478,7 @@ ALTER TABLE [dbo].[Roles] ADD  CONSTRAINT [U_Roles] UNIQUE NONCLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [U_ServiceType]    Script Date: 17/10/2022 12:49:07 am ******/
+/****** Object:  Index [U_ServiceType]    Script Date: 17/10/2022 1:09:08 am ******/
 ALTER TABLE [dbo].[ServiceType] ADD  CONSTRAINT [U_ServiceType] UNIQUE NONCLUSTERED 
 (
 	[Name] ASC
@@ -714,7 +621,7 @@ REFERENCES [dbo].[UserType] ([UserTypeId])
 GO
 ALTER TABLE [dbo].[Users] CHECK CONSTRAINT [FK_Users_UserType]
 GO
-/****** Object:  StoredProcedure [dbo].[usp_Reset]    Script Date: 17/10/2022 12:49:07 am ******/
+/****** Object:  StoredProcedure [dbo].[usp_Reset]    Script Date: 17/10/2022 1:09:08 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -772,8 +679,4 @@ BEGIN
 END
 
 
-GO
-USE [master]
-GO
-ALTER DATABASE [vetversedb] SET  READ_WRITE 
 GO
