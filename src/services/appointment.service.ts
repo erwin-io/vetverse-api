@@ -372,6 +372,7 @@ export class AppointmentService {
               HttpStatus.BAD_REQUEST
             );
           }
+          appointment.isPaid = true;
           const newClientAppointment = new ClientAppointment();
           newClientAppointment.appointment = appointment;
           newClientAppointment.client = await entityManager.findOne(Clients, {
@@ -446,6 +447,7 @@ export class AppointmentService {
               HttpStatus.BAD_REQUEST
             );
           }
+          appointment.isPaid = true;
           const newClientAppointment = new ClientAppointment();
           newClientAppointment.appointment = appointment;
           newClientAppointment.client = await entityManager.findOne(Clients, {
@@ -521,6 +523,7 @@ export class AppointmentService {
               HttpStatus.BAD_REQUEST
             );
           }
+          appointment.isPaid = true;
           return await entityManager.save(Appointment, appointment);
         }
       );
