@@ -60,6 +60,7 @@ export class PetService {
       const result: any = await this.petRepo.manager
         .createQueryBuilder("Pet", "p")
         .leftJoinAndSelect("p.client", "c")
+        .leftJoinAndSelect("p.gender", "g")
         .leftJoinAndSelect("p.petCategory", "pc")
         .leftJoinAndSelect("pc.petType", "pt")
         .where(options)

@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type, Transform } from "class-transformer";
-import { IsDateString, IsMilitaryTime, IsNotEmpty } from "class-validator";
+import { IsDateString, IsEmpty, IsMilitaryTime, IsNotEmpty, IsString } from "class-validator";
 import * as moment from "moment";
 
 export class AppointmentDto {
@@ -32,4 +32,10 @@ export class RescheduleAppointmentDto extends AppointmentDto {
   @IsMilitaryTime()
   @IsNotEmpty()
   time: string;
+}
+
+export class UpdateAppointmentConferencePeer extends AppointmentDto {
+  @ApiProperty()
+  @IsString()
+  conferencePeerId: string;
 }

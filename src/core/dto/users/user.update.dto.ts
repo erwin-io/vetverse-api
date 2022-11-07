@@ -97,3 +97,16 @@ export class UpdateClientUserDto extends UserDto {
   @IsNotEmpty()
   genderId: string;
 }
+
+
+export class UpdatePasswordDto extends UserDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  password: string;
+}
+
+export class UpdateFirebaseToken extends UserDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  firebaseToken: string;
+}

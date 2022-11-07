@@ -20,6 +20,8 @@ import { ConsultaionType } from "../entities/ConsultaionType";
 import { Diagnosis } from "../entities/Diagnosis";
 import { Pet } from "../entities/Pet";
 import { PetAppointment } from "../entities/PetAppointment";
+import { Messages } from "../entities/Messages";
+import { Notifications } from "../entities/Notifications";
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -54,6 +56,8 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         PetAppointment,
         Payment,
         PaymentType,
+        Notifications,
+        Messages,
       ],
       synchronize: false, // never use TRUE in production!
       options: { encrypt: false },

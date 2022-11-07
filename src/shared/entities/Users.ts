@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Clients } from "./Clients";
+import { Messages } from "./Messages";
 import { Staff } from "./Staff";
 import { UserType } from "./UserType";
 import { Roles } from "./Roles";
@@ -28,6 +29,9 @@ export class Users {
   @Column("nvarchar", { name: "currentHashedRefreshToken", nullable: true })
   currentHashedRefreshToken: string | null;
 
+  @Column("nvarchar", { name: "FirebaseToken", nullable: true })
+  firebaseToken: string | null;
+
   @Column("bit", { name: "IsAdminApproved", default: () => "(0)" })
   isAdminApproved: boolean;
 
@@ -36,6 +40,12 @@ export class Users {
 
   @OneToMany(() => Clients, (clients) => clients.user)
   clients: Clients[];
+
+  @OneToMany(() => Messages, (messages) => messages.fromUser)
+  messages: Messages[];
+
+  @OneToMany(() => Messages, (messages) => messages.toUser)
+  messages2: Messages[];
 
   @OneToMany(() => Staff, (staff) => staff.user)
   staff: Staff[];

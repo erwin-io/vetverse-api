@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { isEmpty } from "class-validator";
 // import moment from "moment";
 import * as moment from "moment";
 import { AppointmentStatusEnum } from "src/common/enums/appointment-status.enum";
@@ -13,6 +14,7 @@ import {
 } from "src/core/dto/appointment/appointment.create.dto";
 import {
   RescheduleAppointmentDto,
+  UpdateAppointmentConferencePeer,
   UpdateAppointmentStatusDto,
 } from "src/core/dto/appointment/appointment.update.dtos";
 import { AppointmentViewModel } from "src/core/view-model/appointment.view-model";
@@ -25,10 +27,12 @@ import { Payment } from "src/shared/entities/Payment";
 import { PaymentType } from "src/shared/entities/PaymentType";
 import { Pet } from "src/shared/entities/Pet";
 import { PetAppointment } from "src/shared/entities/PetAppointment";
+import { PetType } from "src/shared/entities/PetType";
 import { ServiceType } from "src/shared/entities/ServiceType";
 import { Staff } from "src/shared/entities/Staff";
 import { Users } from "src/shared/entities/Users";
-import { In, Repository } from "typeorm";
+import { In, IsNull, Repository } from "typeorm";
+import { isNullOrUndefined } from "util";
 
 @Injectable()
 export class AppointmentService {
@@ -216,7 +220,7 @@ export class AppointmentService {
         .createQueryBuilder("Appointment", "a")
         //staff
         .leftJoinAndSelect("a.staff", "s")
-        .leftJoinAndSelect("s.user", "u")
+        .leftJoinAndSelect("s.user", "su")
         //service
         .leftJoinAndSelect("a.serviceType", "st")
         //consultation
@@ -229,11 +233,13 @@ export class AppointmentService {
         //mapping client
         .leftJoinAndSelect("a.clientAppointment", "ca")
         .leftJoinAndSelect("ca.client", "cl")
+        .leftJoinAndSelect("cl.user", "cu")
         //mapping pet
         .leftJoinAndSelect("a.petAppointment", "pa")
         .leftJoinAndSelect("pa.pet", "p")
         .leftJoinAndSelect("p.petCategory", "pc")
         .leftJoinAndSelect("pc.petType", "pt")
+        .leftJoinAndSelect("p.gender", "pg")
         .where(options)
         .getOne();
       return new AppointmentViewModel(query);
@@ -646,6 +652,24 @@ export class AppointmentService {
           return await entityManager.save(Appointment, appointment);
         }
       );
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async updateAppointmentConferencePeer(dto: UpdateAppointmentConferencePeer) {
+    try {
+      const appointment = await this.appointmentRepo.findOne({
+        where: { appointmentId: dto.appointmentId },
+      });
+      if (!appointment) {
+        throw new HttpException(
+          "Appointment not found",
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      appointment.conferencePeerId = dto.conferencePeerId;
+      return await this.appointmentRepo.save(appointment);
     } catch (e) {
       throw e;
     }

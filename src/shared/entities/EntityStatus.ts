@@ -1,4 +1,5 @@
 import { Column, Entity, Index, OneToMany } from "typeorm";
+import { Notifications } from "./Notifications";
 import { Users } from "./Users";
 
 @Index("PK_EntityStatus", ["entityStatusId"], { unique: true })
@@ -9,6 +10,9 @@ export class EntityStatus {
 
   @Column("nvarchar", { name: "Name", length: 100 })
   name: string;
+
+  @OneToMany(() => Notifications, (notifications) => notifications.entityStatus)
+  notifications: Notifications[];
 
   @OneToMany(() => Users, (users) => users.entityStatus)
   users: Users[];

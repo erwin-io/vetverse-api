@@ -19,6 +19,7 @@ import {
 } from "src/core/dto/appointment/appointment.create.dto";
 import {
   RescheduleAppointmentDto,
+  UpdateAppointmentConferencePeer,
   UpdateAppointmentStatusDto,
 } from "src/core/dto/appointment/appointment.update.dtos";
 import { AppointmentService } from "src/services/appointment.service";
@@ -229,6 +230,26 @@ export class AppointmentController {
     try {
       const res: CustomResponse = {};
       res.data = await this.appointmentService.updateStatus(dto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Put("updateAppointmentConferencePeer")
+  @UseGuards(JwtAuthGuard)
+  async updateAppointmentConferencePeer(
+    @Body() dto: UpdateAppointmentConferencePeer
+  ) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.appointmentService.updateAppointmentConferencePeer(
+        dto
+      );
       res.success = true;
       return res;
     } catch (e) {

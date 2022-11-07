@@ -13,6 +13,8 @@ import { ServiceType } from "./ServiceType";
 import { ConsultaionType } from "./ConsultaionType";
 import { AppointmentStatus } from "./AppointmentStatus";
 import { ClientAppointment } from "./ClientAppointment";
+import { Messages } from "./Messages";
+import { Notifications } from "./Notifications";
 import { Payment } from "./Payment";
 import { PetAppointment } from "./PetAppointment";
 
@@ -42,6 +44,9 @@ export class Appointment {
 
   @Column("text", { name: "WalkInAppointmentNotes", nullable: true })
   walkInAppointmentNotes: string | null;
+
+  @Column("nvarchar", { name: "ConferencePeerId", nullable: true })
+  conferencePeerId: string | null;
 
   @ManyToOne(() => Staff, (staff) => staff.appointments)
   @JoinColumn([{ name: "Staffid", referencedColumnName: "staffid" }])
@@ -79,6 +84,12 @@ export class Appointment {
     (clientAppointment) => clientAppointment.appointment
   )
   clientAppointment: ClientAppointment;
+
+  @OneToMany(() => Messages, (messages) => messages.appointment)
+  messages: Messages[];
+
+  @OneToMany(() => Notifications, (notifications) => notifications.appointment)
+  notifications: Notifications[];
 
   @OneToMany(() => Payment, (payment) => payment.appointment)
   payments: Payment[];

@@ -12,6 +12,8 @@ import { UsersService } from "../../services/users.service";
 import {
   ToggleEnableDto,
   UpdateClientUserDto,
+  UpdateFirebaseToken,
+  UpdatePasswordDto,
   UpdateStaffUserDto,
 } from "../../core/dto/users/user.update.dto";
 import { CustomResponse } from "./../../common/helper/customresponse.helpers";
@@ -209,6 +211,43 @@ export class UsersController {
     try {
       const res: CustomResponse = {};
       res.data = await this.userService.updateStaffUser(staffUserDto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Put("/udpdatePassword")
+  @UseGuards(JwtAuthGuard)
+  async udpdatePassword(@Body() updatePasswordDto: UpdatePasswordDto) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.userService.updatePassword(
+        updatePasswordDto.userId,
+        updatePasswordDto.password,);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Put("/updateFirebaseToken")
+  @UseGuards(JwtAuthGuard)
+  async updateFirebaseToken(@Body() updateFirebaseToken: UpdateFirebaseToken) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.userService.updateFirebaseToken(
+        updateFirebaseToken.userId,
+        updateFirebaseToken.firebaseToken
+      );
       res.success = true;
       return res;
     } catch (e) {

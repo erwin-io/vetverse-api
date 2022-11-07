@@ -553,6 +553,22 @@ export class UsersService {
     return await this.findOne({ userId }, true, this.userRepo.manager);
   }
 
+  async updateFirebaseToken(userId: string, firebaseToken: string) {
+    await this.userRepo.update(userId, {
+      firebaseToken,
+    });
+
+    return await this.findOne({ userId }, true, this.userRepo.manager);
+  }
+
+  async updatePassword(userId: string, password: string) {
+    await this.userRepo.update(userId, {
+      password: await hash(password),
+    });
+
+    return await this.findOne({ userId }, true, this.userRepo.manager);
+  }
+
   private _sanitizeUser(user: Users) {
     delete user.password;
     delete user.currentHashedRefreshToken;
