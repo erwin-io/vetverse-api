@@ -139,6 +139,24 @@ export class AppointmentController {
     }
   }
 
+  @Get("getAppointmentConferencePeer/:appointmentId")
+  async getAppointmentConferencePeer(
+    @Param("appointmentId") appointmentId: string
+  ) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.appointmentService.getAppointmentConferencePeer(
+        appointmentId
+      );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
   @Post("createClientAppointment")
   @UseGuards(JwtAuthGuard)
   async createClientAppointment(@Body() dto: CreateClientAppointmentDto) {

@@ -674,4 +674,18 @@ export class AppointmentService {
       throw e;
     }
   }
+
+  async getAppointmentConferencePeer(appointmentId: string) {
+    try {
+      const appointment = await this.appointmentRepo.findOneBy({
+        appointmentId,
+      });
+      if (!appointment) {
+        throw new HttpException("Appointment not found", HttpStatus.NOT_FOUND);
+      }
+      return appointment.conferencePeerId;
+    } catch (e) {
+      throw e;
+    }
+  }
 }
