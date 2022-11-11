@@ -22,6 +22,7 @@ export class AppointmentViewModel {
   clientAppointment: ClientAppointmentViewModel;
   petAppointment: any;
   conferencePeerId: string;
+  diagnosiAndTreatment: string;
   constructor(model: Appointment | undefined) {
     if (!model || model === null) {
       return null;
@@ -41,8 +42,11 @@ export class AppointmentViewModel {
       model.clientAppointment
     );
     this.petAppointment = model.petAppointment;
-    this.payments = (<any[]>model.payments).filter((x) => !x.isVoid);
+    this.payments = model.payments
+      ? (<any[]>model.payments).filter((x) => !x.isVoid)
+      : [];
     this.isPaid = this.payments.length > 0;
     this.conferencePeerId = model.conferencePeerId;
+    this.diagnosiAndTreatment = model.diagnosiAndTreatment;
   }
 }

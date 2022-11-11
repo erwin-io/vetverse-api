@@ -16,6 +16,7 @@ import {
   RescheduleAppointmentDto,
   UpdateAppointmentConferencePeer,
   UpdateAppointmentStatusDto,
+  UpdateDiagnosiAndTreatment,
 } from "src/core/dto/appointment/appointment.update.dtos";
 import { AppointmentViewModel } from "src/core/view-model/appointment.view-model";
 import { Appointment } from "src/shared/entities/Appointment";
@@ -260,6 +261,46 @@ export class AppointmentService {
       throw e;
     }
   }
+  
+
+  // async getAppointmentsByPet(petId: string) {
+  //   try {
+  //     const params: any = {
+  //       petId,
+  //       status:
+  //         status.length === 0
+  //           ? ["Pending", "Approved", "Completed", "Cancelled"]
+  //           : status,
+  //     };
+
+  //     let query = this.appointmentRepo.manager
+  //       .createQueryBuilder("Appointment", "a")
+  //       //staff
+  //       .leftJoinAndSelect("a.staff", "s")
+  //       //service
+  //       .leftJoinAndSelect("a.serviceType", "st")
+  //       //consultation
+  //       .leftJoinAndSelect("a.consultaionType", "ct")
+  //       //status
+  //       .leftJoinAndSelect("a.appointmentStatus", "as")
+  //       //payments
+  //       .leftJoinAndSelect("a.payments", "ap")
+  //       //mapping client
+  //       .leftJoinAndSelect("a.clientAppointment", "ca")
+  //       .leftJoinAndSelect("ca.client", "cl")
+  //       .where("cl.clientId = :clientId")
+  //       .andWhere("as.name IN(:...status)");
+  //     query = query.setParameters(params);
+
+  //     return <AppointmentViewModel[]>(await query.getMany()).map(
+  //       (a: Appointment) => {
+  //         return new AppointmentViewModel(a);
+  //       }
+  //     );
+  //   } catch (e) {
+  //     throw e;
+  //   }
+  // }
 
   async createClientAppointment(dto: CreateClientAppointmentDto) {
     try {
@@ -669,6 +710,24 @@ export class AppointmentService {
         );
       }
       appointment.conferencePeerId = dto.conferencePeerId;
+      return await this.appointmentRepo.save(appointment);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async updateAppointmentDiagnosiAndTreatment(dto: UpdateDiagnosiAndTreatment) {
+    try {
+      const appointment = await this.appointmentRepo.findOne({
+        where: { appointmentId: dto.appointmentId },
+      });
+      if (!appointment) {
+        throw new HttpException(
+          "Appointment not found",
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      appointment.diagnosiAndTreatment = dto.diagnosiAndTreatment;
       return await this.appointmentRepo.save(appointment);
     } catch (e) {
       throw e;

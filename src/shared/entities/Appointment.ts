@@ -48,6 +48,9 @@ export class Appointment {
   @Column("nvarchar", { name: "ConferencePeerId", nullable: true })
   conferencePeerId: string | null;
 
+  @Column("nvarchar", { name: "DiagnosiAndTreatment", nullable: true })
+  diagnosiAndTreatment: string | null;
+
   @ManyToOne(() => Staff, (staff) => staff.appointments)
   @JoinColumn([{ name: "Staffid", referencedColumnName: "staffid" }])
   staff: Staff;
