@@ -1,4 +1,6 @@
 import { Pet } from "src/shared/entities/Pet";
+import { PetAppointment } from "src/shared/entities/PetAppointment";
+import { AppointmentViewModel } from "./appointment.view-model";
 import { ClientViewModel } from "./client.view-model";
 import { GenderViewModel } from "./gender.view-model";
 import { PetCategoryViewModel } from "./pet-category.view-model";
@@ -12,7 +14,8 @@ export class PetViewModel {
   client: ClientViewModel;
   petCategory: PetCategoryViewModel;
   gender: GenderViewModel;
-  constructor(model: Pet | undefined){
+  petAppointments: PetAppointmentModel[] = [];
+  constructor(model: Pet | undefined) {
     if (!model || model === null) {
       return null;
     }
@@ -24,5 +27,21 @@ export class PetViewModel {
     this.client = new ClientViewModel(model.client);
     this.petCategory = new PetCategoryViewModel(model.petCategory);
     this.gender = new GenderViewModel(model.gender);
+    if (model.petAppointments && model.petAppointments.length > 0) {
+      model.petAppointments.forEach((element) => {
+        this.petAppointments.push(new PetAppointmentModel(element));
+      });
+    }
+  }
+}
+
+export class PetAppointmentModel {
+  pet: PetViewModel;
+  appointment: AppointmentViewModel;
+  constructor(model: PetAppointment | undefined) {
+    if (!model || model === null) {
+      return null;
+    }
+    this.appointment = new AppointmentViewModel(model.appointment);
   }
 }

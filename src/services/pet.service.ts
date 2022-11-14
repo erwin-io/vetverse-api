@@ -72,6 +72,28 @@ export class PetService {
     }
   }
 
+  async findPetMedicalRecords(petId: string) {
+    try {
+      const result: any = <Pet>await this.petRepo.manager
+        .createQueryBuilder("Pet", "p")
+        .leftJoinAndSelect("p.client", "c")
+        .leftJoinAndSelect("p.gender", "g")
+        .leftJoinAndSelect("p.petCategory", "pc")
+        .leftJoinAndSelect("pc.petType", "pt")
+        .leftJoinAndSelect("p.petAppointments", "pa")
+        .leftJoinAndSelect("pa.appointment", "a")
+        .where({
+          petId: petId,
+          entityStatusId: "1",
+        })
+        .getOne();
+      return new PetViewModel(result);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
   async findById(petId: string) {
     try {
       const petCategory: Pet = await this.findOne({

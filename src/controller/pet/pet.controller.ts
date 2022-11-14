@@ -66,13 +66,12 @@ export class PetController {
     }
   }
 
-  @Post("")
+  @Get("getPetMedicalRecords/:petId")
   @UseGuards(JwtAuthGuard)
-  async add(@Body() createPetTypeDto: CreatePetDto) {
+  async getPetMedicalRecords(@Param("petId") petId: string) {
     const res: CustomResponse = {};
     try {
-      const res: CustomResponse = {};
-      res.data = await this.petService.add(createPetTypeDto);
+      res.data = await this.petService.findPetMedicalRecords(petId);
       res.success = true;
       return res;
     } catch (e) {
