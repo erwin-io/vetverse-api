@@ -10,6 +10,7 @@ import {
 import { ClientAppointment } from "./ClientAppointment";
 import { Users } from "./Users";
 import { Gender } from "./Gender";
+import { Notifications } from "./Notifications";
 import { Pet } from "./Pet";
 
 @Index("PK_Clients", ["clientId"], { unique: true })
@@ -55,6 +56,9 @@ export class Clients {
   @ManyToOne(() => Gender, (gender) => gender.clients)
   @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
   gender: Gender;
+
+  @OneToMany(() => Notifications, (notifications) => notifications.client)
+  notifications: Notifications[];
 
   @OneToMany(() => Pet, (pet) => pet.client)
   pets: Pet[];

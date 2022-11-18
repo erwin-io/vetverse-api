@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { Appointment } from "./Appointment";
 import { EntityStatus } from "./EntityStatus";
+import { Clients } from "./Clients";
 
 @Index("PK_Notifications", ["notificationId"], { unique: true })
 @Entity("Notifications", { schema: "dbo" })
@@ -35,4 +36,8 @@ export class Notifications {
     { name: "EntityStatusId", referencedColumnName: "entityStatusId" },
   ])
   entityStatus: EntityStatus;
+
+  @ManyToOne(() => Clients, (clients) => clients.notifications)
+  @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
+  client: Clients;
 }

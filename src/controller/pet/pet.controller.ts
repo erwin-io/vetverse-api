@@ -81,9 +81,26 @@ export class PetController {
     }
   }
 
+  @Post("")
+  @UseGuards(JwtAuthGuard)
+  async create(@Body() roleDto: CreatePetDto) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.petService.add(roleDto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+
   @Put("")
   @UseGuards(JwtAuthGuard)
-  async update(@Body() roleDto: PetDto) {
+  async update(@Body() roleDto: NotificationsDto) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};

@@ -286,9 +286,10 @@ export class AppointmentController {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
-      res.data = await this.appointmentService.updateAppointmentDiagnosiAndTreatment(
-        dto
-      );
+      res.data =
+        await this.appointmentService.updateAppointmentDiagnosiAndTreatment(
+          dto
+        );
       res.success = true;
       return res;
     } catch (e) {

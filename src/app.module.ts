@@ -15,7 +15,8 @@ import { PetCategoryModule } from "./controller/pet-category/pet-category.module
 import { PaymentsModule } from "./controller/payments/payments.module";
 import { FileModule } from "./controller/file/file.module";
 import { MessageModule } from "./controller/message/message.module";
-import { DashboardModule } from './controller/dashboard/dashboard.module';
+import { DashboardModule } from "./controller/dashboard/dashboard.module";
+import { NotificationModule } from './controller/notification/notification.module';
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
@@ -34,6 +35,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     MessageModule,
     MessageModule,
     DashboardModule,
+    NotificationModule,
   ],
   providers: [AppService],
   controllers: [],

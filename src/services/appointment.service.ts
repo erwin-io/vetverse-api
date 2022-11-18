@@ -24,6 +24,7 @@ import { AppointmentStatus } from "src/shared/entities/AppointmentStatus";
 import { ClientAppointment } from "src/shared/entities/ClientAppointment";
 import { Clients } from "src/shared/entities/Clients";
 import { ConsultaionType } from "src/shared/entities/ConsultaionType";
+import { Notifications } from "src/shared/entities/Notifications";
 import { Payment } from "src/shared/entities/Payment";
 import { PaymentType } from "src/shared/entities/PaymentType";
 import { Pet } from "src/shared/entities/Pet";
@@ -34,6 +35,10 @@ import { Staff } from "src/shared/entities/Staff";
 import { Users } from "src/shared/entities/Users";
 import { In, IsNull, Repository } from "typeorm";
 import { isNullOrUndefined } from "util";
+import {
+  NotificationTitleConstant,
+  NotificationDescriptionConstant,
+} from "../common/constant/notifications.constant";
 
 @Injectable()
 export class AppointmentService {
@@ -261,7 +266,6 @@ export class AppointmentService {
       throw e;
     }
   }
-  
 
   // async getAppointmentsByPet(petId: string) {
   //   try {
@@ -584,10 +588,17 @@ export class AppointmentService {
       const { appointmentId } = dto;
       return await this.appointmentRepo.manager.transaction(
         async (entityManager) => {
-          const appointment = await entityManager.findOne(Appointment, {
+          let appointment = await entityManager.findOne(Appointment, {
             where: { appointmentId },
             relations: ["appointmentStatus", "serviceType"],
           });
+          const clientAppointment = await entityManager.findOne(
+            ClientAppointment,
+            {
+              where: { appointmentId },
+              relations: ["appointment", "client"],
+            }
+          );
           if (
             appointment.appointmentStatus.appointmentStatusId !==
             AppointmentStatusEnum.PENDING.toString()
@@ -613,7 +624,28 @@ export class AppointmentService {
           appointment.timeEnd = moment(
             addHours(service.durationInHours, new Date(appointmentDate))
           ).format("h:mm:ss a");
-          return await entityManager.save(Appointment, appointment);
+          appointment = await entityManager.save(Appointment, appointment);
+          let notif = new Notifications();
+          notif.appointment = appointment;
+          notif.client = await entityManager.findOne(Clients, {
+            where: { clientId: clientAppointment.client.clientId },
+          });
+          notif.title = NotificationTitleConstant.APPOINTMENT_RESCHEDULED;
+          notif.description =
+            NotificationDescriptionConstant.APPOINTMENT_RESCHEDULED.replace(
+              "{0}",
+              `on ${moment(appointment.appointmentDate).format(
+                "MMM DD, YYYY"
+              )} for ${appointment.serviceType.name}`
+            );
+          notif = await entityManager.save(Notifications, notif);
+          if (!notif) {
+            throw new HttpException(
+              "Error adding notifications!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          return appointment;
         }
       );
     } catch (e) {
@@ -626,10 +658,17 @@ export class AppointmentService {
       const { appointmentId } = dto;
       return await this.appointmentRepo.manager.transaction(
         async (entityManager) => {
-          const appointment = await entityManager.findOne(Appointment, {
+          let appointment = await entityManager.findOne(Appointment, {
             where: { appointmentId },
-            relations: ["appointmentStatus"],
+            relations: ["appointmentStatus", "serviceType"],
           });
+          const clientAppointment = await entityManager.findOne(
+            ClientAppointment,
+            {
+              where: { appointmentId },
+              relations: ["appointment", "client"],
+            }
+          );
           if (
             appointment.appointmentStatus.appointmentStatusId !==
               AppointmentStatusEnum.PENDING.toString() &&
@@ -690,7 +729,54 @@ export class AppointmentService {
               where: { appointmentStatusId: dto.appointmentStatusId },
             }
           );
-          return await entityManager.save(Appointment, appointment);
+          appointment = await entityManager.save(Appointment, appointment);
+          let notif = new Notifications();
+          notif.appointment = appointment;
+          notif.client = await entityManager.findOne(Clients, {
+            where: { clientId: clientAppointment.client.clientId },
+          });
+          if (
+            Number(dto.appointmentStatusId) === AppointmentStatusEnum.APPROVED
+          ) {
+            notif.title = NotificationTitleConstant.APPOINTMENT_APPROVED;
+            notif.description =
+              NotificationDescriptionConstant.APPOINTMENT_APPROVED.replace(
+                "{0}",
+                `on ${moment(appointment.appointmentDate).format(
+                  "MMM DD, YYYY"
+                )} for ${appointment.serviceType.name}`
+              );
+          } else if (
+            Number(dto.appointmentStatusId) === AppointmentStatusEnum.COMPLETED
+          ) {
+            notif.title = NotificationTitleConstant.APPOINTMENT_COMPLETED;
+            notif.description =
+              NotificationDescriptionConstant.APPOINTMENT_COMPLETED.replace(
+                "{0}",
+                `on ${moment(appointment.appointmentDate).format(
+                  "MMM DD, YYYY"
+                )} for ${appointment.serviceType.name}`
+              );
+          } else if (
+            Number(dto.appointmentStatusId) === AppointmentStatusEnum.CANCELLED
+          ) {
+            notif.title = NotificationTitleConstant.APPOINTMENT_CANCELLED;
+            notif.description =
+              NotificationDescriptionConstant.APPOINTMENT_CANCELLED.replace(
+                "{0}",
+                `on ${moment(appointment.appointmentDate).format(
+                  "MMM DD, YYYY"
+                )} for ${appointment.serviceType.name}`
+              );
+          }
+          notif = await entityManager.save(Notifications, notif);
+          if (!notif) {
+            throw new HttpException(
+              "Error adding notifications!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          return appointment;
         }
       );
     } catch (e) {
@@ -718,17 +804,52 @@ export class AppointmentService {
 
   async updateAppointmentDiagnosiAndTreatment(dto: UpdateDiagnosiAndTreatment) {
     try {
-      const appointment = await this.appointmentRepo.findOne({
-        where: { appointmentId: dto.appointmentId },
-      });
-      if (!appointment) {
-        throw new HttpException(
-          "Appointment not found",
-          HttpStatus.BAD_REQUEST
-        );
-      }
-      appointment.diagnosiAndTreatment = dto.diagnosiAndTreatment;
-      return await this.appointmentRepo.save(appointment);
+      return await this.appointmentRepo.manager.transaction(
+        async (entityManager) => {
+          let appointment = await entityManager.findOne(Appointment, {
+            where: { appointmentId: dto.appointmentId },
+            relations: ["serviceType", "clientAppointment"],
+          });
+          const clientAppointment = await entityManager.findOne(
+            ClientAppointment,
+            {
+              where: { appointmentId: dto.appointmentId },
+              relations: ["appointment", "client"],
+            }
+          );
+          if (!appointment) {
+            throw new HttpException(
+              "Appointment not found",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          appointment.diagnosiAndTreatment = dto.diagnosiAndTreatment;
+          appointment = await this.appointmentRepo.save(appointment);
+
+          let notif = new Notifications();
+          notif.appointment = appointment;
+          notif.client = await entityManager.findOne(Clients, {
+            where: { clientId: clientAppointment.client.clientId },
+          });
+          notif.title =
+            NotificationTitleConstant.APPOINTMENT_DIAGNOSIS_AND_TREATMENT;
+          notif.description =
+            NotificationDescriptionConstant.APPOINTMENT_DIAGNOSIS_AND_TREATMENT.replace(
+              "{0}",
+              `on ${moment(appointment.appointmentDate).format(
+                "MMM DD, YYYY"
+              )} for ${appointment.serviceType.name}`
+            );
+          notif = await entityManager.save(Notifications, notif);
+          if (!notif) {
+            throw new HttpException(
+              "Error adding notifications!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          return appointment;
+        }
+      );
     } catch (e) {
       throw e;
     }
