@@ -97,10 +97,9 @@ export class PetController {
     }
   }
 
-
   @Put("")
   @UseGuards(JwtAuthGuard)
-  async update(@Body() roleDto: NotificationsDto) {
+  async update(@Body() roleDto: PetDto) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
