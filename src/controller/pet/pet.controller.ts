@@ -67,7 +67,7 @@ export class PetController {
   }
 
   @Get("getPetMedicalRecords/:petId")
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getPetMedicalRecords(@Param("petId") petId: string) {
     const res: CustomResponse = {};
     try {
