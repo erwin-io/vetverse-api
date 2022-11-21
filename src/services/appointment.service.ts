@@ -140,7 +140,10 @@ export class AppointmentService {
           params.clientName = `%${clientName}%`;
           params.isWalkIn = isWalkIn;
         }
-        query = query.andWhere("s.fullName like :vetName");
+        query = query
+          .andWhere("ISNULL(s.firstName, '') like :clientName")
+          .orWhere("ISNULL(s.middleName, '') like :vetName")
+          .orWhere("ISNULL(s.lastName, '') like :vetName");
         params.vetName = `%${vetName}%`;
         if (serviceType.length > 0) {
           query = query.andWhere("st.name IN(:...serviceType)");
