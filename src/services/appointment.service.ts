@@ -835,28 +835,29 @@ export class AppointmentService {
           }
           appointment.diagnosiAndTreatment = dto.diagnosiAndTreatment;
           appointment = await this.appointmentRepo.save(appointment);
-
-          let notif = new Notifications();
-          notif.appointment = appointment;
-          notif.client = await entityManager.findOne(Clients, {
-            where: { clientId: clientAppointment.client.clientId },
-          });
-          notif.title =
-            NotificationTitleConstant.APPOINTMENT_DIAGNOSIS_AND_TREATMENT;
-          notif.date = new Date();
-          notif.description =
-            NotificationDescriptionConstant.APPOINTMENT_DIAGNOSIS_AND_TREATMENT.replace(
-              "{0}",
-              `on ${moment(appointment.appointmentDate).format(
-                "MMM DD, YYYY"
-              )} ${appointment.timeStart} for ${appointment.serviceType.name}`
-            );
-          notif = await entityManager.save(Notifications, notif);
-          if (!notif) {
-            throw new HttpException(
-              "Error adding notifications!",
-              HttpStatus.BAD_REQUEST
-            );
+          if (!appointment.isWalkIn) {
+            let notif = new Notifications();
+            notif.appointment = appointment;
+            notif.client = await entityManager.findOne(Clients, {
+              where: { clientId: clientAppointment.client.clientId },
+            });
+            notif.title =
+              NotificationTitleConstant.APPOINTMENT_DIAGNOSIS_AND_TREATMENT;
+            notif.date = new Date();
+            notif.description =
+              NotificationDescriptionConstant.APPOINTMENT_DIAGNOSIS_AND_TREATMENT.replace(
+                "{0}",
+                `on ${moment(appointment.appointmentDate).format(
+                  "MMM DD, YYYY"
+                )} ${appointment.timeStart} for ${appointment.serviceType.name}`
+              );
+            notif = await entityManager.save(Notifications, notif);
+            if (!notif) {
+              throw new HttpException(
+                "Error adding notifications!",
+                HttpStatus.BAD_REQUEST
+              );
+            }
           }
           return appointment;
         }
