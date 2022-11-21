@@ -43,4 +43,17 @@ export class NotificationService {
       throw e;
     }
   }
+
+  async getTotalUnreadByClientId(clientId: string) {
+    const isRead = false;
+    const queryBuilder = this.notificationsRepo.manager
+      .createQueryBuilder()
+      .select("n")
+      .from(Notifications, "n")
+      .leftJoinAndSelect("n.appointment", "a")
+      .leftJoinAndSelect("n.client", "c")
+      .where("n.clientId = :clientId", { clientId })
+      .andWhere("n.isRead = :isRead", { isRead });
+    return { total: await queryBuilder.getCount() };
+  }
 }

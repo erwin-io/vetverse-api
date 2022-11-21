@@ -631,12 +631,13 @@ export class AppointmentService {
             where: { clientId: clientAppointment.client.clientId },
           });
           notif.title = NotificationTitleConstant.APPOINTMENT_RESCHEDULED;
+          notif.date = new Date();
           notif.description =
             NotificationDescriptionConstant.APPOINTMENT_RESCHEDULED.replace(
               "{0}",
               `on ${moment(appointment.appointmentDate).format(
                 "MMM DD, YYYY"
-              )} for ${appointment.serviceType.name}`
+              )} ${appointment.timeStart} for ${appointment.serviceType.name}`
             );
           notif = await entityManager.save(Notifications, notif);
           if (!notif) {
@@ -732,6 +733,7 @@ export class AppointmentService {
           appointment = await entityManager.save(Appointment, appointment);
           let notif = new Notifications();
           notif.appointment = appointment;
+          notif.date = new Date();
           notif.client = await entityManager.findOne(Clients, {
             where: { clientId: clientAppointment.client.clientId },
           });
@@ -744,7 +746,7 @@ export class AppointmentService {
                 "{0}",
                 `on ${moment(appointment.appointmentDate).format(
                   "MMM DD, YYYY"
-                )} for ${appointment.serviceType.name}`
+                )} ${appointment.timeStart} for ${appointment.serviceType.name}`
               );
           } else if (
             Number(dto.appointmentStatusId) === AppointmentStatusEnum.COMPLETED
@@ -833,12 +835,13 @@ export class AppointmentService {
           });
           notif.title =
             NotificationTitleConstant.APPOINTMENT_DIAGNOSIS_AND_TREATMENT;
+          notif.date = new Date();
           notif.description =
             NotificationDescriptionConstant.APPOINTMENT_DIAGNOSIS_AND_TREATMENT.replace(
               "{0}",
               `on ${moment(appointment.appointmentDate).format(
                 "MMM DD, YYYY"
-              )} for ${appointment.serviceType.name}`
+              )} ${appointment.timeStart} for ${appointment.serviceType.name}`
             );
           notif = await entityManager.save(Notifications, notif);
           if (!notif) {

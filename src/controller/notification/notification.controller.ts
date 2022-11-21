@@ -64,6 +64,24 @@ export class NotificationController {
     }
   }
 
+  @Get("getTotalUnreadByClientId")
+  @ApiQuery({ name: "clientId", required: false })
+  @UseGuards(JwtAuthGuard)
+  async getTotalUnreadByClientId(@Query("clientId") clientId: string = "") {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.notificationService.getTotalUnreadByClientId(
+        clientId
+      );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
   @Put("updateReadStatus")
   @UseGuards(JwtAuthGuard)
   async updateReadStatus(@Body() dto: NotificationsDto) {

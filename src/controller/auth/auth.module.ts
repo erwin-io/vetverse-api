@@ -10,11 +10,13 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Users } from "src/shared/entities/Users";
 import { Roles } from "src/shared/entities/Roles";
 import { RolesModule } from "../roles/roles.module";
+import { NotificationModule } from "../notification/notification.module";
 
 @Module({
   imports: [
     UsersModule,
     RolesModule,
+    NotificationModule,
     PassportModule.register({}),
     JwtModule.register({}),
     TypeOrmModule.forFeature([Users, Roles]),
