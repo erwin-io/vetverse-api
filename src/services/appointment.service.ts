@@ -625,26 +625,28 @@ export class AppointmentService {
             addHours(service.durationInHours, new Date(appointmentDate))
           ).format("h:mm:ss a");
           appointment = await entityManager.save(Appointment, appointment);
-          let notif = new Notifications();
-          notif.appointment = appointment;
-          notif.client = await entityManager.findOne(Clients, {
-            where: { clientId: clientAppointment.client.clientId },
-          });
-          notif.title = NotificationTitleConstant.APPOINTMENT_RESCHEDULED;
-          notif.date = new Date();
-          notif.description =
-            NotificationDescriptionConstant.APPOINTMENT_RESCHEDULED.replace(
-              "{0}",
-              `on ${moment(appointment.appointmentDate).format(
-                "MMM DD, YYYY"
-              )} ${appointment.timeStart} for ${appointment.serviceType.name}`
-            );
-          notif = await entityManager.save(Notifications, notif);
-          if (!notif) {
-            throw new HttpException(
-              "Error adding notifications!",
-              HttpStatus.BAD_REQUEST
-            );
+          if (!appointment.isWalkIn) {
+            let notif = new Notifications();
+            notif.appointment = appointment;
+            notif.client = await entityManager.findOne(Clients, {
+              where: { clientId: clientAppointment.client.clientId },
+            });
+            notif.title = NotificationTitleConstant.APPOINTMENT_RESCHEDULED;
+            notif.date = new Date();
+            notif.description =
+              NotificationDescriptionConstant.APPOINTMENT_RESCHEDULED.replace(
+                "{0}",
+                `on ${moment(appointment.appointmentDate).format(
+                  "MMM DD, YYYY"
+                )} ${appointment.timeStart} for ${appointment.serviceType.name}`
+              );
+            notif = await entityManager.save(Notifications, notif);
+            if (!notif) {
+              throw new HttpException(
+                "Error adding notifications!",
+                HttpStatus.BAD_REQUEST
+              );
+            }
           }
           return appointment;
         }
@@ -731,52 +733,58 @@ export class AppointmentService {
             }
           );
           appointment = await entityManager.save(Appointment, appointment);
-          let notif = new Notifications();
-          notif.appointment = appointment;
-          notif.date = new Date();
-          notif.client = await entityManager.findOne(Clients, {
-            where: { clientId: clientAppointment.client.clientId },
-          });
-          if (
-            Number(dto.appointmentStatusId) === AppointmentStatusEnum.APPROVED
-          ) {
-            notif.title = NotificationTitleConstant.APPOINTMENT_APPROVED;
-            notif.description =
-              NotificationDescriptionConstant.APPOINTMENT_APPROVED.replace(
-                "{0}",
-                `on ${moment(appointment.appointmentDate).format(
-                  "MMM DD, YYYY"
-                )} ${appointment.timeStart} for ${appointment.serviceType.name}`
+          if (!appointment.isWalkIn) {
+            let notif = new Notifications();
+            notif.appointment = appointment;
+            notif.date = new Date();
+            notif.client = await entityManager.findOne(Clients, {
+              where: { clientId: clientAppointment.client.clientId },
+            });
+            if (
+              Number(dto.appointmentStatusId) === AppointmentStatusEnum.APPROVED
+            ) {
+              notif.title = NotificationTitleConstant.APPOINTMENT_APPROVED;
+              notif.description =
+                NotificationDescriptionConstant.APPOINTMENT_APPROVED.replace(
+                  "{0}",
+                  `on ${moment(appointment.appointmentDate).format(
+                    "MMM DD, YYYY"
+                  )} ${appointment.timeStart} for ${
+                    appointment.serviceType.name
+                  }`
+                );
+            } else if (
+              Number(dto.appointmentStatusId) ===
+              AppointmentStatusEnum.COMPLETED
+            ) {
+              notif.title = NotificationTitleConstant.APPOINTMENT_COMPLETED;
+              notif.description =
+                NotificationDescriptionConstant.APPOINTMENT_COMPLETED.replace(
+                  "{0}",
+                  `on ${moment(appointment.appointmentDate).format(
+                    "MMM DD, YYYY"
+                  )} for ${appointment.serviceType.name}`
+                );
+            } else if (
+              Number(dto.appointmentStatusId) ===
+              AppointmentStatusEnum.CANCELLED
+            ) {
+              notif.title = NotificationTitleConstant.APPOINTMENT_CANCELLED;
+              notif.description =
+                NotificationDescriptionConstant.APPOINTMENT_CANCELLED.replace(
+                  "{0}",
+                  `on ${moment(appointment.appointmentDate).format(
+                    "MMM DD, YYYY"
+                  )} for ${appointment.serviceType.name}`
+                );
+            }
+            notif = await entityManager.save(Notifications, notif);
+            if (!notif) {
+              throw new HttpException(
+                "Error adding notifications!",
+                HttpStatus.BAD_REQUEST
               );
-          } else if (
-            Number(dto.appointmentStatusId) === AppointmentStatusEnum.COMPLETED
-          ) {
-            notif.title = NotificationTitleConstant.APPOINTMENT_COMPLETED;
-            notif.description =
-              NotificationDescriptionConstant.APPOINTMENT_COMPLETED.replace(
-                "{0}",
-                `on ${moment(appointment.appointmentDate).format(
-                  "MMM DD, YYYY"
-                )} for ${appointment.serviceType.name}`
-              );
-          } else if (
-            Number(dto.appointmentStatusId) === AppointmentStatusEnum.CANCELLED
-          ) {
-            notif.title = NotificationTitleConstant.APPOINTMENT_CANCELLED;
-            notif.description =
-              NotificationDescriptionConstant.APPOINTMENT_CANCELLED.replace(
-                "{0}",
-                `on ${moment(appointment.appointmentDate).format(
-                  "MMM DD, YYYY"
-                )} for ${appointment.serviceType.name}`
-              );
-          }
-          notif = await entityManager.save(Notifications, notif);
-          if (!notif) {
-            throw new HttpException(
-              "Error adding notifications!",
-              HttpStatus.BAD_REQUEST
-            );
+            }
           }
           return appointment;
         }
