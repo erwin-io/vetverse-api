@@ -83,6 +83,7 @@ export class PetService {
         .leftJoinAndSelect("p.petAppointments", "pa")
         .leftJoinAndSelect("pa.appointment", "a")
         .leftJoinAndSelect("a.appointmentStatus", "as")
+        .leftJoinAndSelect("a.serviceType", "serv")
         .where({
           petId: petId,
           entityStatusId: "1",
