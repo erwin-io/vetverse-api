@@ -22,7 +22,8 @@ export class AppointmentViewModel {
   clientAppointment: ClientAppointmentViewModel;
   petAppointment: any;
   conferencePeerId: string;
-  diagnosiAndTreatment: string;
+  diagnosisAndTreatment: string;
+  serviceRate: number;
   constructor(model: Appointment | undefined) {
     if (!model || model === null) {
       return null;
@@ -47,6 +48,7 @@ export class AppointmentViewModel {
       : [];
     this.isPaid = this.payments.length > 0;
     this.conferencePeerId = model.conferencePeerId;
-    this.diagnosiAndTreatment = model.diagnosiAndTreatment;
+    this.diagnosisAndTreatment = model.diagnosisAndTreatment;
+    this.serviceRate = model.serviceRate;
   }
 }

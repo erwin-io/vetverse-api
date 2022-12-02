@@ -18,6 +18,7 @@ import { Notifications } from "./Notifications";
 import { Payment } from "./Payment";
 import { PetAppointment } from "./PetAppointment";
 
+@Index("IX_Appointment", ["appointmentId"], { unique: true })
 @Index("PK_Appointment", ["appointmentId"], { unique: true })
 @Entity("Appointment", { schema: "dbo" })
 export class Appointment {
@@ -36,6 +37,14 @@ export class Appointment {
   @Column("nvarchar", { name: "TimeEnd", length: 50 })
   timeEnd: string;
 
+  @Column("decimal", {
+    name: "ServiceRate",
+    precision: 18,
+    scale: 2,
+    default: () => "(0)",
+  })
+  serviceRate: number;
+
   @Column("bit", { name: "IsPaid", default: () => "(0)" })
   isPaid: boolean;
 
@@ -48,8 +57,8 @@ export class Appointment {
   @Column("nvarchar", { name: "ConferencePeerId", nullable: true })
   conferencePeerId: string | null;
 
-  @Column("nvarchar", { name: "DiagnosiAndTreatment", nullable: true })
-  diagnosiAndTreatment: string | null;
+  @Column("nvarchar", { name: "DiagnosisAndTreatment", nullable: true })
+  diagnosisAndTreatment: string | null;
 
   @ManyToOne(() => Staff, (staff) => staff.appointments)
   @JoinColumn([{ name: "Staffid", referencedColumnName: "staffid" }])

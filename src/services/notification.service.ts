@@ -28,6 +28,7 @@ export class NotificationService {
         async (entityManager) => {
           const notification = await entityManager.findOne(Notifications, {
             where: { notificationId: dto.notificationId },
+            relations: ["client"],
           });
           if (!notification) {
             throw new HttpException(
@@ -36,7 +37,20 @@ export class NotificationService {
             );
           }
           notification.isRead = true;
-          return await entityManager.save(notification);
+          await entityManager.save(notification);
+
+          const isRead = false;
+          const queryBuilder = entityManager
+            .createQueryBuilder()
+            .select("n")
+            .from(Notifications, "n")
+            .leftJoinAndSelect("n.appointment", "a")
+            .leftJoinAndSelect("n.client", "c")
+            .where("n.clientId = :clientId", {
+              clientId: notification.client.clientId,
+            })
+            .andWhere("n.isRead = :isRead", { isRead });
+          return { total: await queryBuilder.getCount() };
         }
       );
     } catch (e) {

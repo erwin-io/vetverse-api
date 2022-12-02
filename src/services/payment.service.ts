@@ -19,8 +19,6 @@ export class PaymentService {
         .createQueryBuilder("Payment", "p")
         //Appointment
         .leftJoinAndSelect("p.appointment", "a")
-        //service
-        .leftJoinAndSelect("a.serviceType", "st")
         //consultation
         .leftJoinAndSelect("a.consultaionType", "ct")
         //status
@@ -39,8 +37,6 @@ export class PaymentService {
         .createQueryBuilder("Payment", "p")
         //Appointment
         .leftJoinAndSelect("p.appointment", "a")
-        //service
-        .leftJoinAndSelect("a.serviceType", "st")
         //consultation
         .leftJoinAndSelect("a.consultaionType", "ct")
         //status
@@ -87,6 +83,7 @@ export class PaymentService {
       payment.paymentDate = createPaymentDto.paymentDate;
       payment.paymentType = new PaymentType();
       payment.paymentType.paymentTypeId = createPaymentDto.paymentTypeId;
+      payment.referenceNo = createPaymentDto.referenceNo;
       return await this.paymentRepo.save(payment);
     } catch (e) {
       throw e;

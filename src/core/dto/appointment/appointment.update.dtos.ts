@@ -19,6 +19,12 @@ export class UpdateAppointmentStatusDto extends AppointmentDto {
   @ApiProperty()
   @IsNotEmpty()
   appointmentStatusId: string;
+
+  @ApiProperty({
+    default: false,
+  })
+  @IsNotEmpty()
+  isUpdatedByClient: boolean;
 }
 
 export class RescheduleAppointmentDto extends AppointmentDto {
@@ -46,8 +52,8 @@ export class UpdateAppointmentConferencePeer extends AppointmentDto {
   conferencePeerId: string;
 }
 
-export class UpdateDiagnosiAndTreatment extends AppointmentDto {
+export class UpdateDiagnosisAndTreatment extends AppointmentDto {
   @ApiProperty()
   @IsString()
-  diagnosiAndTreatment: string;
+  diagnosisAndTreatment: string;
 }

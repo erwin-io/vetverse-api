@@ -12,7 +12,7 @@ import {
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { CustomResponse } from "src/common/helper/customresponse.helpers";
 import { JwtAuthGuard } from "src/core/auth/jwt.auth.guard";
-import { UpdateDiagnosiAndTreatment } from "src/core/dto/appointment/appointment.update.dtos";
+import { UpdateDiagnosisAndTreatment } from "src/core/dto/appointment/appointment.update.dtos";
 import { NotificationService } from "src/services/notification.service";
 import { Notifications } from "src/shared/entities/Notifications";
 import { NotificationsDto } from "src/core/dto/notification/notification.dtos";

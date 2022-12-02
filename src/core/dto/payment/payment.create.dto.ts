@@ -21,4 +21,8 @@ export class CreatePaymentDto {
   @ApiProperty()
   @IsNotEmpty()
   appointmentId: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  referenceNo: string;
 }

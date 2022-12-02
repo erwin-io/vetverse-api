@@ -16,7 +16,7 @@ import {
   RescheduleAppointmentDto,
   UpdateAppointmentConferencePeer,
   UpdateAppointmentStatusDto,
-  UpdateDiagnosiAndTreatment,
+  UpdateDiagnosisAndTreatment,
 } from "src/core/dto/appointment/appointment.update.dtos";
 import { AppointmentViewModel } from "src/core/view-model/appointment.view-model";
 import { Appointment } from "src/shared/entities/Appointment";
@@ -39,6 +39,7 @@ import {
   NotificationTitleConstant,
   NotificationDescriptionConstant,
 } from "../common/constant/notifications.constant";
+import { IPaginationOptions, paginate } from "nestjs-typeorm-paginate";
 
 @Injectable()
 export class AppointmentService {
@@ -222,6 +223,44 @@ export class AppointmentService {
     }
   }
 
+  async getClientAppointmentsHistory(
+    clientId: string,
+    options: IPaginationOptions
+  ) {
+    try {
+      const params: any = {
+        clientId,
+        status: ["Completed", "Cancelled"],
+      };
+
+      let query = this.appointmentRepo.manager
+        .createQueryBuilder()
+        .select("a")
+        .from(Appointment, "a")
+        //staff
+        .leftJoinAndSelect("a.staff", "s")
+        //service
+        .leftJoinAndSelect("a.serviceType", "st")
+        //consultation
+        .leftJoinAndSelect("a.consultaionType", "ct")
+        //status
+        .leftJoinAndSelect("a.appointmentStatus", "as")
+        //payments
+        .leftJoinAndSelect("a.payments", "ap")
+        //mapping client
+        .leftJoinAndSelect("a.clientAppointment", "ca")
+        .leftJoinAndSelect("ca.client", "cl")
+        .where("cl.clientId = :clientId")
+        .andWhere("as.name IN(:...status)");
+      query = query.setParameters(params);
+      query.orderBy("n.notificationId", "DESC");
+
+      return paginate<Appointment>(query, options);
+    } catch (e) {
+      throw e;
+    }
+  }
+
   async findOne(options?: any) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -329,6 +368,7 @@ export class AppointmentService {
               HttpStatus.BAD_REQUEST
             );
           }
+          newAppointment.serviceRate = service.price;
           newAppointment.comments = dto.comments;
           newAppointment.timeStart = moment(new Date(appointmentDate)).format(
             "h:mm:ss a"
@@ -405,6 +445,8 @@ export class AppointmentService {
           const vet = await entityManager.findOne(Staff, {
             where: { staffid: dto.veterenarianId },
           });
+          newAppointment.isPaid = true;
+          newAppointment.serviceRate = service.price;
           newAppointment.staff = vet;
           newAppointment.consultaionType = new ConsultaionType();
           newAppointment.consultaionType.consultaionTypeId =
@@ -426,7 +468,6 @@ export class AppointmentService {
               HttpStatus.BAD_REQUEST
             );
           }
-          appointment.isPaid = true;
           const newClientAppointment = new ClientAppointment();
           newClientAppointment.appointment = appointment;
           newClientAppointment.client = await entityManager.findOne(Clients, {
@@ -470,6 +511,7 @@ export class AppointmentService {
               HttpStatus.BAD_REQUEST
             );
           }
+          newAppointment.serviceRate = service.price;
           newAppointment.timeStart = moment(new Date(appointmentDate)).format(
             "h:mm:ss a"
           );
@@ -545,6 +587,7 @@ export class AppointmentService {
               HttpStatus.BAD_REQUEST
             );
           }
+          newAppointment.serviceRate = service.price;
           newAppointment.comments = dto.comments;
           newAppointment.timeStart = moment(new Date(appointmentDate)).format(
             "h:mm:ss a"
@@ -772,6 +815,21 @@ export class AppointmentService {
               Number(dto.appointmentStatusId) ===
               AppointmentStatusEnum.CANCELLED
             ) {
+              if (dto.isUpdatedByClient) {
+                let client = notif.client;
+                client.lastCancelledDate = new Date();
+                const numberOfCancelledAttempt =
+                  Number(client.numberOfCancelledAttempt) + 1;
+                client.numberOfCancelledAttempt =
+                  numberOfCancelledAttempt.toString();
+                client = await entityManager.save(Clients, client);
+                if (!client) {
+                  throw new HttpException(
+                    "Error updating Clients!",
+                    HttpStatus.BAD_REQUEST
+                  );
+                }
+              }
               notif.title = NotificationTitleConstant.APPOINTMENT_CANCELLED;
               notif.description =
                 NotificationDescriptionConstant.APPOINTMENT_CANCELLED.replace(
@@ -781,12 +839,14 @@ export class AppointmentService {
                   )} for ${appointment.serviceType.name}`
                 );
             }
-            notif = await entityManager.save(Notifications, notif);
-            if (!notif) {
-              throw new HttpException(
-                "Error adding notifications!",
-                HttpStatus.BAD_REQUEST
-              );
+            if (!dto.isUpdatedByClient) {
+              notif = await entityManager.save(Notifications, notif);
+              if (!notif) {
+                throw new HttpException(
+                  "Error adding notifications!",
+                  HttpStatus.BAD_REQUEST
+                );
+              }
             }
           }
           return appointment;
@@ -815,7 +875,9 @@ export class AppointmentService {
     }
   }
 
-  async updateAppointmentDiagnosiAndTreatment(dto: UpdateDiagnosiAndTreatment) {
+  async updateAppointmentDiagnosisAndTreatment(
+    dto: UpdateDiagnosisAndTreatment
+  ) {
     try {
       return await this.appointmentRepo.manager.transaction(
         async (entityManager) => {
@@ -836,7 +898,7 @@ export class AppointmentService {
               HttpStatus.BAD_REQUEST
             );
           }
-          appointment.diagnosiAndTreatment = dto.diagnosiAndTreatment;
+          appointment.diagnosisAndTreatment = dto.diagnosisAndTreatment;
           appointment = await this.appointmentRepo.save(appointment);
           if (!appointment.isWalkIn) {
             let notif = new Notifications();

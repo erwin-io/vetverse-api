@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -21,7 +23,7 @@ import {
   RescheduleAppointmentDto,
   UpdateAppointmentConferencePeer,
   UpdateAppointmentStatusDto,
-  UpdateDiagnosiAndTreatment,
+  UpdateDiagnosisAndTreatment,
 } from "src/core/dto/appointment/appointment.update.dtos";
 import { AppointmentService } from "src/services/appointment.service";
 
@@ -131,6 +133,31 @@ export class AppointmentController {
     const res: CustomResponse = {};
     try {
       res.data = await this.appointmentService.findById(appointmentId);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Get("getClientAppointmentsHistory")
+  @ApiQuery({ name: "clientId", required: false })
+  // @UseGuards(JwtAuthGuard)
+  async getClientAppointmentsHistory(@Query("clientId") clientId) {
+    const res: CustomResponse = {};
+    try {
+      // page = page <= 0 ? 1 : page;
+      // limit = limit > 40 ? 40 : limit;
+      const result = await this.appointmentService.getClientAppointmentsHistory(
+        clientId,
+        {
+          page: 1,
+          limit: 10,
+        }
+      );
+      res.data = result;
       res.success = true;
       return res;
     } catch (e) {
@@ -278,16 +305,16 @@ export class AppointmentController {
     }
   }
 
-  @Put("updateAppointmentDiagnosiAndTreatment")
+  @Put("updateAppointmentDiagnosisAndTreatment")
   @UseGuards(JwtAuthGuard)
-  async updateAppointmentDiagnosiAndTreatment(
-    @Body() dto: UpdateDiagnosiAndTreatment
+  async updateAppointmentDiagnosisAndTreatment(
+    @Body() dto: UpdateDiagnosisAndTreatment
   ) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
       res.data =
-        await this.appointmentService.updateAppointmentDiagnosiAndTreatment(
+        await this.appointmentService.updateAppointmentDiagnosisAndTreatment(
           dto
         );
       res.success = true;

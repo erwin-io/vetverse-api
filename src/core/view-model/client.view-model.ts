@@ -15,6 +15,8 @@ export class ClientViewModel {
   user: UserViewModel;
   birthDate: Date;
   age: string;
+  lastCancelledDate: Date;
+  numberOfCancelledAttempt: string;
   constructor(model: Clients | undefined) {
     if (!model || model === null) {
       return null;
@@ -34,5 +36,8 @@ export class ClientViewModel {
     this.user = new UserViewModel(model.user);
     this.birthDate = model.birthDate;
     this.age = model.age;
+    this.age = model.age;
+    this.lastCancelledDate = model.lastCancelledDate;
+    this.numberOfCancelledAttempt = model.numberOfCancelledAttempt;
   }
 }

@@ -116,6 +116,8 @@ export class AuthService {
       age,
       gender,
       fullName,
+      lastCancelledDate,
+      numberOfCancelledAttempt
     } = getInfo;
     const notification =
       await this.notificationService.getTotalUnreadByClientId(clientId);
@@ -140,6 +142,8 @@ export class AuthService {
       refreshToken,
       userTypeIdentityId,
       totalUnreadNotif: notification.total,
+      lastCancelledDate,
+      numberOfCancelledAttempt
     };
   }
 

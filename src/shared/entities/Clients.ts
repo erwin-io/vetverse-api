@@ -43,6 +43,12 @@ export class Clients {
   @Column("bigint", { name: "Age" })
   age: string;
 
+  @Column("datetime", { name: "LastCancelledDate", nullable: true })
+  lastCancelledDate: Date | null;
+
+  @Column("bigint", { name: "NumberOfCancelledAttempt", default: () => "(0)" })
+  numberOfCancelledAttempt: string;
+
   @OneToMany(
     () => ClientAppointment,
     (clientAppointment) => clientAppointment.client
