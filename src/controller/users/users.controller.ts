@@ -23,6 +23,7 @@ import {
 } from "../../core/dto/users/user.create.dto";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../../core/auth/jwt.auth.guard";
+import { ChangePasswordDto } from "src/core/dto/users/change-password.dto";
 
 @ApiTags("users")
 @Controller("users")
@@ -211,6 +212,25 @@ export class UsersController {
     try {
       const res: CustomResponse = {};
       res.data = await this.userService.updateStaffUser(staffUserDto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Put("/changePassword")
+  @UseGuards(JwtAuthGuard)
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.userService.changePassword(
+        changePasswordDto.userId,
+        changePasswordDto.currentPassword,
+        changePasswordDto.newPassword);
       res.success = true;
       return res;
     } catch (e) {
