@@ -561,6 +561,28 @@ export class UsersService {
     return await this.findOne({ userId }, true, this.userRepo.manager);
   }
 
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    return await this.userRepo.manager.transaction(async (entityManager) => {
+      let user: Users = await entityManager.findOne(Users, { where: {
+        userId
+      } });
+
+      if (!user) {
+        throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
+      }
+      
+      const areEqual = await compare(user.password, currentPassword);
+      if (!areEqual) {
+        throw new HttpException("Password not match", HttpStatus.NOT_ACCEPTABLE);
+      }
+      
+      user.password = await hash(newPassword),
+      user = await entityManager.save(Users, user);
+      return this._sanitizeUser(user);
+    });
+
+  }
+
   async updatePassword(userId: string, password: string) {
     await this.userRepo.update(userId, {
       password: await hash(password),

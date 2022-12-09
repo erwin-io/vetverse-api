@@ -121,19 +121,20 @@ export class AppointmentService {
           appointmentDateTo instanceof Date &&
           appointmentDateTo.toDateString() !== "Invalid Date"
         ) {
-          query = query.andWhere(
-            "a.appointmentDate between :appointmentDateFrom and :appointmentDateTo"
-          );
+          query = query
+            .where(
+              "a.appointmentDate between :appointmentDateFrom and :appointmentDateTo"
+            )
+            .andWhere("as.name IN(:...status)");
           params.appointmentDateFrom =
             moment(appointmentDateFrom).format("YYYY-MM-DD");
           params.appointmentDateTo =
             moment(appointmentDateTo).format("YYYY-MM-DD");
         }
         if (!isWalkIn) {
-          query = query
-            .orWhere("ISNULL(cl.firstName, '') like :clientName")
-            .orWhere("ISNULL(cl.middleName, '') like :clientName")
-            .orWhere("ISNULL(cl.lastName, '') like :clientName");
+          query.andWhere(
+            "CONCAT(cl.firstName, ' ', cl.middleName, ' ', cl.lastName) LIKE :clientName"
+          );
           params.clientName = `%${clientName}%`;
         } else {
           query = query.andWhere("a.walkInAppointmentNotes like :clientName");
@@ -141,10 +142,9 @@ export class AppointmentService {
           params.clientName = `%${clientName}%`;
           params.isWalkIn = isWalkIn;
         }
-        query = query
-          .andWhere("ISNULL(s.firstName, '') like :clientName")
-          .orWhere("ISNULL(s.middleName, '') like :vetName")
-          .orWhere("ISNULL(s.lastName, '') like :vetName");
+        query.andWhere(
+          "CONCAT(s.firstName, ' ', s.middleName, ' ', s.lastName) LIKE :vetName"
+        );
         params.vetName = `%${vetName}%`;
         if (serviceType.length > 0) {
           query = query.andWhere("st.name IN(:...serviceType)");
@@ -156,12 +156,11 @@ export class AppointmentService {
         }
 
         query = query
-          .andWhere("as.name IN(:...status)")
           .orderBy("as.appointmentStatusId", "ASC")
           .addOrderBy("a.appointmentDate", "ASC");
       } else {
         query = query
-          .orWhere("a.appointmentId like :keyword")
+          .where("a.appointmentId like :keyword")
           .orWhere("a.appointmentDate like :keyword")
           .orWhere("a.walkInAppointmentNotes like :keyword")
           .orWhere("st.name like :keyword")
@@ -172,13 +171,12 @@ export class AppointmentService {
           .orderBy("as.appointmentStatusId", "ASC")
           .addOrderBy("a.appointmentDate", "ASC");
       }
-      query = query.setParameters(params);
 
-      return <AppointmentViewModel[]>(await query.getMany()).map(
-        (a: Appointment) => {
-          return new AppointmentViewModel(a);
-        }
-      );
+      return <AppointmentViewModel[]>(
+        await query.setParameters(params).getMany()
+      ).map((a: Appointment) => {
+        return new AppointmentViewModel(a);
+      });
     } catch (e) {
       throw e;
     }
