@@ -307,44 +307,30 @@ export class AppointmentService {
     }
   }
 
-  // async getAppointmentsByPet(petId: string) {
-  //   try {
-  //     const params: any = {
-  //       petId,
-  //       status:
-  //         status.length === 0
-  //           ? ["Pending", "Approved", "Completed", "Cancelled"]
-  //           : status,
-  //     };
-
-  //     let query = this.appointmentRepo.manager
-  //       .createQueryBuilder("Appointment", "a")
-  //       //staff
-  //       .leftJoinAndSelect("a.staff", "s")
-  //       //service
-  //       .leftJoinAndSelect("a.serviceType", "st")
-  //       //consultation
-  //       .leftJoinAndSelect("a.consultaionType", "ct")
-  //       //status
-  //       .leftJoinAndSelect("a.appointmentStatus", "as")
-  //       //payments
-  //       .leftJoinAndSelect("a.payments", "ap")
-  //       //mapping client
-  //       .leftJoinAndSelect("a.clientAppointment", "ca")
-  //       .leftJoinAndSelect("ca.client", "cl")
-  //       .where("cl.clientId = :clientId")
-  //       .andWhere("as.name IN(:...status)");
-  //     query = query.setParameters(params);
-
-  //     return <AppointmentViewModel[]>(await query.getMany()).map(
-  //       (a: Appointment) => {
-  //         return new AppointmentViewModel(a);
-  //       }
-  //     );
-  //   } catch (e) {
-  //     throw e;
-  //   }
-  // }
+  async getAppointmentsForADay(dateString: string) {
+    try {
+      dateString = moment(dateString).format("YYYY-MM-DD");
+      const dateFilter = {
+        from: new Date(
+          moment(`${dateString} 00:00`).format("YYYY-MM-DD HH:mm")
+        ),
+        to: new Date(moment(`${dateString} 23:59`).format("YYYY-MM-DD HH:mm")),
+      };
+      const query = await this.appointmentRepo.manager
+        .createQueryBuilder("Appointment", "a")
+        .leftJoinAndSelect("a.appointmentStatus", "as")
+        .where("a.appointmentDate between :from and :to", dateFilter)
+        .andWhere("as.name IN(:...status)", {
+          status: ["Pending", "Approved"],
+        })
+        .getMany();
+      return <AppointmentViewModel[]>query.map((a: Appointment) => {
+        return new AppointmentViewModel(a);
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
 
   async createClientAppointment(dto: CreateClientAppointmentDto) {
     try {

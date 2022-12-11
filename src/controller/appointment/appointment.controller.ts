@@ -185,6 +185,23 @@ export class AppointmentController {
     }
   }
 
+  @Get("getAppointmentsForADay/:date")
+  @UseGuards(JwtAuthGuard)
+  async getAppointmentsForADay(@Param("date") dateString: string) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.appointmentService.getAppointmentsForADay(
+        dateString
+      );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
   @Post("createClientAppointment")
   @UseGuards(JwtAuthGuard)
   async createClientAppointment(@Body() dto: CreateClientAppointmentDto) {
