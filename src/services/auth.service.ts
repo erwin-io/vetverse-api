@@ -117,7 +117,7 @@ export class AuthService {
       gender,
       fullName,
       lastCancelledDate,
-      numberOfCancelledAttempt
+      numberOfCancelledAttempt,
     } = getInfo;
     const notification =
       await this.notificationService.getTotalUnreadByClientId(clientId);
@@ -143,7 +143,7 @@ export class AuthService {
       userTypeIdentityId,
       totalUnreadNotif: notification.total,
       lastCancelledDate,
-      numberOfCancelledAttempt
+      numberOfCancelledAttempt,
     };
   }
 
@@ -213,5 +213,16 @@ export class AuthService {
 
   async findByUserName(username) {
     return await this.usersService.findByUsername(username);
+  }
+
+  verifyJwt(jwt: string): Promise<any> {
+    try {
+      return this.jwtService.verifyAsync(jwt, {
+        publicKey: fs.readFileSync(path.join(__dirname, "../../private.key")),
+      });
+    } catch (ex) {
+      console.log(ex);
+      throw ex;
+    }
   }
 }

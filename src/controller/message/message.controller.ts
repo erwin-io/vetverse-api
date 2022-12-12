@@ -13,6 +13,7 @@ import { CustomResponse } from "src/common/helper/customresponse.helpers";
 import { JwtAuthGuard } from "src/core/auth/jwt.auth.guard";
 import { MessageService } from "src/services/message.service";
 import { CreateMessageDto } from "src/core/dto/message/message.create.dto";
+import { ChatGateway } from "src/gateway/chat/chat.gateway";
 
 @ApiTags("message")
 @Controller("message")
@@ -77,7 +78,8 @@ export class MessageController {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
-      res.data = await this.messageService.addMessage(messageDto);
+      const message: any = messageDto;
+      res.data = await this.messageService.addMessage(message);
       res.success = true;
       return res;
     } catch (e) {

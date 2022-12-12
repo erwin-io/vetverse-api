@@ -34,6 +34,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     MessageModule,
     MessageModule,
     DashboardModule,
+    // ChatModule,
   ],
   providers: [AppService],
   controllers: [],

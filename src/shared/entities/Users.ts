@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Clients } from "./Clients";
+import { GatewayConnectedUsers } from "./GatewayConnectedUsers";
 import { Messages } from "./Messages";
 import { Staff } from "./Staff";
 import { UserType } from "./UserType";
@@ -40,6 +41,12 @@ export class Users {
 
   @OneToMany(() => Clients, (clients) => clients.user)
   clients: Clients[];
+
+  @OneToMany(
+    () => GatewayConnectedUsers,
+    (gatewayConnectedUsers) => gatewayConnectedUsers.user
+  )
+  gatewayConnectedUsers: GatewayConnectedUsers[];
 
   @OneToMany(() => Messages, (messages) => messages.fromUser)
   messages: Messages[];

@@ -97,11 +97,10 @@ export class UsersService {
 
     if (advanceSearch) {
       query = query
-        .where("ISNULL(s.firstName, '') like :name")
-        .orWhere("ISNULL(s.middleName, '') like :name")
-        .orWhere("ISNULL(s.lastName, '') like :name");
-      query = query
-        .where("r.name IN(:...roles)")
+        .where(
+          "CONCAT(s.firstName, ' ', ISNULL(s.middleName, ''), ' ', s.lastName) LIKE :name"
+        )
+        .andWhere("r.name IN(:...roles)")
         .andWhere("u.userId like :userId")
         .andWhere("u.username like :username")
         .andWhere("s.email like :email")
@@ -150,10 +149,9 @@ export class UsersService {
       .innerJoinAndSelect("u.userType", "ut");
 
     if (advanceSearch) {
-      query = query
-        .where("ISNULL(c.firstName, '') like :name")
-        .orWhere("ISNULL(c.middleName, '') like :name")
-        .orWhere("ISNULL(c.lastName, '') like :name");
+      query = query.andWhere(
+        "CONCAT(c.firstName, ' ', ISNULL(c.middleName, ''), ' ', c.lastName) LIKE :name"
+      );
       query = query
         .where("c.userId like :userId")
         .andWhere("c.username like :username")
@@ -561,26 +559,34 @@ export class UsersService {
     return await this.findOne({ userId }, true, this.userRepo.manager);
   }
 
-  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ) {
     return await this.userRepo.manager.transaction(async (entityManager) => {
-      let user: Users = await entityManager.findOne(Users, { where: {
-        userId
-      } });
+      let user: Users = await entityManager.findOne(Users, {
+        where: {
+          userId,
+        },
+      });
 
       if (!user) {
         throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
       }
-      
+
       const areEqual = await compare(user.password, currentPassword);
       if (!areEqual) {
-        throw new HttpException("Password not match", HttpStatus.NOT_ACCEPTABLE);
+        throw new HttpException(
+          "Password not match",
+          HttpStatus.NOT_ACCEPTABLE
+        );
       }
-      
-      user.password = await hash(newPassword),
-      user = await entityManager.save(Users, user);
+
+      (user.password = await hash(newPassword)),
+        (user = await entityManager.save(Users, user));
       return this._sanitizeUser(user);
     });
-
   }
 
   async updatePassword(userId: string, password: string) {

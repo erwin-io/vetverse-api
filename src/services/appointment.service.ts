@@ -221,44 +221,6 @@ export class AppointmentService {
     }
   }
 
-  async getClientAppointmentsHistory(
-    clientId: string,
-    options: IPaginationOptions
-  ) {
-    try {
-      const params: any = {
-        clientId,
-        status: ["Completed", "Cancelled"],
-      };
-
-      let query = this.appointmentRepo.manager
-        .createQueryBuilder()
-        .select("a")
-        .from(Appointment, "a")
-        //staff
-        .leftJoinAndSelect("a.staff", "s")
-        //service
-        .leftJoinAndSelect("a.serviceType", "st")
-        //consultation
-        .leftJoinAndSelect("a.consultaionType", "ct")
-        //status
-        .leftJoinAndSelect("a.appointmentStatus", "as")
-        //payments
-        .leftJoinAndSelect("a.payments", "ap")
-        //mapping client
-        .leftJoinAndSelect("a.clientAppointment", "ca")
-        .leftJoinAndSelect("ca.client", "cl")
-        .where("cl.clientId = :clientId")
-        .andWhere("as.name IN(:...status)");
-      query = query.setParameters(params);
-      query.orderBy("n.notificationId", "DESC");
-
-      return paginate<Appointment>(query, options);
-    } catch (e) {
-      throw e;
-    }
-  }
-
   async findOne(options?: any) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

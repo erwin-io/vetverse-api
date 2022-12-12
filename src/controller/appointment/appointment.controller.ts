@@ -142,31 +142,6 @@ export class AppointmentController {
     }
   }
 
-  @Get("getClientAppointmentsHistory")
-  @ApiQuery({ name: "clientId", required: false })
-  // @UseGuards(JwtAuthGuard)
-  async getClientAppointmentsHistory(@Query("clientId") clientId) {
-    const res: CustomResponse = {};
-    try {
-      // page = page <= 0 ? 1 : page;
-      // limit = limit > 40 ? 40 : limit;
-      const result = await this.appointmentService.getClientAppointmentsHistory(
-        clientId,
-        {
-          page: 1,
-          limit: 10,
-        }
-      );
-      res.data = result;
-      res.success = true;
-      return res;
-    } catch (e) {
-      res.success = false;
-      res.message = e.message !== undefined ? e.message : e;
-      return res;
-    }
-  }
-
   @Get("getAppointmentConferencePeer/:appointmentId")
   async getAppointmentConferencePeer(
     @Param("appointmentId") appointmentId: string

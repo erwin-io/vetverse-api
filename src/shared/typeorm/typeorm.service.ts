@@ -22,6 +22,7 @@ import { Pet } from "../entities/Pet";
 import { PetAppointment } from "../entities/PetAppointment";
 import { Messages } from "../entities/Messages";
 import { Notifications } from "../entities/Notifications";
+import { GatewayConnectedUsers } from "../entities/GatewayConnectedUsers";
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -58,6 +59,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         PaymentType,
         Notifications,
         Messages,
+        GatewayConnectedUsers
       ],
       synchronize: false, // never use TRUE in production!
       options: { encrypt: false },

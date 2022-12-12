@@ -16,6 +16,7 @@ export class NotificationService {
       .select("n")
       .from(Notifications, "n")
       .leftJoinAndSelect("n.appointment", "a")
+      .leftJoinAndSelect("a.appointmentStatus", "as")
       .leftJoinAndSelect("n.client", "c")
       .where("n.clientId= :clientId", { clientId });
     queryBuilder.orderBy("n.notificationId", "DESC"); // Or whatever you need to do

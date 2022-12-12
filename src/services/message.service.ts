@@ -13,12 +13,16 @@ import { Clients } from "src/shared/entities/Clients";
 import { Gender } from "src/shared/entities/Gender";
 import { Users } from "src/shared/entities/Users";
 import { Appointment } from "src/shared/entities/Appointment";
+import { ChatGateway } from "src/gateway/chat/chat.gateway";
+import { GatewayConnectedUsers } from "src/shared/entities/GatewayConnectedUsers";
+import { GatewayConnectedUsersService } from "./gateway-connected-users.service";
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Messages)
-    private readonly messagesRepo: Repository<Messages>
+    private readonly messagesRepo: Repository<Messages>,
+    private chatGateway: ChatGateway
   ) {}
 
   async findByAppointmentPage(
@@ -39,48 +43,7 @@ export class MessageService {
   }
 
   async addMessage(messageDto: CreateMessageDto) {
-    return await this.messagesRepo.manager.transaction(
-      async (entityManager) => {
-        if (messageDto.fromUserId.includes(messageDto.toUserId)) {
-          throw new HttpException(
-            `sender and receiver should bot be the same`,
-            HttpStatus.NOT_FOUND
-          );
-        }
-        const fromUser: any = await entityManager.findOne(Users, {
-          where: { userId: messageDto.fromUserId },
-        });
-        if (!fromUser) {
-          throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
-        }
-        const toUser: any = await entityManager.findOne(Users, {
-          where: { userId: messageDto.toUserId },
-        });
-        if (!toUser) {
-          throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
-        }
-        const appointment: any = await entityManager.findOne(Appointment, {
-          where: { appointmentId: messageDto.appointmentId },
-        });
-        if (!appointment) {
-          throw new HttpException(
-            `Appointment doesn't exist`,
-            HttpStatus.NOT_FOUND
-          );
-        }
-        let message = new Messages();
-        message.message = messageDto.message;
-        message.fromUser = fromUser;
-        message.toUser = toUser;
-        message.isClient = messageDto.isClient;
-        message.appointment = appointment;
-        message.dateTime = new Date();
-        message = await entityManager.save(Messages, message);
-        message.fromUser = this._sanitizeUser(message.fromUser);
-        message.toUser = this._sanitizeUser(message.toUser);
-        return message;
-      }
-    );
+    return await this.chatGateway.addMessage(messageDto);
   }
   _sanitizeUser(user: Users) {
     try {
