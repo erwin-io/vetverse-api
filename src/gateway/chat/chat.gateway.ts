@@ -137,12 +137,13 @@ export class ChatGateway
                   notification: {
                     title: "Veterinarian",
                     body: message.message,
-                    sound: "notif_alert.wav",
+                    sound: "notif_alert",
                   },
                 },
                 {
                   priority: "high",
                   timeToLive: 60 * 24,
+                  android: { sound: "notif_alert" },
                 }
               )
               .then((response: MessagingDevicesResponse) => {
@@ -155,7 +156,7 @@ export class ChatGateway
                   HttpStatus.BAD_REQUEST
                 );
               });
-          } else { 
+          } else {
             return message;
           }
         }
