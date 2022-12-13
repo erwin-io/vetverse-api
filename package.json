@@ -37,6 +37,7 @@
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
+    "firebase-admin": "^11.3.0",
     "moment": "^2.29.4",
     "mssql": "^7.3.5",
     "nestjs-typeorm-paginate": "^4.0.2",

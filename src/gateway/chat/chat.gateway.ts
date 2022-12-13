@@ -12,8 +12,10 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from "@nestjs/websockets";
+import { MessagingDevicesResponse } from "firebase-admin/lib/messaging/messaging-api";
 import { Socket } from "socket.io";
 import { CreateMessageDto } from "src/core/dto/message/message.create.dto";
+import { FirebaseProvider } from "src/core/provider/firebase/firebase-provider";
 import { AuthService } from "src/services/auth.service";
 import { GatewayConnectedUsersService } from "src/services/gateway-connected-users.service";
 import { MessageService } from "src/services/message.service";
@@ -34,7 +36,8 @@ export class ChatGateway
     private readonly messagesRepo: Repository<Messages>,
     private authService: AuthService,
     private userService: UsersService,
-    private gatewayConnectedUsersService: GatewayConnectedUsersService
+    private gatewayConnectedUsersService: GatewayConnectedUsersService,
+    private firebaseProvoder: FirebaseProvider
   ) {}
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -64,12 +67,9 @@ export class ChatGateway
     }
   }
 
-  // async handleConnection() {
-
-  // }
-
   async handleDisconnect(socket: Socket) {
     // remove connection from DB
+    await this.gatewayConnectedUsersService.deleteBySocketId(socket.id);
     socket.disconnect();
   }
 
@@ -94,7 +94,7 @@ export class ChatGateway
           if (!fromUser) {
             throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
           }
-          const toUser: any = await entityManager.findOne(Users, {
+          const toUser: Users = await entityManager.findOne(Users, {
             where: { userId: messageDto.toUserId },
           });
           if (!toUser) {
@@ -127,7 +127,36 @@ export class ChatGateway
           await this.server
             .to(connectedUser.socketId)
             .emit("messageAdded", message);
-          return message;
+
+          if (!messageDto.isClient) {
+            return await this.firebaseProvoder.app
+              .messaging()
+              .sendToDevice(
+                toUser.firebaseToken,
+                {
+                  notification: {
+                    title: "Veterinarian",
+                    body: message.message,
+                  },
+                },
+                {
+                  priority: "high",
+                  timeToLive: 60 * 24,
+                }
+              )
+              .then((response: MessagingDevicesResponse) => {
+                console.log("Successfully sent message:", response);
+                return message;
+              })
+              .catch((error) => {
+                throw new HttpException(
+                  `Error sending notif! ${error.message}`,
+                  HttpStatus.BAD_REQUEST
+                );
+              });
+          } else { 
+            return message;
+          }
         }
       );
     } catch (ex) {

@@ -45,6 +45,7 @@ export class MessageService {
   async addMessage(messageDto: CreateMessageDto) {
     return await this.chatGateway.addMessage(messageDto);
   }
+
   _sanitizeUser(user: Users) {
     try {
       delete user.password;

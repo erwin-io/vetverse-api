@@ -40,12 +40,15 @@ import {
   NotificationDescriptionConstant,
 } from "../common/constant/notifications.constant";
 import { IPaginationOptions, paginate } from "nestjs-typeorm-paginate";
+import { FirebaseProvider } from "src/core/provider/firebase/firebase-provider";
+import { MessagingDevicesResponse } from "firebase-admin/lib/messaging/messaging-api";
 
 @Injectable()
 export class AppointmentService {
   constructor(
     @InjectRepository(Appointment)
-    private readonly appointmentRepo: Repository<Appointment>
+    private readonly appointmentRepo: Repository<Appointment>,
+    private firebaseProvoder: FirebaseProvider
   ) {}
 
   async findAll() {
@@ -638,9 +641,44 @@ export class AppointmentService {
                 "Error adding notifications!",
                 HttpStatus.BAD_REQUEST
               );
+            } else {
+              notif = <Notifications>(
+                await entityManager
+                  .createQueryBuilder("Notifications", "n")
+                  .leftJoinAndSelect("n.client", "c")
+                  .leftJoinAndSelect("c.user", "u")
+                  .leftJoinAndSelect("n.appointment", "a")
+                  .getOne()
+              );
+              return await this.firebaseProvoder.app
+                .messaging()
+                .sendToDevice(
+                  notif.client.user.firebaseToken,
+                  {
+                    notification: {
+                      title: notif.title,
+                      body: notif.description,
+                    },
+                  },
+                  {
+                    priority: "high",
+                    timeToLive: 60 * 24,
+                  }
+                )
+                .then((response: MessagingDevicesResponse) => {
+                  console.log("Successfully sent message:", response);
+                  return appointment;
+                })
+                .catch((error) => {
+                  throw new HttpException(
+                    `Error sending notif! ${error.message}`,
+                    HttpStatus.BAD_REQUEST
+                  );
+                });
             }
+          } else {
+            return appointment;
           }
-          return appointment;
         }
       );
     } catch (e) {
@@ -792,10 +830,47 @@ export class AppointmentService {
                   "Error adding notifications!",
                   HttpStatus.BAD_REQUEST
                 );
-              }
+              } else {
+                notif = <Notifications>(
+                  await entityManager
+                    .createQueryBuilder("Notifications", "n")
+                    .leftJoinAndSelect("n.client", "c")
+                    .leftJoinAndSelect("c.user", "u")
+                    .leftJoinAndSelect("n.appointment", "a")
+                    .getOne()
+                );
+                return await this.firebaseProvoder.app
+                  .messaging()
+                  .sendToDevice(
+                    notif.client.user.firebaseToken,
+                    {
+                      notification: {
+                        title: notif.title,
+                        body: notif.description,
+                      },
+                    },
+                    {
+                      priority: "high",
+                      timeToLive: 60 * 24,
+                    }
+                  )
+                  .then((response: MessagingDevicesResponse) => {
+                    console.log("Successfully sent message:", response);
+                    return appointment;
+                  })
+                  .catch((error) => {
+                    throw new HttpException(
+                      `Error sending notif! ${error.message}`,
+                      HttpStatus.BAD_REQUEST
+                    );
+                  });
+                }
+            } else {
+              return appointment;
             }
+          } else {
+            return appointment;
           }
-          return appointment;
         }
       );
     } catch (e) {
@@ -868,9 +943,44 @@ export class AppointmentService {
                 "Error adding notifications!",
                 HttpStatus.BAD_REQUEST
               );
-            }
+            } else {
+              notif = <Notifications>(
+                await entityManager
+                  .createQueryBuilder("Notifications", "n")
+                  .leftJoinAndSelect("n.client", "c")
+                  .leftJoinAndSelect("c.user", "u")
+                  .leftJoinAndSelect("n.appointment", "a")
+                  .getOne()
+              );
+              return await this.firebaseProvoder.app
+                .messaging()
+                .sendToDevice(
+                  notif.client.user.firebaseToken,
+                  {
+                    notification: {
+                      title: notif.title,
+                      body: notif.description,
+                    },
+                  },
+                  {
+                    priority: "high",
+                    timeToLive: 60 * 24,
+                  }
+                )
+                .then((response: MessagingDevicesResponse) => {
+                  console.log("Successfully sent message:", response);
+                  return appointment;
+                })
+                .catch((error) => {
+                  throw new HttpException(
+                    `Error sending notif! ${error.message}`,
+                    HttpStatus.BAD_REQUEST
+                  );
+                });
+              }
+          } else {
+            return appointment;
           }
-          return appointment;
         }
       );
     } catch (e) {

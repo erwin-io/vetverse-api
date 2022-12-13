@@ -1,5 +1,6 @@
 import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { FirebaseProviderModule } from "src/core/provider/firebase/firebase-provider.module";
 import { ChatGateway } from "src/gateway/chat/chat.gateway";
 import { GatewayConnectedUsersService } from "src/services/gateway-connected-users.service";
 import { MessageService } from "src/services/message.service";
@@ -12,6 +13,7 @@ import { MessageController } from "./message.controller";
 @Module({
   imports: [
     AuthModule,
+    FirebaseProviderModule,
     UsersModule,
     TypeOrmModule.forFeature([Messages, GatewayConnectedUsers])],
   controllers: [MessageController],

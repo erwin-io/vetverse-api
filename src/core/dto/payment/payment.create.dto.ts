@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type, Transform } from "class-transformer";
-import { IsDateString, IsNotEmpty } from "class-validator";
+import { IsDateString, IsNotEmpty, IsString } from "class-validator";
 import * as moment from "moment";
 
 export class CreatePaymentDto {
@@ -23,6 +23,6 @@ export class CreatePaymentDto {
   appointmentId: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsString()
   referenceNo: string;
 }

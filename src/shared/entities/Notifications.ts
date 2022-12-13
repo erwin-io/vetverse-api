@@ -25,6 +25,9 @@ export class Notifications {
   @Column("nvarchar", { name: "Description" })
   description: string;
 
+  @Column("bit", { name: "IsReminder", default: () => "(0)" })
+  isReminder: boolean;
+
   @Column("bit", { name: "IsRead", default: () => "(0)" })
   isRead: boolean;
 

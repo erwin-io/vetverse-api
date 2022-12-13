@@ -16,6 +16,7 @@ import { PaymentsModule } from "./controller/payments/payments.module";
 import { FileModule } from "./controller/file/file.module";
 import { MessageModule } from "./controller/message/message.module";
 import { DashboardModule } from "./controller/dashboard/dashboard.module";
+import { FirebaseProviderModule } from "./core/provider/firebase/firebase-provider.module";
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
@@ -34,7 +35,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     MessageModule,
     MessageModule,
     DashboardModule,
-    // ChatModule,
+    FirebaseProviderModule,
   ],
   providers: [AppService],
   controllers: [],

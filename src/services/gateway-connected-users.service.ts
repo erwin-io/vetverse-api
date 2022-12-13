@@ -55,6 +55,14 @@ export class GatewayConnectedUsersService {
     }
   }
 
+  async deleteBySocketId(socketId: string) {
+    try {
+      return this.gatewayConnectedUsersRepo.delete({ socketId });
+    } catch (e) {
+      throw e;
+    }
+  }
+
   async deleteAll() {
     try {
       await this.gatewayConnectedUsersRepo

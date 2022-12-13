@@ -18,8 +18,8 @@ export class Payment {
   @Column("date", { name: "PaymentDate" })
   paymentDate: Date;
 
-  @Column("nvarchar", { name: "ReferenceNo" })
-  referenceNo: string;
+  @Column("nvarchar", { name: "ReferenceNo", nullable: true })
+  referenceNo: string | null;
 
   @Column("bit", { name: "IsVoid", default: () => "(0)" })
   isVoid: boolean;
