@@ -137,6 +137,7 @@ export class ChatGateway
                   notification: {
                     title: "Veterinarian",
                     body: message.message,
+                    sound: "notif_alert.wav",
                   },
                 },
                 {
