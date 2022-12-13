@@ -18,7 +18,7 @@ export class GatewayConnectedUsersService {
         user: { userId },
       });
       if (!connectedUser) {
-        return "0";
+        return { socketId: "0" };
       }
       return connectedUser;
     } catch (e) {

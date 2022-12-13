@@ -128,7 +128,7 @@ export class ChatGateway
             .to(connectedUser.socketId)
             .emit("messageAdded", message);
 
-          if (!messageDto.isClient) {
+          if (!messageDto.isClient && toUser.firebaseToken) {
             return await this.firebaseProvoder.app
               .messaging()
               .sendToDevice(
