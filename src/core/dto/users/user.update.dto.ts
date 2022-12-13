@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsEmail, IsDate, IsBoolean, IsOptional } from "class-validator";
+import { IsNotEmpty, IsEmail, IsDate, IsBoolean, IsOptional, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform, Type } from "class-transformer";
 import { ToBoolean } from "src/common/helper/env.helper";
@@ -107,6 +107,6 @@ export class UpdatePasswordDto extends UserDto {
 
 export class UpdateFirebaseToken extends UserDto {
   @ApiProperty()
-  @IsNotEmpty()
+  @IsString()
   firebaseToken: string;
 }
