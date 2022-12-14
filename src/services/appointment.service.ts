@@ -631,9 +631,12 @@ export class AppointmentService {
             notif.description =
               NotificationDescriptionConstant.APPOINTMENT_RESCHEDULED.replace(
                 "{0}",
-                `on ${moment(appointment.appointmentDate).format(
+                `${appointment.serviceType.name}`
+              ).replace(
+                "{1}",
+                `${moment(appointment.appointmentDate).format(
                   "MMM DD, YYYY"
-                )} ${appointment.timeStart} for ${appointment.serviceType.name}`
+                )} at ${appointment.timeStart} `
               );
             notif = await entityManager.save(Notifications, notif);
             if (!notif) {
@@ -642,14 +645,16 @@ export class AppointmentService {
                 HttpStatus.BAD_REQUEST
               );
             } else {
-              notif = <Notifications>(
-                await entityManager
-                  .createQueryBuilder("Notifications", "n")
-                  .leftJoinAndSelect("n.client", "c")
-                  .leftJoinAndSelect("c.user", "u")
-                  .leftJoinAndSelect("n.appointment", "a")
-                  .getOne()
-              );
+              const notificationId = notif.notificationId;
+              notif = <Notifications>await entityManager
+                .createQueryBuilder("Notifications", "n")
+                .leftJoinAndSelect("n.client", "c")
+                .leftJoinAndSelect("c.user", "u")
+                .leftJoinAndSelect("n.appointment", "a")
+                .where("n.notificationId = :notificationId", {
+                  notificationId,
+                })
+                .getOne();
               if (
                 notif.client.user.firebaseToken &&
                 notif.client.user.firebaseToken !== ""
@@ -838,14 +843,16 @@ export class AppointmentService {
                   HttpStatus.BAD_REQUEST
                 );
               } else {
-                notif = <Notifications>(
-                  await entityManager
-                    .createQueryBuilder("Notifications", "n")
-                    .leftJoinAndSelect("n.client", "c")
-                    .leftJoinAndSelect("c.user", "u")
-                    .leftJoinAndSelect("n.appointment", "a")
-                    .getOne()
-                );
+                const notificationId = notif.notificationId;
+                notif = <Notifications>await entityManager
+                  .createQueryBuilder("Notifications", "n")
+                  .leftJoinAndSelect("n.client", "c")
+                  .leftJoinAndSelect("c.user", "u")
+                  .leftJoinAndSelect("n.appointment", "a")
+                  .where("n.notificationId = :notificationId", {
+                    notificationId,
+                  })
+                  .getOne();
                 if (
                   notif.client.user.firebaseToken &&
                   notif.client.user.firebaseToken !== ""
@@ -958,14 +965,16 @@ export class AppointmentService {
                 HttpStatus.BAD_REQUEST
               );
             } else {
-              notif = <Notifications>(
-                await entityManager
-                  .createQueryBuilder("Notifications", "n")
-                  .leftJoinAndSelect("n.client", "c")
-                  .leftJoinAndSelect("c.user", "u")
-                  .leftJoinAndSelect("n.appointment", "a")
-                  .getOne()
-              );
+              const notificationId = notif.notificationId;
+              notif = <Notifications>await entityManager
+                .createQueryBuilder("Notifications", "n")
+                .leftJoinAndSelect("n.client", "c")
+                .leftJoinAndSelect("c.user", "u")
+                .leftJoinAndSelect("n.appointment", "a")
+                .where("n.notificationId = :notificationId", {
+                  notificationId,
+                })
+                .getOne();
               if (
                 notif.client.user.firebaseToken &&
                 notif.client.user.firebaseToken !== ""

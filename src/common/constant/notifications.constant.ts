@@ -10,7 +10,8 @@ export const NotificationDescriptionConstant = {
     "Your appointment {0} was approved. Please wait for your schedule!",
   APPOINTMENT_COMPLETED: "Your appointment {0} was successfully completed!",
   APPOINTMENT_CANCELLED: "Appointment {0} has been cancelled!",
-  APPOINTMENT_RESCHEDULED: "Appointment {0} has been rescheduled!",
+  APPOINTMENT_RESCHEDULED:
+    "Yout appointment for {0} has been rescheduled on {1}!",
   APPOINTMENT_DIAGNOSIS_AND_TREATMENT:
     "An diagnosis and treatment has now been added for appointment {0}",
 };
