@@ -650,31 +650,38 @@ export class AppointmentService {
                   .leftJoinAndSelect("n.appointment", "a")
                   .getOne()
               );
-              return await this.firebaseProvoder.app
-                .messaging()
-                .sendToDevice(
-                  notif.client.user.firebaseToken,
-                  {
-                    notification: {
-                      title: notif.title,
-                      body: notif.description,
+              if (
+                notif.client.user.firebaseToken &&
+                notif.client.user.firebaseToken !== ""
+              ) {
+                return await this.firebaseProvoder.app
+                  .messaging()
+                  .sendToDevice(
+                    notif.client.user.firebaseToken,
+                    {
+                      notification: {
+                        title: notif.title,
+                        body: notif.description,
+                        sound: "notif_alert",
+                      },
                     },
-                  },
-                  {
-                    priority: "high",
-                    timeToLive: 60 * 24,
-                  }
-                )
-                .then((response: MessagingDevicesResponse) => {
-                  console.log("Successfully sent message:", response);
-                  return appointment;
-                })
-                .catch((error) => {
-                  throw new HttpException(
-                    `Error sending notif! ${error.message}`,
-                    HttpStatus.BAD_REQUEST
-                  );
-                });
+                    {
+                      priority: "high",
+                      timeToLive: 60 * 24,
+                      android: { sound: "notif_alert" },
+                    }
+                  )
+                  .then((response: MessagingDevicesResponse) => {
+                    console.log("Successfully sent message:", response);
+                    return appointment;
+                  })
+                  .catch((error) => {
+                    throw new HttpException(
+                      `Error sending notif! ${error.message}`,
+                      HttpStatus.BAD_REQUEST
+                    );
+                  });
+              }
             }
           } else {
             return appointment;
@@ -839,32 +846,39 @@ export class AppointmentService {
                     .leftJoinAndSelect("n.appointment", "a")
                     .getOne()
                 );
-                return await this.firebaseProvoder.app
-                  .messaging()
-                  .sendToDevice(
-                    notif.client.user.firebaseToken,
-                    {
-                      notification: {
-                        title: notif.title,
-                        body: notif.description,
+                if (
+                  notif.client.user.firebaseToken &&
+                  notif.client.user.firebaseToken !== ""
+                ) {
+                  return await this.firebaseProvoder.app
+                    .messaging()
+                    .sendToDevice(
+                      notif.client.user.firebaseToken,
+                      {
+                        notification: {
+                          title: notif.title,
+                          body: notif.description,
+                          sound: "notif_alert",
+                        },
                       },
-                    },
-                    {
-                      priority: "high",
-                      timeToLive: 60 * 24,
-                    }
-                  )
-                  .then((response: MessagingDevicesResponse) => {
-                    console.log("Successfully sent message:", response);
-                    return appointment;
-                  })
-                  .catch((error) => {
-                    throw new HttpException(
-                      `Error sending notif! ${error.message}`,
-                      HttpStatus.BAD_REQUEST
-                    );
-                  });
+                      {
+                        priority: "high",
+                        timeToLive: 60 * 24,
+                        android: { sound: "notif_alert" },
+                      }
+                    )
+                    .then((response: MessagingDevicesResponse) => {
+                      console.log("Successfully sent message:", response);
+                      return appointment;
+                    })
+                    .catch((error) => {
+                      throw new HttpException(
+                        `Error sending notif! ${error.message}`,
+                        HttpStatus.BAD_REQUEST
+                      );
+                    });
                 }
+              }
             } else {
               return appointment;
             }
@@ -952,32 +966,39 @@ export class AppointmentService {
                   .leftJoinAndSelect("n.appointment", "a")
                   .getOne()
               );
-              return await this.firebaseProvoder.app
-                .messaging()
-                .sendToDevice(
-                  notif.client.user.firebaseToken,
-                  {
-                    notification: {
-                      title: notif.title,
-                      body: notif.description,
+              if (
+                notif.client.user.firebaseToken &&
+                notif.client.user.firebaseToken !== ""
+              ) {
+                return await this.firebaseProvoder.app
+                  .messaging()
+                  .sendToDevice(
+                    notif.client.user.firebaseToken,
+                    {
+                      notification: {
+                        title: notif.title,
+                        body: notif.description,
+                        sound: "notif_alert",
+                      },
                     },
-                  },
-                  {
-                    priority: "high",
-                    timeToLive: 60 * 24,
-                  }
-                )
-                .then((response: MessagingDevicesResponse) => {
-                  console.log("Successfully sent message:", response);
-                  return appointment;
-                })
-                .catch((error) => {
-                  throw new HttpException(
-                    `Error sending notif! ${error.message}`,
-                    HttpStatus.BAD_REQUEST
-                  );
-                });
+                    {
+                      priority: "high",
+                      timeToLive: 60 * 24,
+                      android: { sound: "notif_alert" },
+                    }
+                  )
+                  .then((response: MessagingDevicesResponse) => {
+                    console.log("Successfully sent message:", response);
+                    return appointment;
+                  })
+                  .catch((error) => {
+                    throw new HttpException(
+                      `Error sending notif! ${error.message}`,
+                      HttpStatus.BAD_REQUEST
+                    );
+                  });
               }
+            }
           } else {
             return appointment;
           }
