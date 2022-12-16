@@ -20,6 +20,8 @@ import { FirebaseProviderModule } from "./core/provider/firebase/firebase-provid
 import { SchedulerController } from './controller/scheduler/scheduler.controller';
 import { SchedulerModule } from './controller/scheduler/scheduler.module';
 import { SchedulerService } from './services/scheduler.service';
+import { ReminderService } from './services/reminder.service';
+import { ReminderModule } from './controller/reminder/reminder.module';
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
@@ -40,8 +42,9 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     DashboardModule,
     FirebaseProviderModule,
     SchedulerModule,
+    ReminderModule,
   ],
-  providers: [AppService, SchedulerService],
-  controllers: [SchedulerController],
+  providers: [AppService],
+  controllers: [],
 })
 export class AppModule {}

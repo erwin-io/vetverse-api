@@ -17,6 +17,7 @@ import { Messages } from "./Messages";
 import { Notifications } from "./Notifications";
 import { Payment } from "./Payment";
 import { PetAppointment } from "./PetAppointment";
+import { Reminder } from "./Reminder";
 
 @Index("IX_Appointment", ["appointmentId"], { unique: true })
 @Index("PK_Appointment", ["appointmentId"], { unique: true })
@@ -111,4 +112,7 @@ export class Appointment {
     (petAppointment) => petAppointment.appointment
   )
   petAppointment: PetAppointment;
+
+  @OneToMany(() => Reminder, (reminder) => reminder.appointment)
+  reminders: Reminder[];
 }

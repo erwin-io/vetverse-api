@@ -8,11 +8,11 @@ import { SchedulerService } from "src/services/scheduler.service";
 export class SchedulerController {
   constructor(private readonly schedulerService: SchedulerService) {}
   
-  @Post("")
-  public async run() {
+  @Post("runAnnouncements")
+  public async runAnnouncements() {
     const res: CustomResponse = {};
     try {
-      res.data = await this.schedulerService.run();
+      res.data = await this.schedulerService.runAnnouncements();
       res.success = true;
       return res;
     } catch (e) {

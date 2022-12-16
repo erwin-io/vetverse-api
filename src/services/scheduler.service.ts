@@ -5,32 +5,61 @@ import {
 } from "firebase-admin/lib/messaging/messaging-api";
 import * as moment from "moment";
 import { FirebaseProvider } from "src/core/provider/firebase/firebase-provider";
-import { AppointmentService } from "./appointment.service";
-import { PetTypeService } from "./pet-type.service";
+import { ReminderService } from "./reminder.service";
 
 @Injectable()
 export class SchedulerService {
   constructor(
     private firebaseProvoder: FirebaseProvider,
-    private appointmentService: AppointmentService,
-    ) {}
+    private reminderService: ReminderService
+  ) {}
 
-  async run() {
-    const notification = {
-      title: "Sent from scheduler",
-      body: "Sent from scheduler",
-      sound: "notif_alert",
-    };
-    await this.sentFirebaseNotif(notification);
+  async runAnnouncements() {
+    // const today = new Date();
+    const getAppointmentsToday = await this.reminderService.geAllReminderByDate(
+      new Date(),
+      false
+    );
+
+    getAppointmentsToday.forEach(async (x) => {
+      const res = await this.firebaseSendAnnouncements(x.title, x.description);
+      console.log(res);
+    });
+
+    return this.reminderService.markAsDeliveredByGroup(
+      getAppointmentsToday.map((x) => x.reminderId.toString())
+    );
   }
 
-  async sentFirebaseNotif(notification: NotificationMessagePayload) {
+  async firebaseSendAnnouncements(title, description) {
+    return await this.firebaseProvoder.app.messaging().sendToTopic(
+      "announcements",
+      {
+        notification: {
+          title: title,
+          body: description,
+          sound: "notif_alert",
+        },
+      },
+      {
+        priority: "high",
+        timeToLive: 60 * 24,
+        android: { sound: "notif_alert" },
+      }
+    );
+  }
+
+  async firebaseSendToDevice(token, title, description) {
     return await this.firebaseProvoder.app
       .messaging()
       .sendToDevice(
-        "eSJkMtslTCubySjpN1oMCb:APA91bFGJWZ_T9gV4ouZA05xXKzTnVPE8ATW7dzX52bx5sEYJ55JLFm_dbZU8Zu7Ndo7Ehb1Vu_NHipjqdLZybqa7gJ574R43k7pF77Ilnmfskkf9pCA_kHLjDYCi6-xI797vv7GVSAC",
+        token,
         {
-          notification,
+          notification: {
+            title: title,
+            body: description,
+            sound: "notif_alert",
+          },
         },
         {
           priority: "high",
