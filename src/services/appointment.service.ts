@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { isEmpty } from "class-validator";
 // import moment from "moment";
 import * as moment from "moment";
+import { ConsultaionTypeEnum } from "src/common/enums/consultation-type.enum";
 import { AppointmentStatusEnum } from "src/common/enums/appointment-status.enum";
 import { PaymentTypeEnum } from "src/common/enums/payment-type.enum";
 import { addHours } from "src/common/utils/utils";
@@ -42,13 +43,16 @@ import {
 import { IPaginationOptions, paginate } from "nestjs-typeorm-paginate";
 import { FirebaseProvider } from "src/core/provider/firebase/firebase-provider";
 import { MessagingDevicesResponse } from "firebase-admin/lib/messaging/messaging-api";
+import { ReminderService } from "./reminder.service";
+import { Reminder } from "src/shared/entities/Reminder";
 
 @Injectable()
 export class AppointmentService {
   constructor(
     @InjectRepository(Appointment)
     private readonly appointmentRepo: Repository<Appointment>,
-    private firebaseProvoder: FirebaseProvider
+    private firebaseProvoder: FirebaseProvider,
+    private reminderService: ReminderService
   ) {}
 
   async findAll() {
@@ -347,12 +351,59 @@ export class AppointmentService {
             ClientAppointment,
             newClientAppointment
           );
+          if (!clientAppointment) {
+            throw new HttpException(
+              "Error saving Client appointment!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
           const newPetAppointment = new PetAppointment();
           newPetAppointment.appointment = appointment;
           newPetAppointment.pet = await entityManager.findOne(Pet, {
             where: { petId: dto.petId },
           });
-          return await entityManager.save(PetAppointment, newPetAppointment);
+          if (dto.consultaionTypeId === ConsultaionTypeEnum.VIDEO.toString()) {
+            let reminder = new Reminder();
+            reminder.isAppointment = true;
+            const reminderDate: any = newAppointment.appointmentDate;
+            const MS_PER_MINUTE = 60000;
+            const MS_PRIOR_REMINDER = 20;
+            reminder.title =
+              NotificationTitleConstant.APPOINTMENT_VIDEO_REMINDER;
+            reminder.description =
+              NotificationDescriptionConstant.APPOINTMENT_VIDEO_REMINDER.replace(
+                "{0}",
+                `${moment(newAppointment.appointmentDate).format(
+                  "MMMM DD, YYYY"
+                )} @ ${moment(newAppointment.appointmentDate).format(
+                  "hh:mm a"
+                )}`
+              );
+            reminder.dueDate = new Date(
+              reminderDate + MS_PRIOR_REMINDER * MS_PER_MINUTE
+            );
+            reminder.appointment = appointment;
+            reminder = await entityManager.save(Reminder, reminder);
+            if (!reminder) {
+              throw new HttpException(
+                "Error saving reminder!",
+                HttpStatus.BAD_REQUEST
+              );
+            }
+          }
+          const petAppointment = await entityManager.save(
+            PetAppointment,
+            newPetAppointment
+          );
+          if (!petAppointment) {
+            throw new HttpException(
+              "Error saving pet appoimtment!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          return await entityManager.findOne(Appointment, {
+            where: { appointmentId: appointment.appointmentId },
+          });
         }
       );
     } catch (e) {
@@ -426,11 +477,46 @@ export class AppointmentService {
             ClientAppointment,
             newClientAppointment
           );
+          if (!clientAppointment) {
+            throw new HttpException(
+              "Error saving Client appointment!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
           const newPetAppointment = new PetAppointment();
           newPetAppointment.appointment = appointment;
           newPetAppointment.pet = await entityManager.findOne(Pet, {
             where: { petId: dto.petId },
           });
+          if (dto.consultaionTypeId === ConsultaionTypeEnum.VIDEO.toString()) {
+            let reminder = new Reminder();
+            reminder.isAppointment = true;
+            const reminderDate: any = newAppointment.appointmentDate;
+            const MS_PER_MINUTE = 60000;
+            const MS_PRIOR_REMINDER = 20;
+            reminder.title =
+              NotificationTitleConstant.APPOINTMENT_VIDEO_REMINDER;
+            reminder.description =
+              NotificationDescriptionConstant.APPOINTMENT_VIDEO_REMINDER.replace(
+                "{0}",
+                `${moment(newAppointment.appointmentDate).format(
+                  "MMMM DD, YYYY"
+                )} @ ${moment(newAppointment.appointmentDate).format(
+                  "hh:mm a"
+                )}`
+              );
+            reminder.dueDate = new Date(
+              reminderDate + MS_PRIOR_REMINDER * MS_PER_MINUTE
+            );
+            reminder.appointment = appointment;
+            reminder = await entityManager.save(Reminder, reminder);
+            if (!reminder) {
+              throw new HttpException(
+                "Error saving reminder!",
+                HttpStatus.BAD_REQUEST
+              );
+            }
+          }
           return await entityManager.save(PetAppointment, newPetAppointment);
         }
       );

@@ -39,6 +39,7 @@ export class ReminderService {
         .leftJoinAndSelect("ca.client", "cl")
         .leftJoinAndSelect("cl.user", "u")
         .where("es.entityStatusId = :entityStatusId", { entityStatusId: "1" })
+        .andWhere("r.delivered = :isAppointment", { isAppointment: false })
         .andWhere("r.isAppointment = :isAppointment", { isAppointment })
         .andWhere("r.dueDate <= :dueDateFrom", {
           dueDateFrom,

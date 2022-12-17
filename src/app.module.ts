@@ -17,11 +17,8 @@ import { FileModule } from "./controller/file/file.module";
 import { MessageModule } from "./controller/message/message.module";
 import { DashboardModule } from "./controller/dashboard/dashboard.module";
 import { FirebaseProviderModule } from "./core/provider/firebase/firebase-provider.module";
-import { SchedulerController } from './controller/scheduler/scheduler.controller';
-import { SchedulerModule } from './controller/scheduler/scheduler.module';
-import { SchedulerService } from './services/scheduler.service';
-import { ReminderService } from './services/reminder.service';
-import { ReminderModule } from './controller/reminder/reminder.module';
+import { SchedulerModule } from "./controller/scheduler/scheduler.module";
+import { ReminderModule } from "./controller/reminder/reminder.module";
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
