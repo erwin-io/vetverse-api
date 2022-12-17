@@ -11,9 +11,11 @@ import { Users } from "src/shared/entities/Users";
 import { Roles } from "src/shared/entities/Roles";
 import { RolesModule } from "../roles/roles.module";
 import { NotificationModule } from "../notification/notification.module";
+import { FirebaseProviderModule } from "src/core/provider/firebase/firebase-provider.module";
 
 @Module({
   imports: [
+    FirebaseProviderModule,
     UsersModule,
     RolesModule,
     NotificationModule,

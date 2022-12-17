@@ -293,14 +293,8 @@ export class UsersService {
     }
     return this._sanitizeUser(result.user);
   }
-
-  async getAllUserToken() {
-    const result = await this.userRepo.({ })
-    return result;
-  }
-
-
-.  async registerClientUser(userDto: ClientUserDto) {
+  
+  async registerClientUser(userDto: ClientUserDto) {
     const { username } = userDto;
     return await this.userRepo.manager.transaction(async (entityManager) => {
       const userInDb = await this.findOne({ username }, false, entityManager);
