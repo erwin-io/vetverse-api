@@ -14,6 +14,27 @@ export class SchedulerService {
     private reminderService: ReminderService
   ) {}
 
+  async runNotificaiton() {
+    // const today = new Date();
+    const getAppointmentsToday = await this.reminderService.geAllReminderByDate(
+      new Date(),
+      true
+    );
+
+    getAppointmentsToday.forEach(async (x) => {
+      const res = await this.firebaseSendToDevice(
+        x.appointment.clientAppointment.client.user.firebaseToken,
+        x.title,
+        x.description
+      );
+      console.log(res);
+    });
+
+    return this.reminderService.markAsDeliveredByGroup(
+      getAppointmentsToday.map((x) => x.reminderId.toString())
+    );
+  }
+
   async runAnnouncements() {
     // const today = new Date();
     const getAppointmentsToday = await this.reminderService.geAllReminderByDate(
