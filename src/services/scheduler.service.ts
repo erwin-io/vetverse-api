@@ -4,14 +4,22 @@ import {
   NotificationMessagePayload,
 } from "firebase-admin/lib/messaging/messaging-api";
 import * as moment from "moment";
+import {
+  NotificationTitleConstant,
+  NotificationDescriptionConstant,
+} from "src/common/constant/notifications.constant";
 import { FirebaseProvider } from "src/core/provider/firebase/firebase-provider";
+import { Clients } from "src/shared/entities/Clients";
+import { Notifications } from "src/shared/entities/Notifications";
+import { NotificationService } from "./notification.service";
 import { ReminderService } from "./reminder.service";
 
 @Injectable()
 export class SchedulerService {
   constructor(
     private firebaseProvoder: FirebaseProvider,
-    private reminderService: ReminderService
+    private reminderService: ReminderService,
+    private notificationService: NotificationService
   ) {}
 
   async runNotificaiton() {
@@ -30,9 +38,27 @@ export class SchedulerService {
       console.log(res);
     });
 
-    return this.reminderService.markAsDeliveredByGroup(
-      getAppointmentsToday.map((x) => x.reminderId.toString())
-    );
+    await this.notificationService
+      .addAppointmentNotification(
+        getAppointmentsToday.map((x) => {
+          return {
+            appointment: x.appointment,
+            client: x.appointment.clientAppointment.client,
+            date: x.dueDate,
+            title: x.title,
+            description: x.description,
+          };
+        })
+      )
+      .then(async (res) => {
+        const reminders = [];
+        await getAppointmentsToday.forEach(async (x) => {
+          reminders.push(
+            await this.reminderService.markAsDelivered(x.reminderId)
+          );
+        });
+        return reminders;
+      });
   }
 
   async runAnnouncements() {
@@ -42,14 +68,21 @@ export class SchedulerService {
       false
     );
 
-    getAppointmentsToday.forEach(async (x) => {
+    await getAppointmentsToday.forEach(async (x) => {
+      const results = [];
       const res = await this.firebaseSendAnnouncements(x.title, x.description);
       console.log(res);
+      const result = await this.notificationService
+        .addRemindersToAll({
+          date: x.dueDate,
+          title: x.title,
+          description: x.description,
+        })
+        .then(async (res) => {
+          return await this.reminderService.markAsDelivered(x.reminderId);
+        });
+      results.push(result);
     });
-
-    return this.reminderService.markAsDeliveredByGroup(
-      getAppointmentsToday.map((x) => x.reminderId.toString())
-    );
   }
 
   async firebaseSendAnnouncements(title, description) {

@@ -1027,7 +1027,7 @@ export class AppointmentService {
             );
           }
           appointment.diagnosisAndTreatment = dto.diagnosisAndTreatment;
-          appointment = await this.appointmentRepo.save(appointment);
+          appointment = await entityManager.save(Appointment, appointment);
           if (!appointment.isWalkIn) {
             let notif = new Notifications();
             notif.appointment = appointment;

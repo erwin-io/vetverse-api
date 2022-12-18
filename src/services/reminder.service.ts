@@ -18,6 +18,8 @@ export class ReminderService {
     try {
       return await this.reminderRepo.findBy({
         entityStatus: { entityStatusId: "1" },
+        isAppointment: false,
+        delivered: false
       });
     } catch (e) {
       throw e;
@@ -39,7 +41,7 @@ export class ReminderService {
         .leftJoinAndSelect("ca.client", "cl")
         .leftJoinAndSelect("cl.user", "u")
         .where("es.entityStatusId = :entityStatusId", { entityStatusId: "1" })
-        .andWhere("r.delivered = :isAppointment", { isAppointment: false })
+        .andWhere("r.delivered = :delivered", { delivered: false })
         .andWhere("r.isAppointment = :isAppointment", { isAppointment })
         .andWhere("r.dueDate <= :dueDateFrom", {
           dueDateFrom,
@@ -102,13 +104,55 @@ export class ReminderService {
 
   async markAsDeliveredByGroup(reminderIds: string[]) {
     try {
-      const res = await this.reminderRepo.manager
-        .createQueryBuilder()
-        .update(Reminder)
-        .set({ delivered: true })
-        .where({ reminderId: In(reminderIds) })
-        .execute();
-      return res.affected > 0;
+      return await this.reminderRepo.manager.transaction(
+        async (entityManager) => {
+          reminderIds.forEach(async (x) => {
+            let reminder = await entityManager.findOne(Reminder, {
+              where: {
+                reminderId: x,
+                entityStatus: { entityStatusId: "1" },
+              },
+            });
+            if (!reminder) {
+              throw new HttpException(
+                "Reminder not found",
+                HttpStatus.NOT_FOUND
+              );
+            }
+            reminder.delivered = true;
+            reminder = await entityManager.save(Reminder, reminder);
+            if (!reminder) {
+              throw new HttpException(
+                "Error updating reminder",
+                HttpStatus.NOT_FOUND
+              );
+            }
+          });
+          return reminderIds;
+        }
+      );
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async markAsDelivered(reminderId: string) {
+    try {
+      return await this.reminderRepo.manager.transaction(
+        async (entityManager) => {
+          const reminder = await entityManager.findOne(Reminder, {
+            where: {
+              reminderId: reminderId,
+              entityStatus: { entityStatusId: "1" },
+            },
+          });
+          if (!reminder) {
+            throw new HttpException("Reminder not found", HttpStatus.NOT_FOUND);
+          }
+          reminder.delivered = true;
+          return await entityManager.save(reminder);
+        }
+      );
     } catch (e) {
       throw e;
     }
