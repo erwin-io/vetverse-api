@@ -15,7 +15,6 @@ import { FirebaseProviderModule } from "src/core/provider/firebase/firebase-prov
 
 @Module({
   imports: [
-    FirebaseProviderModule,
     UsersModule,
     RolesModule,
     NotificationModule,

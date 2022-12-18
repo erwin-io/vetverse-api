@@ -34,10 +34,12 @@ import { query } from "express";
 import { UserTypeEnum } from "src/common/enums/user-type.enum";
 import { Pet } from "src/shared/entities/Pet";
 import { PetCategory } from "src/shared/entities/PetCategory";
+import { FirebaseProvider } from "src/core/provider/firebase/firebase-provider";
 
 @Injectable()
 export class UsersService {
   constructor(
+    private firebaseProvoder: FirebaseProvider,
     @InjectRepository(Users) private readonly userRepo: Repository<Users>
   ) {}
 
@@ -552,6 +554,12 @@ export class UsersService {
   }
 
   async updateFirebaseToken(userId: string, firebaseToken: string) {
+    
+    if (firebaseToken && firebaseToken !== "") {
+      this.firebaseProvoder.app
+        .messaging()
+        .subscribeToTopic([firebaseToken], "announcements");
+    }
     await this.userRepo.update(userId, {
       firebaseToken,
     });

@@ -11,12 +11,10 @@ import { compare, hash } from "src/common/utils/utils";
 import { RoleEnum } from "src/common/enums/role.enum copy";
 import { UserTypeEnum } from "src/common/enums/user-type.enum";
 import { NotificationService } from "./notification.service";
-import { FirebaseProvider } from "src/core/provider/firebase/firebase-provider";
 
 @Injectable()
 export class AuthService {
   constructor(
-    private firebaseProvoder: FirebaseProvider,
     private readonly usersService: UsersService,
     private readonly notificationService: NotificationService,
     private readonly jwtService: JwtService
@@ -89,9 +87,6 @@ export class AuthService {
       username,
       password
     );
-    this.firebaseProvoder.app
-      .messaging()
-      .subscribeToTopic([user.firebaseToken], "announcements");
 
     // generate and sign token
     const { userId } = user;
