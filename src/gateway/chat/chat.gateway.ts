@@ -143,8 +143,7 @@ export class ChatGateway
                 {
                   priority: "high",
                   timeToLive: 60 * 24,
-                  android: { sound: "notif_alert" },
-                  dryRun: true
+                  android: { sound: "notif_alert" }
                 }
               )
               .then((response: MessagingDevicesResponse) => {
@@ -152,6 +151,11 @@ export class ChatGateway
                   console.log(
                     "Successfully sent message:",
                     JSON.stringify(response.results[0].error.code)
+                  );
+                } else {
+                  console.log(
+                    "Successfully sent message:",
+                    JSON.stringify(response)
                   );
                 }
                 return message;
