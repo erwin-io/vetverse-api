@@ -148,10 +148,12 @@ export class ChatGateway
                 }
               )
               .then((response: MessagingDevicesResponse) => {
-                console.log(
-                  "Successfully sent message:",
-                  JSON.stringify(response.results[0].error.code)
-                );
+                if (response.results[0].error) {
+                  console.log(
+                    "Successfully sent message:",
+                    JSON.stringify(response.results[0].error.code)
+                  );
+                }
                 return message;
               })
               .catch((error) => {
