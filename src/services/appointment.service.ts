@@ -671,7 +671,7 @@ export class AppointmentService {
         async (entityManager) => {
           let appointment = await entityManager.findOne(Appointment, {
             where: { appointmentId },
-            relations: ["appointmentStatus", "serviceType"],
+            relations: ["appointmentStatus", "serviceType", "consultaionType"],
           });
           const clientAppointment = await entityManager.findOne(
             ClientAppointment,
@@ -731,6 +731,39 @@ export class AppointmentService {
                 HttpStatus.BAD_REQUEST
               );
             } else {
+              if (
+                appointment.consultaionType.consultaionTypeId ===
+                ConsultaionTypeEnum.VIDEO.toString()
+              ) {
+                let reminder = new Reminder();
+                reminder.isAppointment = true;
+                const reminderDate: any = appointment.appointmentDate;
+                const MS_PER_MINUTE = 60000;
+                const MS_PRIOR_REMINDER = 20;
+                reminder.title =
+                  NotificationTitleConstant.APPOINTMENT_VIDEO_REMINDER;
+                reminder.description =
+                  NotificationDescriptionConstant.APPOINTMENT_VIDEO_REMINDER.replace(
+                    "{0}",
+                    `${moment(appointment.appointmentDate).format(
+                      "MMMM DD, YYYY"
+                    )} @ ${moment(appointment.appointmentDate).format(
+                      "hh:mm a"
+                    )}`
+                  );
+                reminder.dueDate = new Date(
+                  reminderDate + MS_PRIOR_REMINDER * MS_PER_MINUTE
+                );
+                reminder.appointment = appointment;
+                reminder = await entityManager.save(Reminder, reminder);
+                if (!reminder) {
+                  throw new HttpException(
+                    "Error saving reminder!",
+                    HttpStatus.BAD_REQUEST
+                  );
+                }
+              }
+
               const notificationId = notif.notificationId;
               notif = <Notifications>await entityManager
                 .createQueryBuilder("Notifications", "n")
