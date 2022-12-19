@@ -50,15 +50,15 @@ export class ChatGateway
       const decodedToken = await this.authService.verifyJwt(
         socket.handshake.headers.authorization
       );
-      const res: any = await this.userService.findById(decodedToken.userId);
-      if (!res) {
+      const user = await this.userService.findUserById(decodedToken.userId);
+      if (!user) {
         return this.disconnect(socket);
       } else {
-        socket.data.user = res.user;
+        socket.data.user = user;
         // Save connection to DB
         await this.gatewayConnectedUsersService.add({
           socketId: socket.id,
-          userId: res.user.userId,
+          userId: user.userId,
         });
       }
     } catch (ex) {
@@ -144,10 +144,14 @@ export class ChatGateway
                   priority: "high",
                   timeToLive: 60 * 24,
                   android: { sound: "notif_alert" },
+                  dryRun: true
                 }
               )
               .then((response: MessagingDevicesResponse) => {
-                console.log("Successfully sent message:", response);
+                console.log(
+                  "Successfully sent message:",
+                  JSON.stringify(response.results[0].error.code)
+                );
                 return message;
               })
               .catch((error) => {

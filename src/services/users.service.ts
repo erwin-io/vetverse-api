@@ -248,6 +248,14 @@ export class UsersService {
     return result;
   }
 
+  async findUserById(userId: string) {
+    const result = await this.userRepo.findOneBy({ userId });
+    if (!result) {
+      throw new HttpException("User not found", HttpStatus.NOT_FOUND);
+    }
+    return result;
+  }
+
   async findByUsername(username) {
     const result = await this.findOne(
       { username },
@@ -295,7 +303,7 @@ export class UsersService {
     }
     return this._sanitizeUser(result.user);
   }
-  
+
   async registerClientUser(userDto: ClientUserDto) {
     const { username } = userDto;
     return await this.userRepo.manager.transaction(async (entityManager) => {
@@ -554,7 +562,6 @@ export class UsersService {
   }
 
   async updateFirebaseToken(userId: string, firebaseToken: string) {
-    
     if (firebaseToken && firebaseToken !== "") {
       this.firebaseProvoder.app
         .messaging()
