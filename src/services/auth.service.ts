@@ -218,7 +218,7 @@ export class AuthService {
   verifyJwt(jwt: string): Promise<any> {
     try {
       return this.jwtService.verifyAsync(jwt, {
-        publicKey: fs.readFileSync(path.join(__dirname, "../../public.key")),
+        secret: fs.readFileSync(path.join(__dirname, "../../private.key")),
       });
     } catch (ex) {
       console.log(ex);
