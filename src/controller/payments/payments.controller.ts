@@ -71,7 +71,7 @@ export class PaymentsController {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
-      res.data = await this.paymentService.void(dto);
+      res.data = await this.paymentService.updateReferenceNumber(dto);
       res.success = true;
       return res;
     } catch (e) {
