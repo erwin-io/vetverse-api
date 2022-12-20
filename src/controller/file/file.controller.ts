@@ -2,13 +2,17 @@ import {
   Body,
   Controller,
   Post,
+  Req,
+  UploadedFile,
   UploadedFiles,
   UseInterceptors,
 } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiProperty } from "@nestjs/swagger";
-import { FilesInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { IsNotEmpty } from "class-validator";
+import LocalFilesInterceptor from "../../core/interceptors/localfile.interceptors";
+
 
 export class FileDto {
   @ApiProperty()
@@ -19,24 +23,18 @@ export class FileDto {
 @Controller("file")
 @ApiBearerAuth()
 export class FileController {
-  @Post("upload")
+  @Post("")
   @UseInterceptors(
-    FilesInterceptor("files", 20, {
-      storage: diskStorage({
-        destination: "./uploads/",
-        filename: `F_${new Date().toString()}`,
-      }),
-      //   fileFilter: imageFileFilter,
+    LocalFilesInterceptor({
+      fieldName: "file",
+      path: "/avatars",
     })
   )
-  uploadMultipleFiles(@UploadedFiles() files, @Body() file: FileDto) {
-    const response = [];
-    files.forEach((file) => {
-      const fileReponse = {
-        filename: file.filename,
+  async addAvatar(@UploadedFile() file: Express.Multer.File) {
+    const theFile =  {
+        path: file.path,
+        filename: file.originalname,
+        mimetype: file.mimetype,
       };
-      response.push(fileReponse);
-    });
-    return response;
   }
 }

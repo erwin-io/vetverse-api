@@ -11,7 +11,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { CustomResponse } from "src/common/helper/customresponse.helpers";
 import { JwtAuthGuard } from "src/core/auth/jwt.auth.guard";
 import { CreatePaymentDto } from "src/core/dto/payment/payment.create.dto";
-import { PaymentDto } from "src/core/dto/payment/payment.update.dto";
+import { PaymentDto, UpdateReferenceNumberDto } from "src/core/dto/payment/payment.update.dto";
 import { PaymentService } from "src/services/payment.service";
 
 @ApiTags("payments")
@@ -65,9 +65,25 @@ export class PaymentsController {
     }
   }
 
+  @Put("updateReferenceNumber/")
+  @UseGuards(JwtAuthGuard)
+  async updateReferenceNumber(@Body() dto: UpdateReferenceNumberDto) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.paymentService.void(dto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
   @Put("void/")
   @UseGuards(JwtAuthGuard)
-  async Void(@Body() dto: PaymentDto) {
+  async void(@Body() dto: PaymentDto) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};

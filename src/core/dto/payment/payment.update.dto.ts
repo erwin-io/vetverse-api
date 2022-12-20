@@ -8,3 +8,9 @@ export class PaymentDto {
   @IsNotEmpty()
   paymentId: string;
 }
+
+export class UpdateReferenceNumberDto extends PaymentDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  referenceNo: string;
+}

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreatePaymentDto } from "src/core/dto/payment/payment.create.dto";
-import { PaymentDto } from "src/core/dto/payment/payment.update.dto";
+import { PaymentDto, UpdateReferenceNumberDto } from "src/core/dto/payment/payment.update.dto";
 import { Appointment } from "src/shared/entities/Appointment";
 import { Payment } from "src/shared/entities/Payment";
 import { PaymentType } from "src/shared/entities/PaymentType";
@@ -84,6 +84,26 @@ export class PaymentService {
       payment.paymentType = new PaymentType();
       payment.paymentType.paymentTypeId = createPaymentDto.paymentTypeId;
       payment.referenceNo = createPaymentDto.referenceNo;
+      return await this.paymentRepo.save(payment);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async updateReferenceNumber(dto: UpdateReferenceNumberDto) {
+    try {
+      const payment = await this.paymentRepo.findOneBy({
+        paymentId: dto.paymentId,
+        isVoid: false,
+      });
+
+      if (!payment) {
+        throw new HttpException(
+          "There was no payment found.",
+          HttpStatus.BAD_REQUEST
+        );
+      }
+      payment.referenceNo = dto.referenceNo;
       return await this.paymentRepo.save(payment);
     } catch (e) {
       throw e;
