@@ -1,7 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreatePaymentDto } from "src/core/dto/payment/payment.create.dto";
-import { PaymentDto, UpdateReferenceNumberDto } from "src/core/dto/payment/payment.update.dto";
+import {
+  PaymentDto,
+  UpdateReferenceNumberDto,
+} from "src/core/dto/payment/payment.update.dto";
 import { Appointment } from "src/shared/entities/Appointment";
 import { Payment } from "src/shared/entities/Payment";
 import { PaymentType } from "src/shared/entities/PaymentType";

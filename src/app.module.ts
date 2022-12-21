@@ -19,6 +19,7 @@ import { DashboardModule } from "./controller/dashboard/dashboard.module";
 import { FirebaseProviderModule } from "./core/provider/firebase/firebase-provider.module";
 import { SchedulerModule } from "./controller/scheduler/scheduler.module";
 import { ReminderModule } from "./controller/reminder/reminder.module";
+import { ReportsModule } from "./controller/reports/reports.module";
 import * as Joi from "@hapi/joi";
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
@@ -27,7 +28,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
       envFilePath,
       isGlobal: true,
       validationSchema: Joi.object({
-        UPLOADED_FILES_DESTINATION: Joi.string().required()
+        UPLOADED_FILES_DESTINATION: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
@@ -47,6 +48,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     FirebaseProviderModule,
     SchedulerModule,
     ReminderModule,
+    ReportsModule,
   ],
   providers: [AppService],
   controllers: [],

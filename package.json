@@ -24,6 +24,7 @@
     "@automapper/core": "^8.7.6",
     "@automapper/nestjs": "^8.7.6",
     "@hapi/joi": "^17.1.1",
+    "@nestjs/axios": "^1.0.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
