@@ -384,7 +384,79 @@ export class ReportsService {
         .leftJoinAndSelect("s.user", "u")
         .leftJoinAndSelect("u.role", "r")
         .leftJoinAndSelect("u.entityStatus", "es")
-        .where("es.entityStatusId = :entityStatusId", {
+        .where("r.roleId IN(:...roleIds)", { roleIds: [1, 2, 3, 4] })
+        .andWhere("es.entityStatusId = :entityStatusId", {
+          entityStatusId: 1,
+        })
+        .getMany();
+
+      data.items = services.map((x) => {
+        const item = {
+          name:
+            x.middleName && x.middleName !== ""
+              ? `${x.firstName} ${x.middleName} ${x.lastName}`
+              : `${x.firstName} ${x.lastName}`,
+          role: x.user.role.name,
+          contact: x.mobileNumber,
+          address: x.address,
+          email: x.email,
+        };
+        return item;
+      });
+      const params = {
+        template: {
+          name: "staff-report",
+        },
+        data: data,
+      };
+      const url = this.config.get<string>("JSREPORTS_URL").toString();
+      const username = this.config.get<string>("JSREPORTS_USERNAME").toString();
+      const password = this.config.get<string>("JSREPORTS_PASSWORD").toString();
+      const result = await firstValueFrom(
+        this.httpService
+          .post<any>(url, JSON.stringify(params), {
+            auth: {
+              username,
+              password,
+            },
+            responseType: "stream",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+          .pipe(
+            catchError((error) => {
+              throw new HttpException(
+                error.response.data,
+                HttpStatus.BAD_REQUEST
+              );
+            })
+          )
+      );
+      return result.data;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async getVetReport() {
+    try {
+      const data = {
+        report: {
+          name: "Staff report",
+          dateRange: {},
+        },
+        items: [],
+      };
+      const services = <Staff[]>await this.appointmentRepo.manager
+        .createQueryBuilder("Staff", "s")
+        .leftJoinAndSelect("s.user", "u")
+        .leftJoinAndSelect("u.role", "r")
+        .leftJoinAndSelect("u.entityStatus", "es")
+        .where("r.roleId = :roleId", {
+          roleId: 3,
+        })
+        .andWhere("es.entityStatusId = :entityStatusId", {
           entityStatusId: 1,
         })
         .getMany();
