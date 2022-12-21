@@ -5,6 +5,7 @@ import {
   Req,
   Res,
   StreamableFile,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { CustomResponse } from "src/common/helper/customresponse.helpers";
@@ -12,6 +13,7 @@ import { ReportsService } from "src/services/reports.service";
 import { Response } from "express";
 import { Readable, Stream } from "stream";
 import * as moment from "moment";
+import { JwtAuthGuard } from "src/core/auth/jwt.auth.guard";
 
 @ApiTags("reports")
 @Controller("reports")
@@ -21,6 +23,7 @@ export class ReportsController {
   @Get("getServiceReport")
   @ApiQuery({ name: "from", required: false })
   @ApiQuery({ name: "to", required: false })
+  @UseGuards(JwtAuthGuard)
   async getServiceReport(
     @Query("from") from: Date = new Date(),
     @Query("to") to: Date = new Date(),
@@ -48,6 +51,7 @@ export class ReportsController {
   @Get("getPaymentsReport")
   @ApiQuery({ name: "from", required: false })
   @ApiQuery({ name: "to", required: false })
+  @UseGuards(JwtAuthGuard)
   async getPaymentsReport(
     @Query("from") from: Date = new Date(),
     @Query("to") to: Date = new Date(),
