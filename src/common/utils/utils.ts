@@ -1,6 +1,6 @@
 import { getConnectionOptions, getConnection } from "typeorm";
 import * as bcrypt from "bcrypt";
-import { RoleEnum } from "../enums/role.enum copy";
+import { RoleEnum } from "../enums/role.enum";
 
 
 export const toPromise = <T>(data: T): Promise<T> => {

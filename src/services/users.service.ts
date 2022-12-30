@@ -26,7 +26,7 @@ import { Staff } from "../shared/entities/Staff";
 import { UserType } from "../shared/entities/UserType";
 import { EntityStatus } from "../shared/entities/EntityStatus";
 import { Roles } from "../shared/entities/Roles";
-import { RoleEnum } from "src/common/enums/role.enum copy";
+import { RoleEnum } from "src/common/enums/role.enum";
 import { StaffViewModel } from "src/core/view-model/staff.view-model";
 import { ClientViewModel } from "src/core/view-model/client.view-model";
 import { UserViewModel } from "src/core/view-model/user.view-model";

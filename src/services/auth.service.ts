@@ -8,7 +8,7 @@ import { JwtService } from "@nestjs/jwt";
 import * as fs from "fs";
 import * as path from "path";
 import { compare, hash } from "src/common/utils/utils";
-import { RoleEnum } from "src/common/enums/role.enum copy";
+import { RoleEnum } from "src/common/enums/role.enum";
 import { UserTypeEnum } from "src/common/enums/user-type.enum";
 import { NotificationService } from "./notification.service";
 

@@ -439,7 +439,7 @@ export class ReportsService {
     }
   }
 
-  async getVetReport() {
+  async getVetReport(from: Date, to: Date) {
     try {
       const data = {
         report: {
@@ -448,17 +448,39 @@ export class ReportsService {
         },
         items: [],
       };
-      const services = <Staff[]>await this.appointmentRepo.manager
+      const services = <any[]>await this.appointmentRepo.manager
         .createQueryBuilder("Staff", "s")
         .leftJoinAndSelect("s.user", "u")
         .leftJoinAndSelect("u.role", "r")
         .leftJoinAndSelect("u.entityStatus", "es")
-        .where("r.roleId = :roleId", {
+        .leftJoinAndSelect("s.appointments", "tcxa") //cancelled
+        .leftJoinAndSelect("s.appointments", "tca") //compeleted
+        .select("MAX(s.firstName)", "firstName")
+        .addSelect("MAX(s.middleName)", "middleName")
+        .addSelect("MAX(s.lastName)", "lastName")
+        .addSelect("COUNT(tcxa.appointmentId)", "cancelled")
+        .addSelect("COUNT(tca.appointmentId)", "compeleted")
+        .andWhere("r.roleId = :roleId", {
           roleId: 3,
         })
         .andWhere("es.entityStatusId = :entityStatusId", {
           entityStatusId: 1,
         })
+        .andWhere("tcxa.appointmentStatus = :appointmentStatus", {
+          appointmentStatus: 4,
+        })
+        .andWhere("tcxa.appointmentDate between :from and :to", {
+          from: new Date(new Date(from).setHours(0, 0, 0, 0)),
+          to: new Date(new Date(to).setHours(23, 59, 59, 999)),
+        })
+        .andWhere("tca.appointmentStatus = :appointmentStatus", {
+          appointmentStatus: 3,
+        })
+        .andWhere("tca.appointmentDate between :from and :to", {
+          from: new Date(new Date(from).setHours(0, 0, 0, 0)),
+          to: new Date(new Date(to).setHours(23, 59, 59, 999)),
+        })
+        .groupBy("s.staffid")
         .getMany();
 
       data.items = services.map((x) => {
@@ -467,16 +489,15 @@ export class ReportsService {
             x.middleName && x.middleName !== ""
               ? `${x.firstName} ${x.middleName} ${x.lastName}`
               : `${x.firstName} ${x.lastName}`,
-          role: x.user.role.name,
-          contact: x.mobileNumber,
-          address: x.address,
-          email: x.email,
+          totalCancelled: x.cancelled,
+          totalCompleted: x.compeleted,
+          totalAppointments: x.compelete + x.cancelled,
         };
         return item;
       });
       const params = {
         template: {
-          name: "staff-report",
+          name: "vet-report",
         },
         data: data,
       };

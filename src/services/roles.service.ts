@@ -4,7 +4,7 @@ import { In, Not } from "typeorm";
 import { Repository } from "typeorm";
 import { Roles } from "../shared/entities/Roles";
 import { RoleAccessDto } from "../core/dto/roles/role.access.dtos";
-import { RoleEnum } from "src/common/enums/role.enum copy";
+import { RoleEnum } from "src/common/enums/role.enum";
 
 @Injectable()
 export class RolesService {

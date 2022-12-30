@@ -17,7 +17,7 @@ import { JwtAuthGuard } from "src/core/auth/jwt.auth.guard";
 
 @ApiTags("reports")
 @Controller("reports")
-@ApiBearerAuth()
+// @ApiBearerAuth()
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
   @Get("getServiceReport")
@@ -148,6 +148,31 @@ export class ReportsController {
     const res: CustomResponse = {};
     try {
       const stream: Stream = await this.reportsService.getStaffReport();
+
+      response.set({
+        "Content-Type": "application/pdf",
+      });
+
+      stream.pipe(response);
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Get("getVetReport")
+  @ApiQuery({ name: "from", required: false })
+  @ApiQuery({ name: "to", required: false })
+  // @UseGuards(JwtAuthGuard)
+  async getVetReport(
+    @Query("from") from: Date = new Date(),
+    @Query("to") to: Date = new Date(),
+    @Res() response: Response
+  ) {
+    const res: CustomResponse = {};
+    try {
+      const stream: Stream = await this.reportsService.getVetReport(from, to);
 
       response.set({
         "Content-Type": "application/pdf",
