@@ -477,17 +477,17 @@ export class ReportsService {
             x.middleName && x.middleName !== ""
               ? `${x.firstName} ${x.middleName} ${x.lastName}`
               : `${x.firstName} ${x.lastName}`,
-          totalCompleted: x.appointments.filter(
+          completed: x.appointments.filter(
             (x) =>
               Number(x.appointmentStatus.appointmentStatusId) ===
               Number(AppointmentStatusEnum.COMPLETED)
           ).length,
-          totalCancelled: x.appointments.filter(
+          cancelled: x.appointments.filter(
             (x) =>
               Number(x.appointmentStatus.appointmentStatusId) ===
               Number(AppointmentStatusEnum.CANCELLED)
           ).length,
-          totalAppointments: x.appointments.length,
+          appointments: x.appointments.length,
         };
         return item;
       });

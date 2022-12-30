@@ -13,7 +13,6 @@ import { diskStorage } from "multer";
 import { IsNotEmpty } from "class-validator";
 import LocalFilesInterceptor from "../../core/interceptors/localfile.interceptors";
 
-
 export class FileDto {
   @ApiProperty()
   @IsNotEmpty()
@@ -31,10 +30,10 @@ export class FileController {
     })
   )
   async addAvatar(@UploadedFile() file: Express.Multer.File) {
-    const theFile =  {
-        path: file.path,
-        filename: file.originalname,
-        mimetype: file.mimetype,
-      };
+    const theFile = {
+      path: file.path,
+      filename: file.originalname,
+      mimetype: file.mimetype,
+    };
   }
 }
