@@ -444,7 +444,7 @@ export class ReportsService {
     try {
       const data = {
         report: {
-          name: "Staff report",
+          name: "Veterinarian report",
           dateRange: {},
         },
         items: [],
