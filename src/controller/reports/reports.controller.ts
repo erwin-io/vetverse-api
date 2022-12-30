@@ -17,7 +17,7 @@ import { JwtAuthGuard } from "src/core/auth/jwt.auth.guard";
 
 @ApiTags("reports")
 @Controller("reports")
-// @ApiBearerAuth()
+@ApiBearerAuth()
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
   @Get("getServiceReport")
@@ -79,7 +79,7 @@ export class ReportsController {
   @Get("getAppointmentsReport")
   @ApiQuery({ name: "from", required: false })
   @ApiQuery({ name: "to", required: false })
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getAppointmentsReport(
     @Query("from") from: Date = new Date(),
     @Query("to") to: Date = new Date(),
@@ -105,7 +105,7 @@ export class ReportsController {
   }
 
   @Get("getClientsReport")
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getClientsReport(@Res() response: Response) {
     const res: CustomResponse = {};
     try {
@@ -124,7 +124,7 @@ export class ReportsController {
   }
 
   @Get("getPetsReport")
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getPetsReport(@Res() response: Response) {
     const res: CustomResponse = {};
     try {
@@ -143,7 +143,7 @@ export class ReportsController {
   }
 
   @Get("getStaffReport")
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getStaffReport(@Res() response: Response) {
     const res: CustomResponse = {};
     try {
@@ -164,7 +164,7 @@ export class ReportsController {
   @Get("getVetReport")
   @ApiQuery({ name: "from", required: false })
   @ApiQuery({ name: "to", required: false })
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getVetReport(
     @Query("from") from: Date = new Date(),
     @Query("to") to: Date = new Date(),
