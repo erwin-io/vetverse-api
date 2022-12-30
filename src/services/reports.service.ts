@@ -12,6 +12,7 @@ import { Appointment } from "src/shared/entities/Appointment";
 import { Clients } from "src/shared/entities/Clients";
 import { Pet } from "src/shared/entities/Pet";
 import { Staff } from "src/shared/entities/Staff";
+import { AppointmentStatusEnum } from "src/common/enums/appointment-status.enum";
 
 @Injectable()
 export class ReportsService {
@@ -448,53 +449,49 @@ export class ReportsService {
         },
         items: [],
       };
-      const services = <any[]>await this.appointmentRepo.manager
+      const services = <Staff[]>await this.appointmentRepo.manager
         .createQueryBuilder("Staff", "s")
         .leftJoinAndSelect("s.user", "u")
         .leftJoinAndSelect("u.role", "r")
         .leftJoinAndSelect("u.entityStatus", "es")
-        .leftJoinAndSelect("s.appointments", "tcxa") //cancelled
-        .leftJoinAndSelect("s.appointments", "tca") //compeleted
-        .select("MAX(s.firstName)", "firstName")
-        .addSelect("MAX(s.middleName)", "middleName")
-        .addSelect("MAX(s.lastName)", "lastName")
-        .addSelect("COUNT(tcxa.appointmentId)", "cancelled")
-        .addSelect("COUNT(tca.appointmentId)", "compeleted")
-        .andWhere("r.roleId = :roleId", {
+        .leftJoinAndSelect("s.appointments", "a")
+        .leftJoinAndSelect("a.appointmentStatus", "as")
+        .where("r.roleId = :roleId", {
           roleId: 3,
         })
         .andWhere("es.entityStatusId = :entityStatusId", {
           entityStatusId: 1,
         })
-        .andWhere("tcxa.appointmentStatus = :appointmentStatus", {
-          appointmentStatus: 4,
+        .andWhere("as.appointmentStatusId IN(:...appointmentStatusId)", {
+          appointmentStatusId: ["3", "4"],
         })
-        .andWhere("tcxa.appointmentDate between :from and :to", {
+        .andWhere("a.appointmentDate between :from and :to", {
           from: new Date(new Date(from).setHours(0, 0, 0, 0)),
           to: new Date(new Date(to).setHours(23, 59, 59, 999)),
         })
-        .andWhere("tca.appointmentStatus = :appointmentStatus", {
-          appointmentStatus: 3,
-        })
-        .andWhere("tca.appointmentDate between :from and :to", {
-          from: new Date(new Date(from).setHours(0, 0, 0, 0)),
-          to: new Date(new Date(to).setHours(23, 59, 59, 999)),
-        })
-        .groupBy("s.staffid")
         .getMany();
 
-      data.items = services.map((x) => {
+      const items = services.map((x) => {
         const item = {
           name:
             x.middleName && x.middleName !== ""
               ? `${x.firstName} ${x.middleName} ${x.lastName}`
               : `${x.firstName} ${x.lastName}`,
-          totalCancelled: x.cancelled,
-          totalCompleted: x.compeleted,
-          totalAppointments: x.compelete + x.cancelled,
+          totalCompleted: x.appointments.filter(
+            (x) =>
+              Number(x.appointmentStatus.appointmentStatusId) ===
+              Number(AppointmentStatusEnum.COMPLETED)
+          ).length,
+          totalCancelled: x.appointments.filter(
+            (x) =>
+              Number(x.appointmentStatus.appointmentStatusId) ===
+              Number(AppointmentStatusEnum.CANCELLED)
+          ).length,
+          totalAppointments: x.appointments.length,
         };
         return item;
       });
+      data.items = items;
       const params = {
         template: {
           name: "vet-report",
