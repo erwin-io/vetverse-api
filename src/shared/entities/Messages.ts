@@ -6,8 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Appointment } from "./Appointment";
 import { Users } from "./Users";
+import { Appointment } from "./Appointment";
 
 @Index("PK_Messages", ["messageId"], { unique: true })
 @Entity("Messages", { schema: "dbo" })
@@ -24,12 +24,6 @@ export class Messages {
   @Column("bit", { name: "IsClient", default: () => "(0)" })
   isClient: boolean;
 
-  @ManyToOne(() => Appointment, (appointment) => appointment.messages)
-  @JoinColumn([
-    { name: "AppointmentId", referencedColumnName: "appointmentId" },
-  ])
-  appointment: Appointment;
-
   @ManyToOne(() => Users, (users) => users.messages)
   @JoinColumn([{ name: "FromUserId", referencedColumnName: "userId" }])
   fromUser: Users;
@@ -37,4 +31,10 @@ export class Messages {
   @ManyToOne(() => Users, (users) => users.messages2)
   @JoinColumn([{ name: "ToUserId", referencedColumnName: "userId" }])
   toUser: Users;
+
+  @ManyToOne(() => Appointment, (appointment) => appointment.messages)
+  @JoinColumn([
+    { name: "AppointmentId", referencedColumnName: "appointmentId" },
+  ])
+  appointment: Appointment;
 }

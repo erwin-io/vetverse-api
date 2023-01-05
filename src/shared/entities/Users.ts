@@ -5,15 +5,17 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Clients } from "./Clients";
 import { GatewayConnectedUsers } from "./GatewayConnectedUsers";
 import { Messages } from "./Messages";
 import { Staff } from "./Staff";
-import { UserType } from "./UserType";
-import { Roles } from "./Roles";
+import { UserProfilePic } from "./UserProfilePic";
 import { EntityStatus } from "./EntityStatus";
+import { Roles } from "./Roles";
+import { UserType } from "./UserType";
 
 @Index("PK_Users", ["userId"], { unique: true })
 @Entity("Users", { schema: "dbo" })
@@ -57,17 +59,20 @@ export class Users {
   @OneToMany(() => Staff, (staff) => staff.user)
   staff: Staff[];
 
-  @ManyToOne(() => UserType, (userType) => userType.users)
-  @JoinColumn([{ name: "UserTypeId", referencedColumnName: "userTypeId" }])
-  userType: UserType;
-
-  @ManyToOne(() => Roles, (roles) => roles.users)
-  @JoinColumn([{ name: "RoleId", referencedColumnName: "roleId" }])
-  role: Roles;
+  @OneToOne(() => UserProfilePic, (userProfilePic) => userProfilePic.user)
+  userProfilePic: UserProfilePic;
 
   @ManyToOne(() => EntityStatus, (entityStatus) => entityStatus.users)
   @JoinColumn([
     { name: "EntityStatusId", referencedColumnName: "entityStatusId" },
   ])
   entityStatus: EntityStatus;
+
+  @ManyToOne(() => Roles, (roles) => roles.users)
+  @JoinColumn([{ name: "RoleId", referencedColumnName: "roleId" }])
+  role: Roles;
+
+  @ManyToOne(() => UserType, (userType) => userType.users)
+  @JoinColumn([{ name: "UserTypeId", referencedColumnName: "userTypeId" }])
+  userType: UserType;
 }

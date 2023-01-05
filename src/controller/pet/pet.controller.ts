@@ -22,7 +22,7 @@ export class PetController {
   constructor(private readonly petService: PetService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findAll() {
     const res: CustomResponse = {};
     try {
@@ -37,7 +37,7 @@ export class PetController {
   }
 
   @Get("findByClientId/:clientId")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findByClientId(@Param("clientId") clientId: string) {
     const res: CustomResponse = {};
     try {
@@ -52,7 +52,7 @@ export class PetController {
   }
 
   @Get(":petId")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findOne(@Param("petId") petId: string) {
     const res: CustomResponse = {};
     try {
@@ -67,7 +67,7 @@ export class PetController {
   }
 
   @Get("getPetMedicalRecords/:petId")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async getPetMedicalRecords(@Param("petId") petId: string) {
     const res: CustomResponse = {};
     try {
@@ -82,7 +82,7 @@ export class PetController {
   }
 
   @Post("")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async create(@Body() roleDto: CreatePetDto) {
     const res: CustomResponse = {};
     try {
@@ -98,7 +98,7 @@ export class PetController {
   }
 
   @Put("")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async update(@Body() roleDto: PetDto) {
     const res: CustomResponse = {};
     try {
@@ -114,7 +114,7 @@ export class PetController {
   }
 
   @Delete(":petId")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async delete(@Param("petId") petId: string) {
     const res: CustomResponse = {};
     try {

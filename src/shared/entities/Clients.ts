@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { ClientAppointment } from "./ClientAppointment";
-import { Users } from "./Users";
 import { Gender } from "./Gender";
+import { Users } from "./Users";
 import { Notifications } from "./Notifications";
 import { Pet } from "./Pet";
 
@@ -55,13 +55,13 @@ export class Clients {
   )
   clientAppointments: ClientAppointment[];
 
-  @ManyToOne(() => Users, (users) => users.clients)
-  @JoinColumn([{ name: "UserId", referencedColumnName: "userId" }])
-  user: Users;
-
   @ManyToOne(() => Gender, (gender) => gender.clients)
   @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
   gender: Gender;
+
+  @ManyToOne(() => Users, (users) => users.clients)
+  @JoinColumn([{ name: "UserId", referencedColumnName: "userId" }])
+  user: Users;
 
   @OneToMany(() => Notifications, (notifications) => notifications.client)
   notifications: Notifications[];

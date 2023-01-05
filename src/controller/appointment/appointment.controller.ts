@@ -33,7 +33,7 @@ import { AppointmentService } from "src/services/appointment.service";
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
   @Get()
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findAll() {
     const res: CustomResponse = {};
     try {
@@ -50,7 +50,7 @@ export class AppointmentController {
   @Get("getClientAppointmentsByStatus")
   @ApiQuery({ name: "clientId", required: false })
   @ApiQuery({ name: "appointmentStatus", required: false })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async getClientAppointmentsByStatus(
     // eslint-disable-next-line @typescript-eslint/no-inferrable-types
     @Query("clientId") clientId: string = "",
@@ -84,7 +84,7 @@ export class AppointmentController {
   @ApiQuery({ name: "consultaionType", required: false })
   @ApiQuery({ name: "appointmentDateFrom", type: Date, required: false })
   @ApiQuery({ name: "appointmentDateTo", required: false })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async getByAdvanceSearch(
     @Query("isAdvance") isAdvance: boolean,
     // eslint-disable-next-line @typescript-eslint/no-inferrable-types
@@ -128,7 +128,7 @@ export class AppointmentController {
   }
 
   @Get(":appointmentId")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async getById(@Param("appointmentId") appointmentId: string) {
     const res: CustomResponse = {};
     try {
@@ -161,7 +161,7 @@ export class AppointmentController {
   }
 
   @Get("getAppointmentsForADay/:date")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async getAppointmentsForADay(@Param("date") dateString: string) {
     const res: CustomResponse = {};
     try {
@@ -178,7 +178,7 @@ export class AppointmentController {
   }
 
   @Post("createClientAppointment")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async createClientAppointment(@Body() dto: CreateClientAppointmentDto) {
     const res: CustomResponse = {};
     try {
@@ -194,7 +194,7 @@ export class AppointmentController {
   }
 
   @Post("createClientCashlessAppointment")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async createClientCashlessAppointment(
     @Body() dto: CreateClientCashlessAppointmentDto
   ) {
@@ -214,7 +214,7 @@ export class AppointmentController {
   }
 
   @Post("createOnsiteAppointment")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async CreateOnsiteAppointment(@Body() dto: CreateOnsiteAppointmentDto) {
     const res: CustomResponse = {};
     try {
@@ -230,7 +230,7 @@ export class AppointmentController {
   }
 
   @Post("createWalkInAppointment")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async createWalkInAppointment(@Body() dto: CreateWalkInAppointmentDto) {
     const res: CustomResponse = {};
     try {
@@ -246,7 +246,7 @@ export class AppointmentController {
   }
 
   @Put("rescheduleAppointment")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async rescheduleAppointment(@Body() dto: RescheduleAppointmentDto) {
     const res: CustomResponse = {};
     try {
@@ -262,7 +262,7 @@ export class AppointmentController {
   }
 
   @Put("updateAppointmentStatus")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async updateAppointmentStatus(@Body() dto: UpdateAppointmentStatusDto) {
     const res: CustomResponse = {};
     try {
@@ -278,7 +278,7 @@ export class AppointmentController {
   }
 
   @Put("updateAppointmentConferencePeer")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async updateAppointmentConferencePeer(
     @Body() dto: UpdateAppointmentConferencePeer
   ) {
@@ -298,7 +298,7 @@ export class AppointmentController {
   }
 
   @Put("updateAppointmentDiagnosisAndTreatment")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async updateAppointmentDiagnosisAndTreatment(
     @Body() dto: UpdateDiagnosisAndTreatment
   ) {

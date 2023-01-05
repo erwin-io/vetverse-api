@@ -40,7 +40,7 @@ export class MessageController {
     required: true,
     type: Number,
   })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findByAppointmentPage(
     @Query("appointmentId") appointmentId,
     @Query("page", new DefaultValuePipe(1), ParseIntPipe) page = 1,
@@ -73,7 +73,7 @@ export class MessageController {
   }
 
   @Post("")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async add(@Body() messageDto: CreateMessageDto) {
     const res: CustomResponse = {};
     try {

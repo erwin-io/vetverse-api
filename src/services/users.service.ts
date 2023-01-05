@@ -1,5 +1,6 @@
 import { Clients } from "../shared/entities/Clients";
 import {
+  UpdateClientProfilePictureDto,
   UpdateClientUserDto,
   UpdateStaffUserDto,
   UserDto,
@@ -35,6 +36,11 @@ import { UserTypeEnum } from "src/common/enums/user-type.enum";
 import { Pet } from "src/shared/entities/Pet";
 import { PetCategory } from "src/shared/entities/PetCategory";
 import { FirebaseProvider } from "src/core/provider/firebase/firebase-provider";
+import { UserProfilePic } from "src/shared/entities/UserProfilePic";
+import { unlinkSync, writeFile } from "fs";
+import { Files } from "src/shared/entities/Files";
+import { extname, join } from "path";
+import { v4 as uuid } from "uuid";
 
 @Injectable()
 export class UsersService {
@@ -189,7 +195,7 @@ export class UsersService {
   ) {
     const user: any = await entityManager.findOne(Users, {
       where: options,
-      relations: ["userType", "role"],
+      relations: ["userType", "role", "userProfilePic"],
     });
     if (!user) {
       return;
@@ -218,6 +224,15 @@ export class UsersService {
       result.user = sanitizeUser ? this._sanitizeUser(user) : result.user;
       if (result.user.role.roleId === RoleEnum.GUEST.toString())
         result.user.role.roleId = null;
+      if (user.userProfilePic) {
+        const userProfilePic = await entityManager.findOne(UserProfilePic, {
+          where: {
+            userId: user.userId,
+          },
+          relations: ["file"],
+        });
+        result.user.userProfilePic = userProfilePic;
+      }
       return result;
     } else {
       const result: any = await entityManager.findOne(Clients, {
@@ -236,6 +251,15 @@ export class UsersService {
       result.user = sanitizeUser ? this._sanitizeUser(user) : result.user;
       if (result.user.role.roleId === RoleEnum.GUEST.toString())
         result.user.role.roleId = null;
+      if (user.userProfilePic) {
+        const userProfilePic = await entityManager.findOne(UserProfilePic, {
+          where: {
+            userId: user.userId,
+          },
+          relations: ["file"],
+        });
+        result.user.userProfilePic = userProfilePic;
+      }
       return result;
     }
   }
@@ -477,6 +501,7 @@ export class UsersService {
       if (!client) {
         throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
       }
+      let user: Users = client.user;
       client.firstName = userDto.firstName;
       client.middleName = userDto.middleName;
       client.lastName = userDto.lastName;
@@ -488,7 +513,143 @@ export class UsersService {
       client.gender = new Gender();
       client.gender.genderId = userDto.genderId;
 
+      if (userDto.userProfilePic) {
+        const newFileName: string = uuid();
+        let userProfilePic = await entityManager.findOne(UserProfilePic, {
+          where: { userId: user.userId },
+          relations: ["file"],
+        });
+        if (userProfilePic) {
+          try {
+            unlinkSync("./uploads/profile/" + userProfilePic.file.fileName);
+          } catch (ex) {
+            console.log(ex);
+          }
+          const file = userProfilePic.file;
+          file.fileName = `${newFileName}${extname(
+            userDto.userProfilePic.fileName
+          )}`;
+          userProfilePic.file = await entityManager.save(Files, file);
+          const base64Data = userDto.userProfilePic.data.replace(
+            /^data:image\/png;base64,/,
+            ""
+          );
+          writeFile(
+            "./uploads/profile/" + file.fileName,
+            base64Data,
+            "base64",
+            function (err) {
+              console.log(err);
+            }
+          );
+        } else {
+          userProfilePic = new UserProfilePic();
+          userProfilePic.user = user;
+          const file = new Files();
+          file.fileName = `${newFileName}${extname(
+            userDto.userProfilePic.fileName
+          )}`;
+          userProfilePic.file = await entityManager.save(Files, file);
+          const base64Data = userDto.userProfilePic.data.replace(
+            /^data:image\/png;base64,/,
+            ""
+          );
+          writeFile(
+            "./uploads/profile/" + file.fileName,
+            base64Data,
+            "base64",
+            function (err) {
+              console.log(err);
+            }
+          );
+        }
+        user.userProfilePic = await entityManager.save(
+          UserProfilePic,
+          userProfilePic
+        );
+      }
       await entityManager.save(Clients, client);
+      client = await this.findOne({ userId }, true, entityManager);
+
+      return client;
+    });
+  }
+
+  async updateClientProfilePicture(dto: UpdateClientProfilePictureDto) {
+    const userId = dto.userId;
+
+    return await this.userRepo.manager.transaction(async (entityManager) => {
+      let client: any = await this.findOne(
+        {
+          userId,
+          userType: { userTypeId: "2" },
+        },
+        true,
+        entityManager
+      );
+      if (!client) {
+        throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
+      }
+      let user: Users = client.user;
+      if (dto.userProfilePic) {
+        const newFileName: string = uuid();
+        let userProfilePic = await entityManager.findOne(UserProfilePic, {
+          where: { userId: user.userId },
+          relations: ["file"],
+        });
+        if (userProfilePic) {
+          try {
+            unlinkSync("./uploads/profile/" + userProfilePic.file.fileName);
+          } catch (ex) {
+            console.log(ex);
+          }
+          const file = userProfilePic.file;
+          file.fileName = `${newFileName}${extname(
+            dto.userProfilePic.fileName
+          )}`;
+          userProfilePic.file = await entityManager.save(Files, file);
+          const base64Data = dto.userProfilePic.data.replace(
+            `data:image/${extname(
+              dto.userProfilePic.fileName
+            ).toString().replace(".", "")};base64`,
+            ""
+          );
+          writeFile(
+            "./uploads/profile/" + file.fileName,
+            base64Data,
+            "base64",
+            function (err) {
+              console.log(err);
+            }
+          );
+        } else {
+          userProfilePic = new UserProfilePic();
+          userProfilePic.user = user;
+          const file = new Files();
+          file.fileName = `${newFileName}${extname(
+            dto.userProfilePic.fileName
+          )}`;
+          userProfilePic.file = await entityManager.save(Files, file);
+          const base64Data = dto.userProfilePic.data.replace(
+            `data:image/${extname(
+              dto.userProfilePic.fileName
+            ).toString().replace(".", "")};base64`,
+            ""
+          );
+          writeFile(
+            "./uploads/profile/" + file.fileName,
+            base64Data,
+            "base64",
+            function (err) {
+              console.log(err);
+            }
+          );
+        }
+        user.userProfilePic = await entityManager.save(
+          UserProfilePic,
+          userProfilePic
+        );
+      }
       client = await this.findOne({ userId }, true, entityManager);
 
       return client;
@@ -511,7 +672,7 @@ export class UsersService {
       if (!staff) {
         throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
       }
-      let user = staff.user;
+      let user: Users = staff.user;
       user.role.roleId = userDto.roleId;
       user.isAdminApproved = isStaffRegistrationApproved(
         Number(userDto.roleId)
@@ -525,6 +686,62 @@ export class UsersService {
       staff.address = userDto.address;
       staff.gender = new Gender();
       staff.gender.genderId = userDto.genderId;
+
+      if (userDto.userProfilePic) {
+        const newFileName: string = uuid();
+        let userProfilePic = await entityManager.findOne(UserProfilePic, {
+          where: { userId: user.userId },
+          relations: ["file"],
+        });
+        if (userProfilePic) {
+          try {
+            unlinkSync("./uploads/profile/" + userProfilePic.file.fileName);
+          } catch (ex) {
+            console.log(ex);
+          }
+          const file = userProfilePic.file;
+          file.fileName = `${newFileName}${extname(
+            userDto.userProfilePic.fileName
+          )}`;
+          userProfilePic.file = await entityManager.save(Files, file);
+          const base64Data = userDto.userProfilePic.data.replace(
+            /^data:image\/png;base64,/,
+            ""
+          );
+          writeFile(
+            "./uploads/profile/" + file.fileName,
+            base64Data,
+            "base64",
+            function (err) {
+              console.log(err);
+            }
+          );
+        } else {
+          userProfilePic = new UserProfilePic();
+          userProfilePic.user = user;
+          const file = new Files();
+          file.fileName = `${newFileName}${extname(
+            userDto.userProfilePic.fileName
+          )}`;
+          userProfilePic.file = await entityManager.save(Files, file);
+          const base64Data = userDto.userProfilePic.data.replace(
+            /^data:image\/png;base64,/,
+            ""
+          );
+          writeFile(
+            "./uploads/profile/" + file.fileName,
+            base64Data,
+            "base64",
+            function (err) {
+              console.log(err);
+            }
+          );
+        }
+        user.userProfilePic = await entityManager.save(
+          UserProfilePic,
+          userProfilePic
+        );
+      }
 
       await entityManager.save(Staff, staff);
       staff = await this.findOne({ userId }, true, entityManager);

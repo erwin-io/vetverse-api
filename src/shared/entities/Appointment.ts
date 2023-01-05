@@ -8,10 +8,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Staff } from "./Staff";
-import { ServiceType } from "./ServiceType";
-import { ConsultaionType } from "./ConsultaionType";
 import { AppointmentStatus } from "./AppointmentStatus";
+import { ConsultaionType } from "./ConsultaionType";
+import { ServiceType } from "./ServiceType";
+import { Staff } from "./Staff";
+import { AppointmentAttachments } from "./AppointmentAttachments";
 import { ClientAppointment } from "./ClientAppointment";
 import { Messages } from "./Messages";
 import { Notifications } from "./Notifications";
@@ -61,25 +62,6 @@ export class Appointment {
   @Column("nvarchar", { name: "DiagnosisAndTreatment", nullable: true })
   diagnosisAndTreatment: string | null;
 
-  @ManyToOne(() => Staff, (staff) => staff.appointments)
-  @JoinColumn([{ name: "Staffid", referencedColumnName: "staffid" }])
-  staff: Staff;
-
-  @ManyToOne(() => ServiceType, (serviceType) => serviceType.appointments)
-  @JoinColumn([
-    { name: "ServiceTypeId", referencedColumnName: "serviceTypeId" },
-  ])
-  serviceType: ServiceType;
-
-  @ManyToOne(
-    () => ConsultaionType,
-    (consultaionType) => consultaionType.appointments
-  )
-  @JoinColumn([
-    { name: "ConsultaionTypeId", referencedColumnName: "consultaionTypeId" },
-  ])
-  consultaionType: ConsultaionType;
-
   @ManyToOne(
     () => AppointmentStatus,
     (appointmentStatus) => appointmentStatus.appointments
@@ -91,6 +73,31 @@ export class Appointment {
     },
   ])
   appointmentStatus: AppointmentStatus;
+
+  @ManyToOne(
+    () => ConsultaionType,
+    (consultaionType) => consultaionType.appointments
+  )
+  @JoinColumn([
+    { name: "ConsultaionTypeId", referencedColumnName: "consultaionTypeId" },
+  ])
+  consultaionType: ConsultaionType;
+
+  @ManyToOne(() => ServiceType, (serviceType) => serviceType.appointments)
+  @JoinColumn([
+    { name: "ServiceTypeId", referencedColumnName: "serviceTypeId" },
+  ])
+  serviceType: ServiceType;
+
+  @ManyToOne(() => Staff, (staff) => staff.appointments)
+  @JoinColumn([{ name: "Staffid", referencedColumnName: "staffid" }])
+  staff: Staff;
+
+  @OneToMany(
+    () => AppointmentAttachments,
+    (appointmentAttachments) => appointmentAttachments.appointment
+  )
+  appointmentAttachments: AppointmentAttachments[];
 
   @OneToOne(
     () => ClientAppointment,

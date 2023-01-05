@@ -23,7 +23,7 @@ import { PaymentService } from "src/services/payment.service";
 export class PaymentsController {
   constructor(private readonly paymentService: PaymentService) {}
   @Get()
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findAll() {
     const res: CustomResponse = {};
     try {
@@ -38,7 +38,7 @@ export class PaymentsController {
   }
 
   @Get(":paymentId")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async getById(@Param("paymentId") paymentId: string) {
     const res: CustomResponse = {};
     try {
@@ -53,7 +53,7 @@ export class PaymentsController {
   }
 
   @Post("")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async create(@Body() dto: CreatePaymentDto) {
     const res: CustomResponse = {};
     try {
@@ -69,7 +69,7 @@ export class PaymentsController {
   }
 
   @Put("updateReferenceNumber/")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async updateReferenceNumber(@Body() dto: UpdateReferenceNumberDto) {
     const res: CustomResponse = {};
     try {
@@ -85,7 +85,7 @@ export class PaymentsController {
   }
 
   @Put("void/")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async void(@Body() dto: PaymentDto) {
     const res: CustomResponse = {};
     try {

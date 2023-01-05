@@ -20,7 +20,7 @@ export class ReminderController {
   constructor(private readonly reminderService: ReminderService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findAll() {
     const res: CustomResponse = {};
     try {
@@ -56,7 +56,7 @@ export class ReminderController {
   }
 
   @Get(":reminderId")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findOne(@Param("reminderId") reminderId: string) {
     const res: CustomResponse = {};
     try {
@@ -71,7 +71,7 @@ export class ReminderController {
   }
 
   @Post("")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async add(@Body() createReminderDto: CreateReminderDto) {
     const res: CustomResponse = {};
     try {
@@ -87,7 +87,7 @@ export class ReminderController {
   }
 
   @Delete(":reminderId")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async delete(@Param("reminderId") reminderId: string) {
     const res: CustomResponse = {};
     try {

@@ -24,6 +24,9 @@ import { Messages } from "../entities/Messages";
 import { Notifications } from "../entities/Notifications";
 import { GatewayConnectedUsers } from "../entities/GatewayConnectedUsers";
 import { Reminder } from "../entities/Reminder";
+import { AppointmentAttachments } from "../entities/AppointmentAttachments";
+import { Files } from "../entities/Files";
+import { UserProfilePic } from "../entities/UserProfilePic";
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -62,6 +65,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         Messages,
         GatewayConnectedUsers,
         Reminder,
+        Files,
+        UserProfilePic,
+        AppointmentAttachments,
       ],
       synchronize: false, // never use TRUE in production!
       options: { encrypt: false },

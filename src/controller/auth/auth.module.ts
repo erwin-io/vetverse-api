@@ -12,10 +12,12 @@ import { Roles } from "src/shared/entities/Roles";
 import { RolesModule } from "../roles/roles.module";
 import { NotificationModule } from "../notification/notification.module";
 import { FirebaseProviderModule } from "src/core/provider/firebase/firebase-provider.module";
+import { FileModule } from "../file/file.module";
 
 @Module({
   imports: [
     UsersModule,
+    FileModule,
     RolesModule,
     NotificationModule,
     PassportModule.register({}),

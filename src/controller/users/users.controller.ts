@@ -7,10 +7,13 @@ import {
   Put,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from "@nestjs/common";
 import { UsersService } from "../../services/users.service";
 import {
   ToggleEnableDto,
+  UpdateClientProfilePictureDto,
   UpdateClientUserDto,
   UpdateFirebaseToken,
   UpdatePasswordDto,
@@ -21,9 +24,19 @@ import {
   CreateClientUserDto,
   CreateStaffUserDto,
 } from "../../core/dto/users/user.create.dto";
-import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiQuery,
+  ApiTags,
+} from "@nestjs/swagger";
 import { JwtAuthGuard } from "../../core/auth/jwt.auth.guard";
 import { ChangePasswordDto } from "src/core/dto/users/change-password.dto";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { extname } from "path";
+import { unlinkSync } from "fs";
 
 @ApiTags("users")
 @Controller("users")
@@ -38,7 +51,7 @@ export class UsersController {
     required: true,
     type: String,
   })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findAll(@Query("userTypeId") userTypeId?) {
     const res: CustomResponse = {};
     try {
@@ -61,7 +74,7 @@ export class UsersController {
   @ApiQuery({ name: "email", required: false })
   @ApiQuery({ name: "mobileNumber", required: false })
   @ApiQuery({ name: "name", required: false })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async getStaffByAdvanceSearch(
     @Query("isAdvance") isAdvance: boolean,
     // eslint-disable-next-line @typescript-eslint/no-inferrable-types
@@ -108,7 +121,7 @@ export class UsersController {
   @ApiQuery({ name: "email", required: false })
   @ApiQuery({ name: "mobileNumber", required: false })
   @ApiQuery({ name: "name", required: false })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async getClientByAdvanceSearch(
     @Query("isAdvance") isAdvance: boolean,
     // eslint-disable-next-line @typescript-eslint/no-inferrable-types
@@ -145,7 +158,7 @@ export class UsersController {
   }
 
   @Get(":id")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findOne(@Param("id") userId: string) {
     const res: CustomResponse = {};
     try {
@@ -160,7 +173,7 @@ export class UsersController {
   }
 
   @Post("/client")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async createClient(@Body() createClientUserDto: CreateClientUserDto) {
     const res: CustomResponse = {};
     try {
@@ -175,7 +188,7 @@ export class UsersController {
   }
 
   @Post("/staff")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async createStaff(@Body() createStaffUserDto: CreateStaffUserDto) {
     const res: CustomResponse = {};
     try {
@@ -190,7 +203,7 @@ export class UsersController {
   }
 
   @Put("/client")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async updateClientUser(@Body() clientUserDto: UpdateClientUserDto) {
     const res: CustomResponse = {};
     try {
@@ -205,8 +218,24 @@ export class UsersController {
     }
   }
 
+  @Put("/clientProfilePicture")
+  //@UseGuards(JwtAuthGuard)
+  async updateClientProfilePicture(@Body() dto: UpdateClientProfilePictureDto) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.userService.updateClientProfilePicture(dto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
   @Put("/staff")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async updateStaffUser(@Body() staffUserDto: UpdateStaffUserDto) {
     const res: CustomResponse = {};
     try {
@@ -222,7 +251,7 @@ export class UsersController {
   }
 
   @Put("/changePassword")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
     const res: CustomResponse = {};
     try {
@@ -230,7 +259,8 @@ export class UsersController {
       res.data = await this.userService.changePassword(
         changePasswordDto.userId,
         changePasswordDto.currentPassword,
-        changePasswordDto.newPassword);
+        changePasswordDto.newPassword
+      );
       res.success = true;
       return res;
     } catch (e) {
@@ -241,14 +271,15 @@ export class UsersController {
   }
 
   @Put("/udpdatePassword")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async udpdatePassword(@Body() updatePasswordDto: UpdatePasswordDto) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
       res.data = await this.userService.updatePassword(
         updatePasswordDto.userId,
-        updatePasswordDto.password,);
+        updatePasswordDto.password
+      );
       res.success = true;
       return res;
     } catch (e) {
@@ -259,7 +290,7 @@ export class UsersController {
   }
 
   @Put("/updateFirebaseToken")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async updateFirebaseToken(@Body() updateFirebaseToken: UpdateFirebaseToken) {
     const res: CustomResponse = {};
     try {
@@ -278,7 +309,7 @@ export class UsersController {
   }
 
   @Put("/toggleEnable")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async toggleEnable(@Body() toggleEnableDto: ToggleEnableDto) {
     const res: CustomResponse = {};
     try {

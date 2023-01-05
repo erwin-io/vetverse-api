@@ -11,13 +11,15 @@ import { compare, hash } from "src/common/utils/utils";
 import { RoleEnum } from "src/common/enums/role.enum";
 import { UserTypeEnum } from "src/common/enums/user-type.enum";
 import { NotificationService } from "./notification.service";
+import { FilesService } from "./files.service";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly notificationService: NotificationService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly filesService: FilesService
   ) {}
 
   async registerClient(userDto: ClientUserDto) {
@@ -31,6 +33,7 @@ export class AuthService {
   async login({ username, password }: LoginUserDto) {
     // find user in db
     const user: Users = await this.usersService.findByLogin(username, password);
+    console.log(user);
 
     // generate and sign token
     const { userId } = user;
@@ -60,6 +63,7 @@ export class AuthService {
       gender,
       fullName,
     } = getInfo;
+    console.log(getInfo);
     return {
       userId,
       username,
@@ -78,6 +82,9 @@ export class AuthService {
       accessToken,
       refreshToken,
       userTypeIdentityId,
+      userProfilePic: getInfo.user.userProfilePic
+        ? getInfo.user.userProfilePic.file.fileName
+        : null,
     };
   }
 
@@ -144,6 +151,9 @@ export class AuthService {
       totalUnreadNotif: notification.total,
       lastCancelledDate,
       numberOfCancelledAttempt,
+      userProfilePic: getInfo.user.userProfilePic
+        ? getInfo.user.userProfilePic.file.fileName
+        : null,
     };
   }
 

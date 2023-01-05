@@ -3,10 +3,12 @@ import { Injectable, mixin, NestInterceptor, Type } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
 import { diskStorage } from "multer";
+import { extname } from "path";
 
 interface LocalFilesInterceptorOptions {
   fieldName: string;
   path?: string;
+  maxCount?: number;
 }
 
 function LocalFilesInterceptor(
@@ -25,6 +27,15 @@ function LocalFilesInterceptor(
       const multerOptions: MulterOptions = {
         storage: diskStorage({
           destination,
+          filename: (req, file, cb) => {
+            // Generating a 32 random chars long string
+            const randomName = Array(32)
+              .fill(null)
+              .map(() => Math.round(Math.random() * 16).toString(16))
+              .join("");
+            //Calling the callback passing the random name generated with the original extension name
+            cb(null, `${randomName}${extname(file.originalname)}`);
+          },
         }),
       };
 

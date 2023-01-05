@@ -59,6 +59,10 @@ export class UpdateStaffUserDto extends UserDto {
   @ApiProperty()
   @IsNotEmpty()
   roleId: string;
+
+  @ApiProperty()
+  @IsOptional()
+  userProfilePic: any;
 }
 
 export class UpdateClientUserDto extends UserDto {
@@ -96,6 +100,10 @@ export class UpdateClientUserDto extends UserDto {
   @ApiProperty()
   @IsNotEmpty()
   genderId: string;
+
+  @ApiProperty()
+  @IsOptional()
+  userProfilePic: any;
 }
 
 
@@ -109,4 +117,10 @@ export class UpdateFirebaseToken extends UserDto {
   @ApiProperty()
   @IsString()
   firebaseToken: string;
+}
+
+export class UpdateClientProfilePictureDto extends UserDto {
+  @ApiProperty()
+  @IsOptional()
+  userProfilePic: any;
 }

@@ -22,7 +22,7 @@ export class PetCategoryController {
   constructor(private readonly petCategoryService: PetCategoryService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findAll() {
     const res: CustomResponse = {};
     try {
@@ -37,7 +37,7 @@ export class PetCategoryController {
   }
 
   @Get(":petCategoryId")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async findOne(@Param("petCategoryId") petCategoryId: string) {
     const res: CustomResponse = {};
     try {
@@ -52,7 +52,7 @@ export class PetCategoryController {
   }
 
   @Post("")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async add(@Body() createPetTypeDto: CreatePetCategoryDto) {
     const res: CustomResponse = {};
     try {
@@ -68,7 +68,7 @@ export class PetCategoryController {
   }
 
   @Put("")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async update(@Body() roleDto: PetCategoryDto) {
     const res: CustomResponse = {};
     try {
@@ -84,7 +84,7 @@ export class PetCategoryController {
   }
 
   @Delete(":petCategoryId")
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async delete(@Param("petCategoryId") petCategoryId: string) {
     const res: CustomResponse = {};
     try {
