@@ -17,6 +17,9 @@ export class Files {
   @Column("nvarchar", { name: "FileName" })
   fileName: string;
 
+  @Column("varchar", { name: "Url", nullable: true })
+  url: string | null;
+
   @OneToMany(
     () => AppointmentAttachments,
     (appointmentAttachments) => appointmentAttachments.file

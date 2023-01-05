@@ -23,6 +23,8 @@
   "dependencies": {
     "@automapper/core": "^8.7.6",
     "@automapper/nestjs": "^8.7.6",
+    "@firebase/auth": "^0.21.0",
+    "@firebase/storage": "^0.10.0",
     "@hapi/joi": "^17.1.1",
     "@nestjs/axios": "^1.0.1",
     "@nestjs/common": "^9.0.0",
@@ -43,6 +45,7 @@
     "moment": "^2.29.4",
     "mssql": "^7.3.5",
     "nestjs-typeorm-paginate": "^4.0.2",
+    "node-base64-to-file": "^1.0.4",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
@@ -50,6 +53,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "socket.io": "^4.5.4",
+    "stream-buffers": "^3.0.2",
     "typeorm": "^0.3.7"
   },
   "devDependencies": {

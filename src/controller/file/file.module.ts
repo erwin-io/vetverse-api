@@ -1,13 +1,13 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { FilesService } from "src/services/files.service";
+import { FirebaseProviderModule } from "src/core/provider/firebase/firebase-provider.module";
 import { Files } from "src/shared/entities/Files";
 import { FileController } from "./file.controller";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Files])],
+  imports: [FirebaseProviderModule, TypeOrmModule.forFeature([Files])],
   controllers: [FileController],
-  providers: [FilesService],
-  exports: [FilesService],
+  providers: [],
+  exports: [],
 })
 export class FileModule {}

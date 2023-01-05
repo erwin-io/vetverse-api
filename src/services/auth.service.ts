@@ -11,7 +11,6 @@ import { compare, hash } from "src/common/utils/utils";
 import { RoleEnum } from "src/common/enums/role.enum";
 import { UserTypeEnum } from "src/common/enums/user-type.enum";
 import { NotificationService } from "./notification.service";
-import { FilesService } from "./files.service";
 
 @Injectable()
 export class AuthService {
@@ -19,7 +18,6 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly notificationService: NotificationService,
     private readonly jwtService: JwtService,
-    private readonly filesService: FilesService
   ) {}
 
   async registerClient(userDto: ClientUserDto) {
@@ -83,7 +81,7 @@ export class AuthService {
       refreshToken,
       userTypeIdentityId,
       userProfilePic: getInfo.user.userProfilePic
-        ? getInfo.user.userProfilePic.file.fileName
+        ? getInfo.user.userProfilePic.file.url
         : null,
     };
   }
@@ -152,7 +150,7 @@ export class AuthService {
       lastCancelledDate,
       numberOfCancelledAttempt,
       userProfilePic: getInfo.user.userProfilePic
-        ? getInfo.user.userProfilePic.file.fileName
+        ? getInfo.user.userProfilePic.file.url
         : null,
     };
   }

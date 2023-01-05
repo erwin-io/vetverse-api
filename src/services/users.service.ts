@@ -41,6 +41,8 @@ import { unlinkSync, writeFile } from "fs";
 import { Files } from "src/shared/entities/Files";
 import { extname, join } from "path";
 import { v4 as uuid } from "uuid";
+import base64toFile from "node-base64-to-file";
+import { getStorage, ref, uploadString } from "@firebase/storage";
 
 @Injectable()
 export class UsersService {
@@ -501,7 +503,7 @@ export class UsersService {
       if (!client) {
         throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
       }
-      let user: Users = client.user;
+      const user: Users = client.user;
       client.firstName = userDto.firstName;
       client.middleName = userDto.middleName;
       client.lastName = userDto.lastName;
@@ -512,62 +514,6 @@ export class UsersService {
       client.address = userDto.address;
       client.gender = new Gender();
       client.gender.genderId = userDto.genderId;
-
-      if (userDto.userProfilePic) {
-        const newFileName: string = uuid();
-        let userProfilePic = await entityManager.findOne(UserProfilePic, {
-          where: { userId: user.userId },
-          relations: ["file"],
-        });
-        if (userProfilePic) {
-          try {
-            unlinkSync("./uploads/profile/" + userProfilePic.file.fileName);
-          } catch (ex) {
-            console.log(ex);
-          }
-          const file = userProfilePic.file;
-          file.fileName = `${newFileName}${extname(
-            userDto.userProfilePic.fileName
-          )}`;
-          userProfilePic.file = await entityManager.save(Files, file);
-          const base64Data = userDto.userProfilePic.data.replace(
-            /^data:image\/png;base64,/,
-            ""
-          );
-          writeFile(
-            "./uploads/profile/" + file.fileName,
-            base64Data,
-            "base64",
-            function (err) {
-              console.log(err);
-            }
-          );
-        } else {
-          userProfilePic = new UserProfilePic();
-          userProfilePic.user = user;
-          const file = new Files();
-          file.fileName = `${newFileName}${extname(
-            userDto.userProfilePic.fileName
-          )}`;
-          userProfilePic.file = await entityManager.save(Files, file);
-          const base64Data = userDto.userProfilePic.data.replace(
-            /^data:image\/png;base64,/,
-            ""
-          );
-          writeFile(
-            "./uploads/profile/" + file.fileName,
-            base64Data,
-            "base64",
-            function (err) {
-              console.log(err);
-            }
-          );
-        }
-        user.userProfilePic = await entityManager.save(
-          UserProfilePic,
-          userProfilePic
-        );
-      }
       await entityManager.save(Clients, client);
       client = await this.findOne({ userId }, true, entityManager);
 
@@ -577,83 +523,91 @@ export class UsersService {
 
   async updateClientProfilePicture(dto: UpdateClientProfilePictureDto) {
     const userId = dto.userId;
-
-    return await this.userRepo.manager.transaction(async (entityManager) => {
-      let client: any = await this.findOne(
-        {
-          userId,
-          userType: { userTypeId: "2" },
-        },
-        true,
-        entityManager
-      );
-      if (!client) {
-        throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
-      }
-      let user: Users = client.user;
-      if (dto.userProfilePic) {
-        const newFileName: string = uuid();
-        let userProfilePic = await entityManager.findOne(UserProfilePic, {
-          where: { userId: user.userId },
-          relations: ["file"],
-        });
-        if (userProfilePic) {
-          try {
-            unlinkSync("./uploads/profile/" + userProfilePic.file.fileName);
-          } catch (ex) {
-            console.log(ex);
-          }
-          const file = userProfilePic.file;
-          file.fileName = `${newFileName}${extname(
-            dto.userProfilePic.fileName
-          )}`;
-          userProfilePic.file = await entityManager.save(Files, file);
-          const base64Data = dto.userProfilePic.data.replace(
-            `data:image/${extname(
-              dto.userProfilePic.fileName
-            ).toString().replace(".", "")};base64`,
-            ""
-          );
-          writeFile(
-            "./uploads/profile/" + file.fileName,
-            base64Data,
-            "base64",
-            function (err) {
-              console.log(err);
-            }
-          );
-        } else {
-          userProfilePic = new UserProfilePic();
-          userProfilePic.user = user;
-          const file = new Files();
-          file.fileName = `${newFileName}${extname(
-            dto.userProfilePic.fileName
-          )}`;
-          userProfilePic.file = await entityManager.save(Files, file);
-          const base64Data = dto.userProfilePic.data.replace(
-            `data:image/${extname(
-              dto.userProfilePic.fileName
-            ).toString().replace(".", "")};base64`,
-            ""
-          );
-          writeFile(
-            "./uploads/profile/" + file.fileName,
-            base64Data,
-            "base64",
-            function (err) {
-              console.log(err);
-            }
-          );
-        }
-        user.userProfilePic = await entityManager.save(
-          UserProfilePic,
-          userProfilePic
+    return await this.userRepo.manager
+      .transaction(async (entityManager) => {
+        let client: any = await this.findOne(
+          {
+            userId,
+            userType: { userTypeId: "2" },
+          },
+          true,
+          entityManager
         );
-      }
-      client = await this.findOne({ userId }, true, entityManager);
+        if (!client) {
+          throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
+        }
+        const user: Users = client.user;
+        if (dto.userProfilePic) {
+          const newFileName: string = uuid();
+          let userProfilePic = await entityManager.findOne(UserProfilePic, {
+            where: { userId: user.userId },
+            relations: ["file"],
+          });
+          const bucket = this.firebaseProvoder.app.storage().bucket();
+          if (userProfilePic) {
+            try {
+              const deleteFile = bucket.file(
+                `profile/${userProfilePic.file.fileName}`
+              );
+              deleteFile.delete();
+            } catch (ex) {
+              console.log(ex);
+            }
+            const file = userProfilePic.file;
+            file.fileName = `${newFileName}${extname(
+              dto.userProfilePic.fileName
+            )}`;
 
-      return client;
-    });
+            const bucketFile = bucket.file(
+              `profile/${newFileName}${extname(dto.userProfilePic.fileName)}`
+            );
+            const base64 = dto.userProfilePic.data.split(",")[1];
+            const img = Buffer.from(base64, "base64");
+            return await bucketFile.save(img).then(async (res) => {
+              console.log("res");
+              console.log(res);
+              const url = await bucketFile.getSignedUrl({
+                action: "read",
+                expires: "03-09-2500",
+              });
+
+              file.url = url[0];
+              userProfilePic.file = await entityManager.save(Files, file);
+              user.userProfilePic = await entityManager.save(
+                UserProfilePic,
+                userProfilePic
+              );
+              client = await this.findOne({ userId }, true, entityManager);
+              return client;
+            }); 
+          } else {
+            userProfilePic = new UserProfilePic();
+            userProfilePic.user = user;
+            const file = new Files();
+            file.fileName = `${newFileName}${extname(
+              dto.userProfilePic.fileName
+            )}`;
+            const bucketFile = bucket.file(
+              `profile/${newFileName}${extname(dto.userProfilePic.fileName)}`
+            );
+            const base64 = dto.userProfilePic.data.split(",")[1];
+            const img = Buffer.from(base64, "base64");
+            return await bucketFile.save(img).then(async () => {
+              const url = await bucketFile.getSignedUrl({
+                action: "read",
+                expires: "03-09-2500",
+              });
+              file.url = url[0];
+              userProfilePic.file = await entityManager.save(Files, file);
+              user.userProfilePic = await entityManager.save(
+                UserProfilePic,
+                userProfilePic
+              );
+              return await this.findOne({ userId }, true, entityManager);
+            });
+          }
+        }
+      });
   }
 
   async updateStaffUser(userDto: UpdateStaffUserDto) {
@@ -693,9 +647,13 @@ export class UsersService {
           where: { userId: user.userId },
           relations: ["file"],
         });
+        const bucket = this.firebaseProvoder.app.storage().bucket();
         if (userProfilePic) {
           try {
-            unlinkSync("./uploads/profile/" + userProfilePic.file.fileName);
+            const deleteFile = bucket.file(
+              `profile/${userProfilePic.file.fileName}`
+            );
+            deleteFile.delete();
           } catch (ex) {
             console.log(ex);
           }
@@ -703,39 +661,42 @@ export class UsersService {
           file.fileName = `${newFileName}${extname(
             userDto.userProfilePic.fileName
           )}`;
-          userProfilePic.file = await entityManager.save(Files, file);
-          const base64Data = userDto.userProfilePic.data.replace(
-            /^data:image\/png;base64,/,
-            ""
+          
+          const bucketFile = bucket.file(
+            `profile/${newFileName}${extname(userDto.userProfilePic.fileName)}`
           );
-          writeFile(
-            "./uploads/profile/" + file.fileName,
-            base64Data,
-            "base64",
-            function (err) {
-              console.log(err);
-            }
-          );
-        } else {
+          const base64 = userDto.userProfilePic.data.split(",")[1];
+          const img = Buffer.from(base64, "base64");
+          await bucketFile.save(img).then(async () => {
+            const url = await bucketFile.getSignedUrl({
+              action: "read",
+              expires: "03-09-2500",
+            });
+            file.url = url[0];
+            userProfilePic.file = await entityManager.save(Files, file);
+          });
+        } 
+        else {
           userProfilePic = new UserProfilePic();
           userProfilePic.user = user;
           const file = new Files();
           file.fileName = `${newFileName}${extname(
             userDto.userProfilePic.fileName
           )}`;
-          userProfilePic.file = await entityManager.save(Files, file);
-          const base64Data = userDto.userProfilePic.data.replace(
-            /^data:image\/png;base64,/,
-            ""
+          
+          const bucketFile = bucket.file(
+            `profile/${newFileName}${extname(userDto.userProfilePic.fileName)}`
           );
-          writeFile(
-            "./uploads/profile/" + file.fileName,
-            base64Data,
-            "base64",
-            function (err) {
-              console.log(err);
-            }
-          );
+          const base64 = userDto.userProfilePic.data.split(",")[1];
+          const img = Buffer.from(base64, "base64");
+          await bucketFile.save(img).then(async () => {
+            const url = await bucketFile.getSignedUrl({
+              action: "read",
+              expires: "03-09-2500",
+            });
+            file.url = url[0];
+            userProfilePic.file = await entityManager.save(Files, file);
+          });
         }
         user.userProfilePic = await entityManager.save(
           UserProfilePic,

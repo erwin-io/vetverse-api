@@ -7,9 +7,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Gender } from "./Gender";
 import { PetCategory } from "./PetCategory";
 import { Clients } from "./Clients";
+import { Gender } from "./Gender";
 import { PetAppointment } from "./PetAppointment";
 
 @Index("PK_Pet", ["petId"], { unique: true })
@@ -30,10 +30,6 @@ export class Pet {
   @Column("bigint", { name: "EntityStatusId", default: () => "(1)" })
   entityStatusId: string;
 
-  @ManyToOne(() => Gender, (gender) => gender.pets)
-  @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
-  gender: Gender;
-
   @ManyToOne(() => PetCategory, (petCategory) => petCategory.pets)
   @JoinColumn([
     { name: "PetCategoryId", referencedColumnName: "petCategoryId" },
@@ -43,6 +39,10 @@ export class Pet {
   @ManyToOne(() => Clients, (clients) => clients.pets)
   @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
   client: Clients;
+
+  @ManyToOne(() => Gender, (gender) => gender.pets)
+  @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
+  gender: Gender;
 
   @OneToMany(() => PetAppointment, (petAppointment) => petAppointment.pet)
   petAppointments: PetAppointment[];
