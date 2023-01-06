@@ -561,8 +561,7 @@ export class UsersService {
             const bucketFile = bucket.file(
               `profile/${newFileName}${extname(dto.userProfilePic.fileName)}`
             );
-            const base64 = dto.userProfilePic.data.split(",")[1];
-            const img = Buffer.from(base64, "base64");
+            const img = Buffer.from(dto.userProfilePic.data, "base64");
             return await bucketFile.save(img).then(async (res) => {
               console.log("res");
               console.log(res);
@@ -590,8 +589,7 @@ export class UsersService {
             const bucketFile = bucket.file(
               `profile/${newFileName}${extname(dto.userProfilePic.fileName)}`
             );
-            const base64 = dto.userProfilePic.data.split(",")[1];
-            const img = Buffer.from(base64, "base64");
+            const img = Buffer.from(dto.userProfilePic.data, "base64");
             return await bucketFile.save(img).then(async () => {
               const url = await bucketFile.getSignedUrl({
                 action: "read",
@@ -665,8 +663,7 @@ export class UsersService {
           const bucketFile = bucket.file(
             `profile/${newFileName}${extname(userDto.userProfilePic.fileName)}`
           );
-          const base64 = userDto.userProfilePic.data.split(",")[1];
-          const img = Buffer.from(base64, "base64");
+          const img = Buffer.from(userDto.userProfilePic.data, "base64");
           await bucketFile.save(img).then(async () => {
             const url = await bucketFile.getSignedUrl({
               action: "read",
@@ -687,8 +684,7 @@ export class UsersService {
           const bucketFile = bucket.file(
             `profile/${newFileName}${extname(userDto.userProfilePic.fileName)}`
           );
-          const base64 = userDto.userProfilePic.data.split(",")[1];
-          const img = Buffer.from(base64, "base64");
+          const img = Buffer.from(userDto.userProfilePic.data, "base64");
           await bucketFile.save(img).then(async () => {
             const url = await bucketFile.getSignedUrl({
               action: "read",
