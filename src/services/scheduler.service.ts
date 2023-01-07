@@ -28,15 +28,15 @@ export class SchedulerService {
       new Date(),
       true
     );
-
-    getAppointmentsToday.forEach(async (x) => {
+    
+    for (const x of getAppointmentsToday) {
       const res = await this.firebaseSendToDevice(
         x.appointment.clientAppointment.client.user.firebaseToken,
         x.title,
         x.description
       );
       console.log(res);
-    });
+    }
 
     await this.notificationService
       .addAppointmentNotification(
@@ -52,11 +52,11 @@ export class SchedulerService {
       )
       .then(async (res) => {
         const reminders = [];
-        await getAppointmentsToday.forEach(async (x) => {
+        for (const x of getAppointmentsToday) {
           reminders.push(
             await this.reminderService.markAsDelivered(x.reminderId)
           );
-        });
+        }
         return reminders;
       });
   }
@@ -68,7 +68,7 @@ export class SchedulerService {
       false
     );
 
-    await getAppointmentsToday.forEach(async (x) => {
+    for (const x of getAppointmentsToday) {
       const results = [];
       const res = await this.firebaseSendAnnouncements(x.title, x.description);
       console.log(res);
@@ -82,7 +82,7 @@ export class SchedulerService {
           return await this.reminderService.markAsDelivered(x.reminderId);
         });
       results.push(result);
-    });
+    }
   }
 
   async firebaseSendAnnouncements(title, description) {
