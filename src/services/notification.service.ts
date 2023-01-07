@@ -94,6 +94,7 @@ export class NotificationService {
             notification.title = dto.title;
             notification.description = dto.description;
             notification.isRead = false;
+            notification.isReminder = true;
             return notification;
           });
 
