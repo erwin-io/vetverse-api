@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -20,6 +21,7 @@ import {
   CreateWalkInAppointmentDto,
 } from "src/core/dto/appointment/appointment.create.dto";
 import {
+  AddAttachmentFileDto,
   RescheduleAppointmentDto,
   UpdateAppointmentConferencePeer,
   UpdateAppointmentStatusDto,
@@ -309,6 +311,42 @@ export class AppointmentController {
         await this.appointmentService.updateAppointmentDiagnosisAndTreatment(
           dto
         );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Post("addAttachmentFile")
+  //@UseGuards(JwtAuthGuard)
+  async addAttachmentFile(@Body() dto: AddAttachmentFileDto) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.appointmentService.addAttachmentFile(dto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Delete("removeAttachmentFile/:appointmentAttachmentId")
+  //@UseGuards(JwtAuthGuard)
+  async removeAttachmentFile(
+    @Param("appointmentAttachmentId") appointmentAttachmentId: string
+  ) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.appointmentService.removeAttachmentFile(
+        appointmentAttachmentId
+      );
       res.success = true;
       return res;
     } catch (e) {

@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type, Transform } from "class-transformer";
 import {
+  IsBase64,
   IsDateString,
   IsEmpty,
   IsMilitaryTime,
@@ -56,4 +57,16 @@ export class UpdateDiagnosisAndTreatment extends AppointmentDto {
   @ApiProperty()
   @IsString()
   diagnosisAndTreatment: string;
+}
+
+
+export class AddAttachmentFileDto extends AppointmentDto {
+  @ApiProperty()
+  @IsString()
+  fileName: string;
+
+  @ApiProperty()
+  @IsBase64()
+  data: any;
+
 }

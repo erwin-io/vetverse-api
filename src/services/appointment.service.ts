@@ -14,6 +14,7 @@ import {
   CreateWalkInAppointmentDto,
 } from "src/core/dto/appointment/appointment.create.dto";
 import {
+  AddAttachmentFileDto,
   RescheduleAppointmentDto,
   UpdateAppointmentConferencePeer,
   UpdateAppointmentStatusDto,
@@ -1266,6 +1267,91 @@ export class AppointmentService {
         throw new HttpException("Appointment not found", HttpStatus.NOT_FOUND);
       }
       return appointment.conferencePeerId;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async addAttachmentFile(dto: AddAttachmentFileDto) {
+    try {
+      return await this.appointmentRepo.manager.transaction( async(entityManager)=> {
+        if(dto.data) {
+          let appointmentAttachment = new AppointmentAttachments();
+          const newFileName: string = uuid();
+          const bucket = this.firebaseProvoder.app.storage().bucket();
+
+          const file = new Files();
+          file.fileName = `${newFileName}${extname(dto.fileName)}`;
+
+          const bucketFile = bucket.file(
+            `appointments/attachments/${newFileName}${extname(
+              dto.fileName
+            )}`
+          );
+          const img = Buffer.from(dto.data, "base64");
+          await bucketFile.save(img).then(async () => {
+            const url = await bucketFile.getSignedUrl({
+              action: "read",
+              expires: "03-09-2500",
+            });
+            file.url = url[0];
+            appointmentAttachment.file = await entityManager.save(
+              Files,
+              file
+            );
+          });
+          appointmentAttachment.appointment = await entityManager.findOneBy(Appointment, { appointmentId: dto.appointmentId });
+          await entityManager.save(
+            AppointmentAttachments,
+            appointmentAttachment
+          );
+          return entityManager.find(AppointmentAttachments, { 
+            where: { 
+              appointment: { appointmentId: dto.appointmentId }
+            },
+            relations: ["file"]
+          });
+        } else {
+          return [];
+        }
+      })
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async removeAttachmentFile(appointmentAttachmentId: string) {
+    try {
+      return await this.appointmentRepo.manager.transaction( async(entityManager)=> {
+        const appointmentAttachment = await entityManager.findOne(AppointmentAttachments, 
+          { where: { appointmentAttachmentId}, relations: ["file", "appointment"] }, 
+        );
+        if(appointmentAttachment) {
+          await entityManager.delete(AppointmentAttachments, { appointmentAttachmentId });
+          const file = appointmentAttachment.file;
+          await entityManager.delete(Files, { fileId: file.fileId });
+          
+          try {
+            const bucket = this.firebaseProvoder.app.storage().bucket();
+            const deleteFile = bucket.file(
+              `appointments/attachments/${appointmentAttachment.file.fileName}`
+            );
+            deleteFile.delete();
+          } catch (ex) {
+            console.log(ex);
+          }
+
+          const appoimtment = appointmentAttachment.appointment;
+          return entityManager.find(AppointmentAttachments, { 
+            where: { 
+              appointment: { appointmentId: appoimtment.appointmentId }
+            },
+            relations: ["file"]
+          });
+        } else {
+          return [];
+        }
+      })
     } catch (e) {
       throw e;
     }
