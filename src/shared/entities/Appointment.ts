@@ -14,6 +14,7 @@ import { ServiceType } from "./ServiceType";
 import { Staff } from "./Staff";
 import { AppointmentAttachments } from "./AppointmentAttachments";
 import { ClientAppointment } from "./ClientAppointment";
+import { DiagnosisAttachments } from "./DiagnosisAttachments";
 import { Messages } from "./Messages";
 import { Notifications } from "./Notifications";
 import { Payment } from "./Payment";
@@ -104,6 +105,12 @@ export class Appointment {
     (clientAppointment) => clientAppointment.appointment
   )
   clientAppointment: ClientAppointment;
+
+  @OneToMany(
+    () => DiagnosisAttachments,
+    (diagnosisAttachments) => diagnosisAttachments.appointment
+  )
+  diagnosisAttachments: DiagnosisAttachments[];
 
   @OneToMany(() => Messages, (messages) => messages.appointment)
   messages: Messages[];

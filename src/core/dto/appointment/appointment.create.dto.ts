@@ -6,6 +6,7 @@ import {
   IsMilitaryTime,
   isMilitaryTime,
   IsNotEmpty,
+  IsOptional,
   IsString,
 } from "class-validator";
 import * as moment from "moment";
@@ -67,6 +68,10 @@ export class CreateOnsiteAppointmentDto extends CreatePaidAppointmentDto {
   @ApiProperty()
   @IsNotEmpty()
   petId: string;
+
+  @ApiProperty()
+  @IsOptional()
+  appointmentAttachments: any[];
 }
 
 export class CreateWalkInAppointmentDto extends CreatePaidAppointmentDto {
@@ -91,6 +96,10 @@ export class CreateClientAppointmentDto extends CreateAppointmentDto {
   @ApiProperty()
   @IsNotEmpty()
   consultaionTypeId: string;
+
+  @ApiProperty()
+  @IsOptional()
+  appointmentAttachments: any[];
 }
 
 export class CreateClientCashlessAppointmentDto extends CreateAppointmentDto {
@@ -115,4 +124,8 @@ export class CreateClientCashlessAppointmentDto extends CreateAppointmentDto {
   @ApiProperty()
   @IsNotEmpty()
   consultaionTypeId: string;
+
+  @ApiProperty()
+  @IsOptional()
+  appointmentAttachments: any[];
 }

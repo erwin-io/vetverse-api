@@ -28,6 +28,7 @@ import { AppointmentAttachments } from "../entities/AppointmentAttachments";
 import { Files } from "../entities/Files";
 import { UserProfilePic } from "../entities/UserProfilePic";
 import { PetProfilePic } from "../entities/PetProfilePic";
+import { DiagnosisAttachments } from "../entities/DiagnosisAttachments";
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -69,7 +70,8 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         Files,
         UserProfilePic,
         AppointmentAttachments,
-        PetProfilePic
+        PetProfilePic,
+        DiagnosisAttachments
       ],
       synchronize: false, // never use TRUE in production!
       options: { encrypt: false },

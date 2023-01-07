@@ -45,6 +45,10 @@ import { FirebaseProvider } from "src/core/provider/firebase/firebase-provider";
 import { MessagingDevicesResponse } from "firebase-admin/lib/messaging/messaging-api";
 import { ReminderService } from "./reminder.service";
 import { Reminder } from "src/shared/entities/Reminder";
+import { AppointmentAttachments } from "src/shared/entities/AppointmentAttachments";
+import { Files } from "src/shared/entities/Files";
+import { v4 as uuid } from "uuid";
+import { extname } from "path";
 
 @Injectable()
 export class AppointmentService {
@@ -255,6 +259,8 @@ export class AppointmentService {
         .leftJoinAndSelect("p.petCategory", "pc")
         .leftJoinAndSelect("pc.petType", "pt")
         .leftJoinAndSelect("p.gender", "pg")
+        .leftJoinAndSelect("a.appointmentAttachments", "aa")
+        .leftJoinAndSelect("aa.file", "f")
         .where(options)
         .getOne();
       return new AppointmentViewModel(query);
@@ -401,6 +407,44 @@ export class AppointmentService {
               HttpStatus.BAD_REQUEST
             );
           }
+          if (
+            dto.appointmentAttachments &&
+            dto.appointmentAttachments.length > 0
+          ) {
+            for (const attachment of dto.appointmentAttachments) {
+              if (attachment) {
+                let appointmentAttachment = new AppointmentAttachments();
+                const newFileName: string = uuid();
+                const bucket = this.firebaseProvoder.app.storage().bucket();
+
+                const file = new Files();
+                file.fileName = `${newFileName}${extname(attachment.fileName)}`;
+
+                const bucketFile = bucket.file(
+                  `appointments/attachments/${newFileName}${extname(
+                    attachment.fileName
+                  )}`
+                );
+                const img = Buffer.from(attachment.data, "base64");
+                await bucketFile.save(img).then(async () => {
+                  const url = await bucketFile.getSignedUrl({
+                    action: "read",
+                    expires: "03-09-2500",
+                  });
+                  file.url = url[0];
+                  appointmentAttachment.file = await entityManager.save(
+                    Files,
+                    file
+                  );
+                });
+                appointmentAttachment.appointment = appointment;
+                appointmentAttachment = await entityManager.save(
+                  AppointmentAttachments,
+                  appointmentAttachment
+                );
+              }
+            }
+          }
           return await entityManager.findOne(Appointment, {
             where: { appointmentId: appointment.appointmentId },
           });
@@ -517,6 +561,44 @@ export class AppointmentService {
               );
             }
           }
+          if (
+            dto.appointmentAttachments &&
+            dto.appointmentAttachments.length > 0
+          ) {
+            for (const attachment of dto.appointmentAttachments) {
+              if (attachment) {
+                let appointmentAttachment = new AppointmentAttachments();
+                const newFileName: string = uuid();
+                const bucket = this.firebaseProvoder.app.storage().bucket();
+
+                const file = new Files();
+                file.fileName = `${newFileName}${extname(attachment.fileName)}`;
+
+                const bucketFile = bucket.file(
+                  `appointments/attachments/${newFileName}${extname(
+                    attachment.fileName
+                  )}`
+                );
+                const img = Buffer.from(attachment.data, "base64");
+                await bucketFile.save(img).then(async () => {
+                  const url = await bucketFile.getSignedUrl({
+                    action: "read",
+                    expires: "03-09-2500",
+                  });
+                  file.url = url[0];
+                  appointmentAttachment.file = await entityManager.save(
+                    Files,
+                    file
+                  );
+                });
+                appointmentAttachment.appointment = appointment;
+                appointmentAttachment = await entityManager.save(
+                  AppointmentAttachments,
+                  appointmentAttachment
+                );
+              }
+            }
+          }
           return await entityManager.save(PetAppointment, newPetAppointment);
         }
       );
@@ -593,6 +675,44 @@ export class AppointmentService {
           newPetAppointment.pet = await entityManager.findOne(Pet, {
             where: { petId: dto.petId },
           });
+          if (
+            dto.appointmentAttachments &&
+            dto.appointmentAttachments.length > 0
+          ) {
+            for (const attachment of dto.appointmentAttachments) {
+              if (attachment) {
+                let appointmentAttachment = new AppointmentAttachments();
+                const newFileName: string = uuid();
+                const bucket = this.firebaseProvoder.app.storage().bucket();
+
+                const file = new Files();
+                file.fileName = `${newFileName}${extname(attachment.fileName)}`;
+
+                const bucketFile = bucket.file(
+                  `appointments/attachments/${newFileName}${extname(
+                    attachment.fileName
+                  )}`
+                );
+                const img = Buffer.from(attachment.data, "base64");
+                await bucketFile.save(img).then(async () => {
+                  const url = await bucketFile.getSignedUrl({
+                    action: "read",
+                    expires: "03-09-2500",
+                  });
+                  file.url = url[0];
+                  appointmentAttachment.file = await entityManager.save(
+                    Files,
+                    file
+                  );
+                });
+                appointmentAttachment.appointment = appointment;
+                appointmentAttachment = await entityManager.save(
+                  AppointmentAttachments,
+                  appointmentAttachment
+                );
+              }
+            }
+          }
           return await entityManager.save(PetAppointment, newPetAppointment);
         }
       );

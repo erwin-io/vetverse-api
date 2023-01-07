@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { AppointmentAttachments } from "./AppointmentAttachments";
+import { DiagnosisAttachments } from "./DiagnosisAttachments";
 import { PetProfilePic } from "./PetProfilePic";
 import { UserProfilePic } from "./UserProfilePic";
 
@@ -26,6 +27,12 @@ export class Files {
     (appointmentAttachments) => appointmentAttachments.file
   )
   appointmentAttachments: AppointmentAttachments[];
+
+  @OneToMany(
+    () => DiagnosisAttachments,
+    (diagnosisAttachments) => diagnosisAttachments.file
+  )
+  diagnosisAttachments: DiagnosisAttachments[];
 
   @OneToMany(() => PetProfilePic, (petProfilePic) => petProfilePic.file)
   petProfilePics: PetProfilePic[];

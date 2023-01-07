@@ -13,9 +13,9 @@ import { GatewayConnectedUsers } from "./GatewayConnectedUsers";
 import { Messages } from "./Messages";
 import { Staff } from "./Staff";
 import { UserProfilePic } from "./UserProfilePic";
-import { Roles } from "./Roles";
 import { UserType } from "./UserType";
 import { EntityStatus } from "./EntityStatus";
+import { Roles } from "./Roles";
 
 @Index("PK_Users", ["userId"], { unique: true })
 @Entity("Users", { schema: "dbo" })
@@ -62,10 +62,6 @@ export class Users {
   @OneToOne(() => UserProfilePic, (userProfilePic) => userProfilePic.user)
   userProfilePic: UserProfilePic;
 
-  @ManyToOne(() => Roles, (roles) => roles.users)
-  @JoinColumn([{ name: "RoleId", referencedColumnName: "roleId" }])
-  role: Roles;
-
   @ManyToOne(() => UserType, (userType) => userType.users)
   @JoinColumn([{ name: "UserTypeId", referencedColumnName: "userTypeId" }])
   userType: UserType;
@@ -75,4 +71,8 @@ export class Users {
     { name: "EntityStatusId", referencedColumnName: "entityStatusId" },
   ])
   entityStatus: EntityStatus;
+
+  @ManyToOne(() => Roles, (roles) => roles.users)
+  @JoinColumn([{ name: "RoleId", referencedColumnName: "roleId" }])
+  role: Roles;
 }

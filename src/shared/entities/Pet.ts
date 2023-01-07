@@ -8,9 +8,9 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { PetCategory } from "./PetCategory";
-import { Clients } from "./Clients";
 import { Gender } from "./Gender";
+import { Clients } from "./Clients";
+import { PetCategory } from "./PetCategory";
 import { PetAppointment } from "./PetAppointment";
 import { PetProfilePic } from "./PetProfilePic";
 
@@ -32,19 +32,19 @@ export class Pet {
   @Column("bigint", { name: "EntityStatusId", default: () => "(1)" })
   entityStatusId: string;
 
-  @ManyToOne(() => PetCategory, (petCategory) => petCategory.pets)
-  @JoinColumn([
-    { name: "PetCategoryId", referencedColumnName: "petCategoryId" },
-  ])
-  petCategory: PetCategory;
+  @ManyToOne(() => Gender, (gender) => gender.pets)
+  @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
+  gender: Gender;
 
   @ManyToOne(() => Clients, (clients) => clients.pets)
   @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
   client: Clients;
 
-  @ManyToOne(() => Gender, (gender) => gender.pets)
-  @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
-  gender: Gender;
+  @ManyToOne(() => PetCategory, (petCategory) => petCategory.pets)
+  @JoinColumn([
+    { name: "PetCategoryId", referencedColumnName: "petCategoryId" },
+  ])
+  petCategory: PetCategory;
 
   @OneToMany(() => PetAppointment, (petAppointment) => petAppointment.pet)
   petAppointments: PetAppointment[];
