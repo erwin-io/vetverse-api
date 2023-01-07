@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type, Transform } from "class-transformer";
-import { IsDateString, IsNotEmpty, IsNumber } from "class-validator";
+import { IsDateString, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
 import * as moment from "moment";
 
 export class CreatePetDto {
@@ -37,4 +37,8 @@ export class CreatePetDto {
   @ApiProperty()
   @IsNotEmpty()
   genderId: string;
+  
+  @ApiProperty()
+  @IsOptional()
+  petProfilePic: any;
 }

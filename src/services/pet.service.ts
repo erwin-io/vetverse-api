@@ -8,10 +8,16 @@ import { PetCategory } from "src/shared/entities/PetCategory";
 import { Gender } from "src/shared/entities/Gender";
 import { Clients } from "src/shared/entities/Clients";
 import { PetViewModel } from "src/core/view-model/pet.view-model";
+import { v4 as uuid } from "uuid";
+import { PetProfilePic } from "src/shared/entities/PetProfilePic";
+import { extname } from "path";
+import { Files } from "src/shared/entities/Files";
+import { FirebaseProvider } from "src/core/provider/firebase/firebase-provider";
 
 @Injectable()
 export class PetService {
   constructor(
+    private firebaseProvoder: FirebaseProvider,
     @InjectRepository(Pet)
     private readonly petRepo: Repository<Pet>
   ) {}
@@ -42,6 +48,8 @@ export class PetService {
         .leftJoinAndSelect("p.petCategory", "pc")
         .leftJoinAndSelect("pc.petType", "pt")
         .leftJoinAndSelect("p.gender", "pg")
+        .leftJoinAndSelect("p.petProfilePic", "pic")
+        .leftJoinAndSelect("pic.file", "f")
         .where({
           entityStatusId: "1",
           client: { clientId },
@@ -63,6 +71,8 @@ export class PetService {
         .leftJoinAndSelect("p.gender", "g")
         .leftJoinAndSelect("p.petCategory", "pc")
         .leftJoinAndSelect("pc.petType", "pt")
+        .leftJoinAndSelect("p.petProfilePic", "pic")
+        .leftJoinAndSelect("pic.file", "f")
         .where(options)
         .getOne();
       return result;
@@ -84,6 +94,8 @@ export class PetService {
         .leftJoinAndSelect("pa.appointment", "a")
         .leftJoinAndSelect("a.appointmentStatus", "as")
         .leftJoinAndSelect("a.serviceType", "serv")
+        .leftJoinAndSelect("p.petProfilePic", "pic")
+        .leftJoinAndSelect("pic.file", "f")
         .where({
           petId: petId,
           entityStatusId: "1",
@@ -114,7 +126,7 @@ export class PetService {
   async add(createPetDto: CreatePetDto) {
     try {
       return await this.petRepo.manager.transaction(async (entityManager) => {
-        const pet = new Pet();
+        let pet = new Pet();
         pet.petCategory = new PetCategory();
         pet.petCategory.petCategoryId = createPetDto.petCategoryId;
         pet.name = createPetDto.name;
@@ -127,7 +139,40 @@ export class PetService {
             clientId: createPetDto.clientId,
           },
         });
-        return await entityManager.save(pet);
+        pet = await entityManager.save(pet);
+        if (createPetDto.petProfilePic) {
+          let petProfilePic = new PetProfilePic();
+          const newFileName: string = uuid();
+          const bucket = this.firebaseProvoder.app.storage().bucket();
+
+          const file = new Files();
+          file.fileName = `${newFileName}${extname(
+            createPetDto.petProfilePic.fileName
+          )}`;
+
+          const bucketFile = bucket.file(
+            `profile/pet/${newFileName}${extname(
+              createPetDto.petProfilePic.fileName
+            )}`
+          );
+          const img = Buffer.from(createPetDto.petProfilePic.data, "base64");
+          await bucketFile.save(img).then(async () => {
+            const url = await bucketFile.getSignedUrl({
+              action: "read",
+              expires: "03-09-2500",
+            });
+            file.url = url[0];
+            petProfilePic.file = await entityManager.save(Files, file);
+          });
+          pet.petProfilePic = petProfilePic;
+          petProfilePic.petId = pet.petId;
+          petProfilePic = await entityManager.save(
+            PetProfilePic,
+            petProfilePic
+          );
+          pet.petProfilePic = petProfilePic;
+        }
+        return pet;
       });
     } catch (e) {
       throw e;
@@ -152,6 +197,73 @@ export class PetService {
         pet.weight = petDto.weight;
         pet.gender = new Gender();
         pet.gender.genderId = petDto.genderId;
+        if (petDto.petProfilePic) {
+          const newFileName: string = uuid();
+          let petProfilePic = await entityManager.findOne(PetProfilePic, {
+            where: { petId: pet.petId },
+            relations: ["file"],
+          });
+          const bucket = this.firebaseProvoder.app.storage().bucket();
+          if (petProfilePic) {
+            try {
+              const deleteFile = bucket.file(
+                `profile/pet/${petProfilePic.file.fileName}`
+              );
+              deleteFile.delete();
+            } catch (ex) {
+              console.log(ex);
+            }
+            const file = await entityManager.findOne(Files, {
+              where: { fileId: petProfilePic.file.fileId },
+            });
+            file.fileName = `${newFileName}${extname(
+              petDto.petProfilePic.fileName
+            )}`;
+            const bucketFile = bucket.file(
+              `profile/pet/${newFileName}${extname(
+                petDto.petProfilePic.fileName
+              )}`
+            );
+            const img = Buffer.from(petDto.petProfilePic.data, "base64");
+            await bucketFile.save(img).then(async () => {
+              const url = await bucketFile.getSignedUrl({
+                action: "read",
+                expires: "03-09-2500",
+              });
+              file.url = url[0];
+              petProfilePic.file = await entityManager.save(Files, file);
+            });
+          } else {
+            petProfilePic = new PetProfilePic();
+            const newFileName: string = uuid();
+            const bucket = this.firebaseProvoder.app.storage().bucket();
+
+            const file = new Files();
+            file.fileName = `${newFileName}${extname(
+              petDto.petProfilePic.fileName
+            )}`;
+
+            const bucketFile = bucket.file(
+              `profile/pet/${newFileName}${extname(
+                petDto.petProfilePic.fileName
+              )}`
+            );
+            const img = Buffer.from(petDto.petProfilePic.data, "base64");
+            await bucketFile.save(img).then(async () => {
+              const url = await bucketFile.getSignedUrl({
+                action: "read",
+                expires: "03-09-2500",
+              });
+              file.url = url[0];
+              petProfilePic.file = await entityManager.save(Files, file);
+            });
+          }
+          petProfilePic.petId = pet.petId;
+          pet.petProfilePic = await entityManager.save(
+            PetProfilePic,
+            petProfilePic
+          );
+        }
         return await entityManager.save(pet);
       });
     } catch (e) {

@@ -41,8 +41,6 @@ import { unlinkSync, writeFile } from "fs";
 import { Files } from "src/shared/entities/Files";
 import { extname, join } from "path";
 import { v4 as uuid } from "uuid";
-import base64toFile from "node-base64-to-file";
-import { getStorage, ref, uploadString } from "@firebase/storage";
 
 @Injectable()
 export class UsersService {

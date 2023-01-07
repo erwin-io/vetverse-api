@@ -1,7 +1,9 @@
 import { Pet } from "src/shared/entities/Pet";
 import { PetAppointment } from "src/shared/entities/PetAppointment";
+import { PetProfilePic } from "src/shared/entities/PetProfilePic";
 import { AppointmentViewModel } from "./appointment.view-model";
 import { ClientViewModel } from "./client.view-model";
+import { FilesViewModel } from "./file.view.mode";
 import { GenderViewModel } from "./gender.view-model";
 import { PetCategoryViewModel } from "./pet-category.view-model";
 
@@ -15,6 +17,7 @@ export class PetViewModel {
   petCategory: PetCategoryViewModel;
   gender: GenderViewModel;
   petAppointments: PetAppointmentModel[] = [];
+  petProfilePic: PetProfilePicViewModel;
   constructor(model: Pet | undefined) {
     if (!model || model === null) {
       return null;
@@ -32,6 +35,7 @@ export class PetViewModel {
         this.petAppointments.push(new PetAppointmentModel(element));
       });
     }
+    this.petProfilePic = new PetProfilePicViewModel(model.petProfilePic);
   }
 }
 
@@ -43,5 +47,16 @@ export class PetAppointmentModel {
       return null;
     }
     this.appointment = new AppointmentViewModel(model.appointment);
+  }
+}
+
+export class PetProfilePicViewModel {
+  petId: string;
+  file: FilesViewModel;
+  constructor(model: PetProfilePic | undefined) {
+    if (!model || model === null) {
+      return null;
+    }
+    this.file = new FilesViewModel(model.file);
   }
 }

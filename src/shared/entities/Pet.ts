@@ -5,12 +5,14 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { PetCategory } from "./PetCategory";
 import { Clients } from "./Clients";
 import { Gender } from "./Gender";
 import { PetAppointment } from "./PetAppointment";
+import { PetProfilePic } from "./PetProfilePic";
 
 @Index("PK_Pet", ["petId"], { unique: true })
 @Entity("Pet", { schema: "dbo" })
@@ -46,4 +48,7 @@ export class Pet {
 
   @OneToMany(() => PetAppointment, (petAppointment) => petAppointment.pet)
   petAppointments: PetAppointment[];
+
+  @OneToOne(() => PetProfilePic, (petProfilePic) => petProfilePic.pet)
+  petProfilePic: PetProfilePic;
 }
