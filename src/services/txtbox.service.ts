@@ -14,8 +14,8 @@ export class TxtboxService {
     data.append("message", `Your OTP ${otp}`);
     data.append("number", number.toString());
 
-    const url = this.config.get<string>("TEXTBOX_OTP_URI").toString();
-    const apiKey = this.config.get<string>("TEXTBOX_APIKEY").toString();
+    const url = this.config.get<string>("TXTBOX_OTP_URI").toString();
+    const apiKey = this.config.get<string>("TXTBOX_APIKEY").toString();
     const config = {
       method: "post",
       url: url,
