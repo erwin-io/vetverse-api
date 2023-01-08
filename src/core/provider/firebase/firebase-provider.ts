@@ -10,7 +10,7 @@ export class FirebaseProvider {
   constructor(private readonly config: ConfigService) {
     this.app = admin.initializeApp({
       credential: admin.credential.cert(firebaseConfig),
-      storageBucket: "vetverse-web.appspot.com",
+      storageBucket: this.config.get<string>("FIREBASE_BUCKET"),
     });
   }
 }
