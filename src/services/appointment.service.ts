@@ -50,6 +50,7 @@ import { AppointmentAttachments } from "src/shared/entities/AppointmentAttachmen
 import { Files } from "src/shared/entities/Files";
 import { v4 as uuid } from "uuid";
 import { extname } from "path";
+import { DiagnosisAttachments } from "src/shared/entities/DiagnosisAttachments";
 
 @Injectable()
 export class AppointmentService {
@@ -261,7 +262,9 @@ export class AppointmentService {
         .leftJoinAndSelect("pc.petType", "pt")
         .leftJoinAndSelect("p.gender", "pg")
         .leftJoinAndSelect("a.appointmentAttachments", "aa")
-        .leftJoinAndSelect("aa.file", "f")
+        .leftJoinAndSelect("aa.file", "aaf")
+        .leftJoinAndSelect("a.diagnosisAttachments", "da")
+        .leftJoinAndSelect("da.file", "daf")
         .where(options)
         .getOne();
       return new AppointmentViewModel(query);
@@ -1320,6 +1323,54 @@ export class AppointmentService {
     }
   }
 
+  async addDiagnosisAttachmentFile(dto: AddAttachmentFileDto) {
+    try {
+      return await this.appointmentRepo.manager.transaction( async(entityManager)=> {
+        if(dto.data) {
+          let diagnosisAttachment = new DiagnosisAttachments();
+          const newFileName: string = uuid();
+          const bucket = this.firebaseProvoder.app.storage().bucket();
+
+          const file = new Files();
+          file.fileName = `${newFileName}${extname(dto.fileName)}`;
+
+          const bucketFile = bucket.file(
+            `appointments/diagnosis-attachment/${newFileName}${extname(
+              dto.fileName
+            )}`
+          );
+          const img = Buffer.from(dto.data, "base64");
+          await bucketFile.save(img).then(async () => {
+            const url = await bucketFile.getSignedUrl({
+              action: "read",
+              expires: "03-09-2500",
+            });
+            file.url = url[0];
+            diagnosisAttachment.file = await entityManager.save(
+              Files,
+              file
+            );
+          });
+          diagnosisAttachment.appointment = await entityManager.findOneBy(Appointment, { appointmentId: dto.appointmentId });
+          await entityManager.save(
+            DiagnosisAttachments,
+            diagnosisAttachment
+          );
+          return entityManager.find(DiagnosisAttachments, { 
+            where: { 
+              appointment: { appointmentId: dto.appointmentId }
+            },
+            relations: ["file"]
+          });
+        } else {
+          return [];
+        }
+      })
+    } catch (e) {
+      throw e;
+    }
+  }
+
   async removeAttachmentFile(appointmentAttachmentId: string) {
     try {
       return await this.appointmentRepo.manager.transaction( async(entityManager)=> {
@@ -1343,6 +1394,43 @@ export class AppointmentService {
 
           const appoimtment = appointmentAttachment.appointment;
           return entityManager.find(AppointmentAttachments, { 
+            where: { 
+              appointment: { appointmentId: appoimtment.appointmentId }
+            },
+            relations: ["file"]
+          });
+        } else {
+          return [];
+        }
+      })
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async removeDiagnosisAttachmentFile(diagnosisAttachmentsId: string) {
+    try {
+      return await this.appointmentRepo.manager.transaction( async(entityManager)=> {
+        const diagnosisAttachment = await entityManager.findOne(DiagnosisAttachments, 
+          { where: { diagnosisAttachmentsId }, relations: ["file", "appointment"] }, 
+        );
+        if(diagnosisAttachment) {
+          await entityManager.delete(DiagnosisAttachments, { diagnosisAttachmentsId });
+          const file = diagnosisAttachment.file;
+          await entityManager.delete(Files, { fileId: file.fileId });
+          
+          try {
+            const bucket = this.firebaseProvoder.app.storage().bucket();
+            const deleteFile = bucket.file(
+              `appointments/diagnosis-attachment/${diagnosisAttachment.file.fileName}`
+            );
+            deleteFile.delete();
+          } catch (ex) {
+            console.log(ex);
+          }
+
+          const appoimtment = diagnosisAttachment.appointment;
+          return entityManager.find(DiagnosisAttachments, { 
             where: { 
               appointment: { appointmentId: appoimtment.appointmentId }
             },

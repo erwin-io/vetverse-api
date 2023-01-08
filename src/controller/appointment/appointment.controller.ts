@@ -336,6 +336,22 @@ export class AppointmentController {
     }
   }
 
+  @Post("addDiagnosisAttachmentFile")
+  //@UseGuards(JwtAuthGuard)
+  async addDiagnosisAttachmentFile(@Body() dto: AddAttachmentFileDto) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.appointmentService.addDiagnosisAttachmentFile(dto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
   @Delete("removeAttachmentFile/:appointmentAttachmentId")
   //@UseGuards(JwtAuthGuard)
   async removeAttachmentFile(
@@ -346,6 +362,26 @@ export class AppointmentController {
       const res: CustomResponse = {};
       res.data = await this.appointmentService.removeAttachmentFile(
         appointmentAttachmentId
+      );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Delete("removeDiagnosisAttachmentFile/:diagnosisAttachmentsId")
+  //@UseGuards(JwtAuthGuard)
+  async removeDiagnosisAttachmentFile(
+    @Param("diagnosisAttachmentsId") diagnosisAttachmentsId: string
+  ) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.appointmentService.removeDiagnosisAttachmentFile(
+        diagnosisAttachmentsId
       );
       res.success = true;
       return res;

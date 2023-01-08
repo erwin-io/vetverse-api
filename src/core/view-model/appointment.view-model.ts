@@ -25,6 +25,7 @@ export class AppointmentViewModel {
   diagnosisAndTreatment: string;
   serviceRate: number;
   appointmentAttachments: any[];
+  diagnosisAttachments: any[];
   constructor(model: Appointment | undefined) {
     if (!model || model === null) {
       return null;
@@ -52,5 +53,6 @@ export class AppointmentViewModel {
     this.diagnosisAndTreatment = model.diagnosisAndTreatment;
     this.serviceRate = model.serviceRate;
     this.appointmentAttachments = model.appointmentAttachments;
+    this.diagnosisAttachments = model.diagnosisAttachments;
   }
 }
