@@ -21,6 +21,7 @@ import { SchedulerModule } from "./controller/scheduler/scheduler.module";
 import { ReminderModule } from "./controller/reminder/reminder.module";
 import { ReportsModule } from "./controller/reports/reports.module";
 import { FirebaseStorageService } from './services/firebase-storage.service';
+import { TxtboxService } from './services/txtbox.service';
 import * as Joi from "@hapi/joi";
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
@@ -51,7 +52,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     ReminderModule,
     ReportsModule,
   ],
-  providers: [AppService, FirebaseStorageService],
+  providers: [AppService],
   controllers: [],
 })
 export class AppModule {}

@@ -9,8 +9,8 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Gender } from "./Gender";
-import { Clients } from "./Clients";
 import { PetCategory } from "./PetCategory";
+import { Clients } from "./Clients";
 import { PetAppointment } from "./PetAppointment";
 import { PetProfilePic } from "./PetProfilePic";
 
@@ -36,15 +36,15 @@ export class Pet {
   @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
   gender: Gender;
 
-  @ManyToOne(() => Clients, (clients) => clients.pets)
-  @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
-  client: Clients;
-
   @ManyToOne(() => PetCategory, (petCategory) => petCategory.pets)
   @JoinColumn([
     { name: "PetCategoryId", referencedColumnName: "petCategoryId" },
   ])
   petCategory: PetCategory;
+
+  @ManyToOne(() => Clients, (clients) => clients.pets)
+  @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
+  client: Clients;
 
   @OneToMany(() => PetAppointment, (petAppointment) => petAppointment.pet)
   petAppointments: PetAppointment[];

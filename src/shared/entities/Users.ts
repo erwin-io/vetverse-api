@@ -13,9 +13,9 @@ import { GatewayConnectedUsers } from "./GatewayConnectedUsers";
 import { Messages } from "./Messages";
 import { Staff } from "./Staff";
 import { UserProfilePic } from "./UserProfilePic";
-import { UserType } from "./UserType";
-import { EntityStatus } from "./EntityStatus";
 import { Roles } from "./Roles";
+import { EntityStatus } from "./EntityStatus";
+import { UserType } from "./UserType";
 
 @Index("PK_Users", ["userId"], { unique: true })
 @Entity("Users", { schema: "dbo" })
@@ -41,6 +41,12 @@ export class Users {
   @Column("bit", { name: "Enable", default: () => "(1)" })
   enable: boolean;
 
+  @Column("bigint", { name: "Otp" })
+  otp: string;
+
+  @Column("bit", { name: "IsVerified", default: () => "(0)" })
+  isVerified: boolean;
+
   @OneToMany(() => Clients, (clients) => clients.user)
   clients: Clients[];
 
@@ -62,9 +68,9 @@ export class Users {
   @OneToOne(() => UserProfilePic, (userProfilePic) => userProfilePic.user)
   userProfilePic: UserProfilePic;
 
-  @ManyToOne(() => UserType, (userType) => userType.users)
-  @JoinColumn([{ name: "UserTypeId", referencedColumnName: "userTypeId" }])
-  userType: UserType;
+  @ManyToOne(() => Roles, (roles) => roles.users)
+  @JoinColumn([{ name: "RoleId", referencedColumnName: "roleId" }])
+  role: Roles;
 
   @ManyToOne(() => EntityStatus, (entityStatus) => entityStatus.users)
   @JoinColumn([
@@ -72,7 +78,7 @@ export class Users {
   ])
   entityStatus: EntityStatus;
 
-  @ManyToOne(() => Roles, (roles) => roles.users)
-  @JoinColumn([{ name: "RoleId", referencedColumnName: "roleId" }])
-  role: Roles;
+  @ManyToOne(() => UserType, (userType) => userType.users)
+  @JoinColumn([{ name: "UserTypeId", referencedColumnName: "userTypeId" }])
+  userType: UserType;
 }

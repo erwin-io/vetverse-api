@@ -1,4 +1,4 @@
-import { UserDto } from "../../core/dto/users/user.update.dto";
+import { UserDto, VerifyOtpDto } from "../../core/dto/users/user.update.dto";
 import {
   ClientUserDto,
   StaffUserDto,
@@ -131,6 +131,20 @@ export class AuthController {
       return this.authService.getNewAccessAndRefreshToken(result.userId);
     } else {
       return null;
+    }
+  }
+
+  @Post("/verifyOtp")
+  public async verifyOtp(@Body() dto: VerifyOtpDto) {
+    const res: CustomResponse = {};
+    try {
+      res.data = await this.authService.verifyOtp(dto.userId, dto.otp);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
     }
   }
 }

@@ -20,6 +20,7 @@ import {
   hash,
   getAge,
   isStaffRegistrationApproved,
+  generateOtp,
 } from "../common/utils/utils";
 import { Users } from "../shared/entities/Users";
 import { Gender } from "../shared/entities/Gender";
@@ -41,11 +42,13 @@ import { unlinkSync, writeFile } from "fs";
 import { Files } from "src/shared/entities/Files";
 import { extname, join } from "path";
 import { v4 as uuid } from "uuid";
+import { TxtboxService } from "./txtbox.service";
 
 @Injectable()
 export class UsersService {
   constructor(
     private firebaseProvoder: FirebaseProvider,
+    private txtboxService: TxtboxService,
     @InjectRepository(Users) private readonly userRepo: Repository<Users>
   ) {}
 
@@ -290,6 +293,18 @@ export class UsersService {
     return this._sanitizeUser(result.user);
   }
 
+  async findByOtp(userId: string, otp: string) {
+    const result = await this.findOne(
+      { userId, otp },
+      false,
+      this.userRepo.manager
+    );
+    if (result === (null || undefined)) return null;
+    delete result.user.otp;
+    return this._sanitizeUser(result.user);
+  }
+
+
   async findByLogin(username, password) {
     const result = await this.findOne(
       { username },
@@ -311,7 +326,7 @@ export class UsersService {
 
   async findByLoginCLient(username, password) {
     const result = await this.findOne(
-      { username, userType: { userTypeId: 2 } },
+      { username, userType: { userTypeId: 2 }},
       false,
       this.userRepo.manager
     );
@@ -319,7 +334,7 @@ export class UsersService {
       throw new HttpException("Username not found", HttpStatus.NOT_FOUND);
     }
     if (!result.user.enable) {
-      throw new HttpException("Yout account has been disabled", HttpStatus.OK);
+      throw new HttpException("Your account has been disabled", HttpStatus.OK);
     }
     const areEqual = await compare(result.user.password, password);
     if (!areEqual) {
@@ -344,6 +359,9 @@ export class UsersService {
       user.role.roleId = RoleEnum.GUEST.toString();
       user.entityStatus = new EntityStatus();
       user.entityStatus.entityStatusId = "1";
+      const otp = generateOtp();
+      user.otp = otp;
+      user.isVerified = false;
       user = await entityManager.save(Users, user);
       let client = new Clients();
       client.user = user;
@@ -358,7 +376,9 @@ export class UsersService {
       client.gender = new Gender();
       client.gender.genderId = userDto.genderId;
       client = await entityManager.save(Clients, client);
+      delete user.otp;
       client.user = await this._sanitizeUser(user);
+      await this.txtboxService.sendOTP(client.mobileNumber, otp);
       return client;
     });
   }
@@ -380,6 +400,8 @@ export class UsersService {
       user.role = new Roles();
       user.role.roleId = RoleEnum.GUEST.toString();
       user.entityStatus.entityStatusId = "1";
+      user.otp = generateOtp();
+      user.isVerified = true;
       user = await entityManager.save(Users, user);
       let staff = new Staff();
       staff.user = user;
@@ -415,6 +437,8 @@ export class UsersService {
       user.role.roleId = RoleEnum.GUEST.toString();
       user.entityStatus.entityStatusId = "1";
       user.isAdminApproved = true;
+      user.otp = generateOtp();
+      user.isVerified = true;
       user = await entityManager.save(Users, user);
       let client = new Clients();
       client.user = user;
@@ -469,6 +493,8 @@ export class UsersService {
       user.role.roleId = userDto.roleId;
       user.entityStatus.entityStatusId = "1";
       user.isAdminApproved = true;
+      user.otp = generateOtp();
+      user.isVerified = true;
       user = await entityManager.save(Users, user);
       let staff = new Staff();
       staff.user = user;
@@ -782,6 +808,14 @@ export class UsersService {
     });
 
     return await this.findOne({ userId }, true, this.userRepo.manager);
+  }
+
+  async verifyUser(userId: string) {
+    await this.userRepo.update(userId, {
+      isVerified: true,
+    });
+
+    return await this.findById(userId);
   }
 
   private _sanitizeUser(user: Users) {

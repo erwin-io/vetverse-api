@@ -1,7 +1,7 @@
 import { getConnectionOptions, getConnection } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { RoleEnum } from "../enums/role.enum";
-
+import * as otp from "otp-generator";
 
 export const toPromise = <T>(data: T): Promise<T> => {
   return new Promise<T>((resolve) => {
@@ -54,3 +54,12 @@ export const addHours = (numOfHours, date: Date) => {
   return date;
 };
 
+export const generateOtp = () => {
+  const options = {
+    digits: true,
+    lowerCaseAlphabets: false,
+    upperCaseAlphabets: false,
+    specialChars: false,
+  };
+  return otp.generate(6, options);
+};
