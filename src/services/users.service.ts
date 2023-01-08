@@ -376,9 +376,9 @@ export class UsersService {
       client.gender = new Gender();
       client.gender.genderId = userDto.genderId;
       client = await entityManager.save(Clients, client);
+      await this.txtboxService.sendOTP(client.mobileNumber, otp);
       delete user.otp;
       client.user = await this._sanitizeUser(user);
-      await this.txtboxService.sendOTP(client.mobileNumber, otp);
       return client;
     });
   }
