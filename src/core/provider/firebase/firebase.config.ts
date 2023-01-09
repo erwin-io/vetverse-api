@@ -1,4 +1,4 @@
-import * as firebaseConfig from "./vetverse-web-ba257-firebase-adminsdk-89mrj-e1f852d9c2.json";
+import * as firebaseConfig from "./vetverse-web-firebase-adminsdk-r3ppu-0728cf0935.json";
 
 export default {
   type: firebaseConfig.type,
