@@ -5,6 +5,7 @@ import { Appointment } from "src/shared/entities/Appointment";
 import { Payment } from "src/shared/entities/Payment";
 import { Repository } from "typeorm";
 import * as moment from "moment";
+import { Notifications } from "src/shared/entities/Notifications";
 
 @Injectable()
 export class DashboardService {
@@ -222,5 +223,60 @@ export class DashboardService {
     } catch (e) {
       throw e;
     }
+  }
+
+  async getClientUpcomingAppointment(clientId: string) {
+    const query = await this.appointmentRepo.manager
+      .createQueryBuilder("Appointment", "a")
+      .leftJoinAndSelect("a.staff", "s")
+      .leftJoinAndSelect("a.serviceType", "st")
+      .leftJoinAndSelect("a.consultaionType", "ct")
+      .leftJoinAndSelect("a.appointmentStatus", "as")
+      .leftJoinAndSelect("a.payments", "ap")
+      .leftJoinAndSelect("a.clientAppointment", "ca")
+      .leftJoinAndSelect("ca.client", "cl")
+      .where("cl.clientId = :clientId", { clientId })
+      .andWhere("as.appointmentStatusId = :appointmentStatusId", {
+        appointmentStatusId: 2,
+      })
+      .orderBy("a.appointmentDate", "ASC")
+      .addOrderBy("a.timeStart", "ASC");
+
+    const appointment: any = await query.getOne();
+    return {
+      appointment: new AppointmentViewModel(appointment),
+      total: await query.getCount()
+    };
+  }
+
+  async getClientLatestAppointmentNotif(clientId: string) {
+    const query = await this.appointmentRepo.manager
+      .createQueryBuilder("Notifications", "n")
+      .leftJoinAndSelect("n.appointment", "a")
+      .leftJoinAndSelect("a.staff", "s")
+      .leftJoinAndSelect("a.serviceType", "st")
+      .leftJoinAndSelect("a.consultaionType", "ct")
+      .leftJoinAndSelect("a.appointmentStatus", "as")
+      .leftJoinAndSelect("a.payments", "ap")
+      .leftJoinAndSelect("a.clientAppointment", "ca")
+      .leftJoinAndSelect("n.client", "cl")
+      .where("cl.clientId = :clientId", { clientId })
+      .andWhere("n.isRead = :isRead", { isRead: false })
+      .andWhere("n.isReminder = :isReminder", { isReminder: false })
+      .orderBy("n.notificationId", "DESC")
+      .getOne();
+    return <Notifications>query;
+  }
+
+  async getClientLatestAnnouncements(clientId: string) {
+    const query = await this.appointmentRepo.manager
+      .createQueryBuilder("Notifications", "n")
+      .leftJoinAndSelect("n.client", "cl")
+      .where("cl.clientId = :clientId", { clientId })
+      .andWhere("n.isRead = :isRead", { isRead: false })
+      .andWhere("n.isReminder = :isReminder", { isReminder: true })
+      .orderBy("n.notificationId", "DESC")
+      .getOne();
+    return <Notifications>query;
   }
 }

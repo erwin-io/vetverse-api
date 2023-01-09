@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Query, UseGuards } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 import { CustomResponse } from "src/common/helper/customresponse.helpers";
 import { JwtAuthGuard } from "src/core/auth/jwt.auth.guard";
@@ -85,6 +85,60 @@ export class DashboardController {
     const res: CustomResponse = {};
     try {
       res.data = await this.dashboardServiceService.getYearlyRevenueGraph(year);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Get("getClientUpcomingAppointment/:clientId")
+  //@UseGuards(JwtAuthGuard)
+  async getClientUpcomingAppointment(@Param("clientId") clientId: string) {
+    const res: CustomResponse = {};
+    try {
+      res.data =
+        await this.dashboardServiceService.getClientUpcomingAppointment(
+          clientId
+        );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Get("getClientLatestAppointmentNotif/:clientId")
+  //@UseGuards(JwtAuthGuard)
+  async getClientLatestAppointmentNotif(@Param("clientId") clientId: string) {
+    const res: CustomResponse = {};
+    try {
+      res.data =
+        await this.dashboardServiceService.getClientLatestAppointmentNotif(
+          clientId
+        );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Get("getClientLatestAnnouncements/:clientId")
+  //@UseGuards(JwtAuthGuard)
+  async getClientLatestAnnouncements(@Param("clientId") clientId: string) {
+    const res: CustomResponse = {};
+    try {
+      res.data =
+        await this.dashboardServiceService.getClientLatestAnnouncements(
+          clientId
+        );
       res.success = true;
       return res;
     } catch (e) {
