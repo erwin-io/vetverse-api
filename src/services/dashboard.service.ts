@@ -239,8 +239,8 @@ export class DashboardService {
       .andWhere("as.appointmentStatusId = :appointmentStatusId", {
         appointmentStatusId: 2,
       })
-      .andWhere("a.appointmentDate < :date", {
-        date: new Date(moment(`${date} 23:59`).format("YYYY-MM-DD HH:mm")),
+      .andWhere("a.appointmentDate >= :date", {
+        date: new Date(moment(`${date} 00:00`).format("YYYY-MM-DD HH:mm")),
       })
       .orderBy("a.appointmentDate", "ASC")
       .addOrderBy("a.timeStart", "ASC");
