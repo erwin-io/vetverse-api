@@ -225,7 +225,7 @@ export class DashboardService {
     }
   }
 
-  async getClientUpcomingAppointment(clientId: string) {
+  async getClientUpcomingAppointment(clientId: string, date: string) {
     const query = await this.appointmentRepo.manager
       .createQueryBuilder("Appointment", "a")
       .leftJoinAndSelect("a.staff", "s")
@@ -239,13 +239,16 @@ export class DashboardService {
       .andWhere("as.appointmentStatusId = :appointmentStatusId", {
         appointmentStatusId: 2,
       })
+      .andWhere("a.appointmentDate < :date", {
+        date: new Date(moment(`${date} 23:59`).format("YYYY-MM-DD HH:mm")),
+      })
       .orderBy("a.appointmentDate", "ASC")
       .addOrderBy("a.timeStart", "ASC");
 
     const appointment: any = await query.getOne();
     return {
-      appointment: new AppointmentViewModel(appointment),
-      total: await query.getCount()
+      appointment: appointment ? new AppointmentViewModel(appointment) : null,
+      total: await query.getCount(),
     };
   }
 

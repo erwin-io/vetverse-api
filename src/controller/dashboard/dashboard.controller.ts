@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Query, UseGuards } from "@nestjs/common";
-import { ApiTags, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+import { ApiTags, ApiBearerAuth, ApiQuery, ApiParam } from "@nestjs/swagger";
+import * as moment from "moment";
 import { CustomResponse } from "src/common/helper/customresponse.helpers";
 import { JwtAuthGuard } from "src/core/auth/jwt.auth.guard";
 import { AppointmentService } from "src/services/appointment.service";
@@ -94,14 +95,20 @@ export class DashboardController {
     }
   }
 
-  @Get("getClientUpcomingAppointment/:clientId")
+  @Get("getClientUpcomingAppointment")
   //@UseGuards(JwtAuthGuard)
-  async getClientUpcomingAppointment(@Param("clientId") clientId: string) {
+  @ApiQuery({ name: "clientId", required: true })
+  @ApiQuery({ name: "date", required: false })
+  async getClientUpcomingAppointment(
+    @Query("clientId") clientId,
+    @Query("date") date = new Date()
+  ) {
     const res: CustomResponse = {};
     try {
       res.data =
         await this.dashboardServiceService.getClientUpcomingAppointment(
-          clientId
+          clientId,
+          moment(date).format("YYYY-MM-DD")
         );
       res.success = true;
       return res;
