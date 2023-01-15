@@ -344,12 +344,19 @@ export class UsersService {
   }
 
   async registerClientUser(userDto: ClientUserDto) {
-    const { username } = userDto;
+    const { username, mobileNumber } = userDto;
     return await this.userRepo.manager.transaction(async (entityManager) => {
       const userInDb = await this.findOne({ username }, false, entityManager);
       if (userInDb) {
         throw new HttpException("Username already exist", HttpStatus.CONFLICT);
       }
+
+      const numberInDb = await entityManager.findOne(Clients, {where : {mobileNumber}});
+      if (numberInDb) {
+        throw new HttpException("Mobile number already exists", HttpStatus.CONFLICT);
+      }
+      
+      
       let user = new Users();
       user.username = userDto.username;
       user.password = await hash(userDto.password);
