@@ -1,4 +1,5 @@
 import { Column, Entity, Index, OneToMany } from "typeorm";
+import { ClientReminders } from "./ClientReminders";
 import { Notifications } from "./Notifications";
 import { Reminder } from "./Reminder";
 import { Users } from "./Users";
@@ -11,6 +12,12 @@ export class EntityStatus {
 
   @Column("nvarchar", { name: "Name", length: 100 })
   name: string;
+
+  @OneToMany(
+    () => ClientReminders,
+    (clientReminders) => clientReminders.entityStatus
+  )
+  clientReminders: ClientReminders[];
 
   @OneToMany(() => Notifications, (notifications) => notifications.entityStatus)
   notifications: Notifications[];

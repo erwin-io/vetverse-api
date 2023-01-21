@@ -6,6 +6,7 @@ import { Payment } from "src/shared/entities/Payment";
 import { Repository } from "typeorm";
 import * as moment from "moment";
 import { Notifications } from "src/shared/entities/Notifications";
+import { NotificationTypeEnum } from "src/common/enums/notifications-type.enum";
 
 @Injectable()
 export class DashboardService {
@@ -265,7 +266,9 @@ export class DashboardService {
       .leftJoinAndSelect("n.client", "cl")
       .where("cl.clientId = :clientId", { clientId })
       .andWhere("n.isRead = :isRead", { isRead: false })
-      .andWhere("n.isReminder = :isReminder", { isReminder: false })
+      .andWhere("n.notificationTypeId = :notificationTypeId", {
+        notificationTypeId: NotificationTypeEnum.APPOINTMENT.toString(),
+      })
       .orderBy("n.notificationId", "DESC")
       .getOne();
     return <Notifications>query;
@@ -277,7 +280,9 @@ export class DashboardService {
       .leftJoinAndSelect("n.client", "cl")
       .where("cl.clientId = :clientId", { clientId })
       .andWhere("n.isRead = :isRead", { isRead: false })
-      .andWhere("n.isReminder = :isReminder", { isReminder: true })
+      .andWhere("n.notificationTypeId = :notificationTypeId", {
+        notificationTypeId: NotificationTypeEnum.ANNOUNCEMENTS.toString(),
+      })
       .orderBy("n.notificationId", "DESC")
       .getOne();
     return <Notifications>query;

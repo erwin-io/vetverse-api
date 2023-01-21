@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { ClientAppointment } from "./ClientAppointment";
+import { ClientReminders } from "./ClientReminders";
 import { Gender } from "./Gender";
 import { Users } from "./Users";
 import { Notifications } from "./Notifications";
@@ -54,6 +55,9 @@ export class Clients {
     (clientAppointment) => clientAppointment.client
   )
   clientAppointments: ClientAppointment[];
+
+  @OneToMany(() => ClientReminders, (clientReminders) => clientReminders.client)
+  clientReminders: ClientReminders[];
 
   @ManyToOne(() => Gender, (gender) => gender.clients)
   @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])

@@ -7,6 +7,7 @@ import { Appointment } from "src/shared/entities/Appointment";
 import { Clients } from "src/shared/entities/Clients";
 import { EntityStatus } from "src/shared/entities/EntityStatus";
 import { ClientAppointment } from "src/shared/entities/ClientAppointment";
+import { NotificationTypeEnum } from "src/common/enums/notifications-type.enum";
 
 @Injectable()
 export class NotificationService {
@@ -28,16 +29,6 @@ export class NotificationService {
     return paginate<Notifications>(queryBuilder, options);
   }
 
-  // async addMultiple(
-  //   batch: {
-  //     appointmentId: string;
-  //     date: Date;
-  //     clientId: string;
-  //     title: string;
-  //     description: string;
-  //     isReminder?: boolean;
-  //   }[]
-  // )
   async addAppointmentNotification(
     dto: {
       appointment: Appointment;
@@ -94,7 +85,8 @@ export class NotificationService {
             notification.title = dto.title;
             notification.description = dto.description;
             notification.isRead = false;
-            notification.isReminder = true;
+            notification.notificationTypeId =
+              NotificationTypeEnum.ANNOUNCEMENTS.toString();
             return notification;
           });
 
