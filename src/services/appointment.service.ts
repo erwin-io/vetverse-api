@@ -51,6 +51,7 @@ import { Files } from "src/shared/entities/Files";
 import { v4 as uuid } from "uuid";
 import { extname } from "path";
 import { DiagnosisAttachments } from "src/shared/entities/DiagnosisAttachments";
+import { NotificationTypeEnum } from "src/common/enums/notifications-type.enum";
 
 @Injectable()
 export class AppointmentService {
@@ -832,6 +833,7 @@ export class AppointmentService {
           appointment = await entityManager.save(Appointment, appointment);
           if (!appointment.isWalkIn) {
             let notif = new Notifications();
+            notif.notificationTypeId = NotificationTypeEnum.APPOINTMENT.toString();
             notif.appointment = appointment;
             notif.client = await entityManager.findOne(Clients, {
               where: { clientId: clientAppointment.client.clientId },
@@ -1020,6 +1022,7 @@ export class AppointmentService {
           appointment = await entityManager.save(Appointment, appointment);
           if (!appointment.isWalkIn) {
             let notif = new Notifications();
+            notif.notificationTypeId = NotificationTypeEnum.APPOINTMENT.toString();
             notif.appointment = appointment;
             notif.date = new Date();
             notif.client = await entityManager.findOne(Clients, {
@@ -1187,6 +1190,7 @@ export class AppointmentService {
           appointment = await entityManager.save(Appointment, appointment);
           if (!appointment.isWalkIn) {
             let notif = new Notifications();
+            notif.notificationTypeId = NotificationTypeEnum.APPOINTMENT.toString();
             notif.appointment = appointment;
             notif.client = await entityManager.findOne(Clients, {
               where: { clientId: clientAppointment.client.clientId },

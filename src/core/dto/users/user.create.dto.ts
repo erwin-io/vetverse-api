@@ -93,6 +93,10 @@ export class ClientUserDto extends CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
   genderId: string;
+
+  @ApiProperty()
+  @IsOptional()
+  sendOtp: boolean;
 }
 
 export class CreateClientPetDto {

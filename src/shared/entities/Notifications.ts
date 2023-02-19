@@ -6,9 +6,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { EntityStatus } from "./EntityStatus";
 import { Appointment } from "./Appointment";
 import { Clients } from "./Clients";
-import { EntityStatus } from "./EntityStatus";
 
 @Index("PK_Notifications", ["notificationId"], { unique: true })
 @Entity("Notifications", { schema: "dbo" })
@@ -25,11 +25,17 @@ export class Notifications {
   @Column("nvarchar", { name: "Description" })
   description: string;
 
-  @Column("bit", { name: "IsReminder", default: () => "(0)" })
-  isReminder: boolean;
+  @Column("bigint", { name: "NotificationTypeId" })
+  notificationTypeId: string;
 
   @Column("bit", { name: "IsRead", default: () => "(0)" })
   isRead: boolean;
+
+  @ManyToOne(() => EntityStatus, (entityStatus) => entityStatus.notifications)
+  @JoinColumn([
+    { name: "EntityStatusId", referencedColumnName: "entityStatusId" },
+  ])
+  entityStatus: EntityStatus;
 
   @ManyToOne(() => Appointment, (appointment) => appointment.notifications)
   @JoinColumn([
@@ -40,10 +46,4 @@ export class Notifications {
   @ManyToOne(() => Clients, (clients) => clients.notifications)
   @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
   client: Clients;
-
-  @ManyToOne(() => EntityStatus, (entityStatus) => entityStatus.notifications)
-  @JoinColumn([
-    { name: "EntityStatusId", referencedColumnName: "entityStatusId" },
-  ])
-  entityStatus: EntityStatus;
 }

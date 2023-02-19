@@ -1,0 +1,33 @@
+// Online Javascript Editor for free
+// Write, Edit and Run your Javascript code using JS Online Compiler
+function addMonths(date, amount) {
+    const endDate = new Date(date.getTime());
+    const originalTimeZoneOffset = endDate.getTimezoneOffset();
+    endDate.setMonth(endDate.getMonth() + amount);
+    while (monthDiff(date, endDate) > amount) {
+        endDate.setDate(endDate.getDate() - 1);
+    }
+    const endTimeZoneOffset = endDate.getTimezoneOffset();
+    const diff = endTimeZoneOffset - originalTimeZoneOffset;
+    const finalDate = diff ? endDate.setMinutes(endDate.getMinutes() - diff) : endDate;
+    return new Date(finalDate);
+}
+function monthDiff(from, to) {
+    const years = to.getFullYear() - from.getFullYear();
+    const months = to.getMonth() - from.getMonth();
+    return 12 * years + months;
+}
+
+var days = 28;
+var getNumOfMonth = days >= 31 ? days / 31 : 0;
+
+var month = (getNumOfMonth.toString().split(".").length > 1 ? Number(getNumOfMonth.toString().split(".")[0]) : getNumOfMonth);
+
+
+var daysDiff = days - (month * 31);
+
+
+
+var dateResult = addMonths(new Date(2023,00,28),month);
+var nextDate = dateResult.setDate(dateResult.getDate()+daysDiff);
+console.log(new Date(nextDate));
