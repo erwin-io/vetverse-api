@@ -17,12 +17,12 @@ import { ServiceTypeService } from "../../services/service-type.service";
 
 @ApiTags("service-type")
 @Controller("service-type")
-@ApiBearerAuth()
+@ApiBearerAuth("jwt")
 export class ServiceTypeController {
   constructor(private readonly serviceTypService: ServiceTypeService) {}
 
   @Get()
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async findAll() {
     const res: CustomResponse = {};
     try {
@@ -37,7 +37,7 @@ export class ServiceTypeController {
   }
 
   @Get(":serviceTypeId")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param("serviceTypeId") serviceTypeId: string) {
     const res: CustomResponse = {};
     try {
@@ -52,7 +52,7 @@ export class ServiceTypeController {
   }
 
   @Post("")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async add(@Body() createServiceTypeDto: CreateServiceTypeDto) {
     const res: CustomResponse = {};
     try {
@@ -68,7 +68,7 @@ export class ServiceTypeController {
   }
 
   @Put("")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async update(@Body() roleDto: ServiceTypeDto) {
     const res: CustomResponse = {};
     try {
@@ -84,7 +84,7 @@ export class ServiceTypeController {
   }
 
   @Delete(":serviceTypeId")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async delete(@Param("serviceTypeId") serviceTypeId: string) {
     const res: CustomResponse = {};
     try {

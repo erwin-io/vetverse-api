@@ -17,12 +17,12 @@ import { PetTypeService } from "src/services/pet-type.service";
 
 @ApiTags("pet-type")
 @Controller("pet-type")
-@ApiBearerAuth()
+@ApiBearerAuth("jwt")
 export class PetTypeController {
   constructor(private readonly petTypeService: PetTypeService) {}
 
   @Get()
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async findAll() {
     const res: CustomResponse = {};
     try {
@@ -37,7 +37,7 @@ export class PetTypeController {
   }
 
   @Get(":petTypeId")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async findOne(@Param("petTypeId") petTypeId: string) {
     const res: CustomResponse = {};
     try {
@@ -52,7 +52,7 @@ export class PetTypeController {
   }
 
   @Post("")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async add(@Body() createPetTypeDto: CreatePetTypeDto) {
     const res: CustomResponse = {};
     try {
@@ -68,7 +68,7 @@ export class PetTypeController {
   }
 
   @Put("")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async update(@Body() roleDto: PetTypeDto) {
     const res: CustomResponse = {};
     try {
@@ -84,7 +84,7 @@ export class PetTypeController {
   }
 
   @Delete(":petTypeId")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async delete(@Param("petTypeId") petTypeId: string) {
     const res: CustomResponse = {};
     try {

@@ -598,8 +598,6 @@ export class UsersService {
           );
           const img = Buffer.from(dto.userProfilePic.data, "base64");
           return await bucketFile.save(img).then(async (res) => {
-            console.log("res");
-            console.log(res);
             const url = await bucketFile.getSignedUrl({
               action: "read",
               expires: "03-09-2500",
