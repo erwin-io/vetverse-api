@@ -8,14 +8,14 @@ import { DashboardService } from "src/services/dashboard.service";
 
 @Controller("dashboard")
 @ApiTags("dashboard")
-@ApiBearerAuth()
+@ApiBearerAuth("jwt")
 export class DashboardController {
   constructor(private readonly dashboardServiceService: DashboardService) {}
 
   @Get("getVetAppointmentSummary")
   @ApiQuery({ name: "staffId", required: false })
   @ApiQuery({ name: "year", required: false })
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getVetAppointmentSummary(
     @Query("staffId") staffId = "",
     @Query("year") year = new Date().getFullYear()
@@ -40,7 +40,7 @@ export class DashboardController {
   @ApiQuery({ name: "staffId", required: false })
   @ApiQuery({ name: "appointmentStatusId", required: false })
   @ApiQuery({ name: "year", required: false })
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getVetYearlyClosedAppointmentGraph(
     @Query("staffId") staffId = "",
     @Query("appointmentStatusId") appointmentStatusId = "",
@@ -65,7 +65,7 @@ export class DashboardController {
 
   @Get("getYearlyRevenue")
   @ApiQuery({ name: "year", required: false })
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getYearlyRevenue(@Query("year") year = new Date().getFullYear()) {
     const res: CustomResponse = {};
     try {
@@ -81,7 +81,7 @@ export class DashboardController {
 
   @Get("getYearlyRevenueGraph")
   @ApiQuery({ name: "year", required: false })
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getYearlyRevenueGraph(@Query("year") year = new Date().getFullYear()) {
     const res: CustomResponse = {};
     try {
@@ -96,7 +96,7 @@ export class DashboardController {
   }
 
   @Get("getClientUpcomingAppointment")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiQuery({ name: "clientId", required: true })
   @ApiQuery({ name: "date", required: false })
   async getClientUpcomingAppointment(
@@ -120,7 +120,7 @@ export class DashboardController {
   }
 
   @Get("getClientLatestAppointmentNotif/:clientId")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getClientLatestAppointmentNotif(@Param("clientId") clientId: string) {
     const res: CustomResponse = {};
     try {
@@ -138,7 +138,7 @@ export class DashboardController {
   }
 
   @Get("getClientLatestAnnouncements/:clientId")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getClientLatestAnnouncements(@Param("clientId") clientId: string) {
     const res: CustomResponse = {};
     try {

@@ -12,10 +12,13 @@ async function bootstrap() {
   const config: ConfigService = app.get(ConfigService);
   const port: number = config.get<number>("PORT");
   const options = new DocumentBuilder()
-    .addBearerAuth()
     .setTitle("vetverse-api")
     .setDescription("A documentation for vetverse-api")
     .setVersion("1.0")
+    .addBearerAuth(
+      { type: "http", scheme: "bearer", bearerFormat: "JWT", in: "header" },
+      "jwt"
+    )
     .build();
   app.use(bodyParser.json({ limit: "50mb" }));
   app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));

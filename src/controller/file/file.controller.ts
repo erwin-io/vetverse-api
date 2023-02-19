@@ -38,7 +38,7 @@ export class FileDto {
 }
 @ApiTags("file")
 @Controller("file")
-@ApiBearerAuth()
+@ApiBearerAuth("jwt")
 export class FileController {
   constructor(private firebaseProvoder: FirebaseProvider) {}
   @Get(":fileName")
